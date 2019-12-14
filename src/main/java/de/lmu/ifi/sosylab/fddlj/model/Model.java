@@ -7,8 +7,8 @@ import java.beans.PropertyChangeListener;
  * The main interface of the reversi model. It provides all necessary methods for accessing and
  * manipulating the data such that a game can be played successfully.
  *
- * <p>When something changes in the model, the model notifies its observers by firing a {@link
- * PropertyChangeEvent change-event}.
+ * <p>When something changes in the model, the model notifies its observers by firing a
+ * {@link PropertyChangeEvent change-event}.
  *
  * @author Leonard Ganz, Josef Feger
  */
@@ -24,7 +24,7 @@ public interface Model {
    * @param cell the location on the game field on which to place the disk
    * @return {@code true} if the placement was successful, {@code false} otherwise
    */
-  public boolean placeDisk(Disk disk, Cell cell);
+  boolean placeDisk(Disk disk, Cell cell);
 
   /**
    * Add a {@link PropertyChangeListener} to the model that will be notified about the changes made

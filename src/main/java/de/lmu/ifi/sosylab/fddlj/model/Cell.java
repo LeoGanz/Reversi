@@ -13,12 +13,12 @@ public interface Cell extends Comparable<Cell> {
    *
    * @return the column of this cell, as integer value
    */
-  public int getColumn();
+  int getColumn();
 
   /**
    * Get the row of this cell as integer index, starting from 0.
    *
    * @return the row of this cell, as integer value
    */
-  public int getRow();
+  int getRow();
 }
