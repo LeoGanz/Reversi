@@ -2,6 +2,7 @@ package de.lmu.ifi.sosylab.fddlj.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Set;
 
 /**
  * The main interface of the reversi model. It provides all necessary methods for accessing and
@@ -25,6 +26,15 @@ public interface Model {
    * @return {@code true} if the placement was successful, {@code false} otherwise
    */
   boolean placeDisk(Disk disk, Cell cell);
+
+  /**
+   * Computes all possible moves for a selected cell. Reversi rules apply.
+   *
+   * @param cell the {@link Cell cell} that the {@link Disk disk} is currently positioned
+   * @return a set of cells with all possible moves for the selected disk, {@link Set#of() empty
+   *     set} if selected cell contains no disk
+   */
+  Set<Cell> getPossibleMovesForDisk(Cell cell);
 
   /**
    * Add a {@link PropertyChangeListener} to the model that will be notified about the changes made
