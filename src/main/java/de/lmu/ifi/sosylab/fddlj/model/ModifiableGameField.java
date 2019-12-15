@@ -1,5 +1,12 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
+/**
+ * A {@link GameField} whose board can be modified. A ModifiableGameField can only be used inside of
+ * its containing package to ensure it cannot be manipulated outside of the classes that make up the
+ * game's model.
+ *
+ * @author Leonard Ganz
+ */
 interface ModifiableGameField extends GameField {
 
   /**

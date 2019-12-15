@@ -1,7 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
 import java.io.Serializable;
-import java.util.Optional;
 
 /**
  * Implementation of a data structure class that contains all necessary attributes in order to
@@ -26,20 +25,12 @@ public interface GameState extends Serializable {
   GameField getField();
 
   /**
-   * Return the player that is currently allowed to make a move.
+   * Returns the {@link PlayerManagement} that stores information about the players that are
+   * involved in the current game.
    *
-   * @return the current player
+   * @return the current player management
    */
-  Player getCurrentPlayer();
-
-  /**
-   * Return the winner of the current game. This method may only be called if the current game is
-   * finished.
-   *
-   * @return {@link Optional#empty()} if the game is a draw. Otherwise an optional that contains the
-   *     winner
-   */
-  Optional<Player> getWinner();
+  PlayerManagement getPlayerManagement();
 
   /**
    * Returns a deep copy of the {@link GameState} this method is called for.
