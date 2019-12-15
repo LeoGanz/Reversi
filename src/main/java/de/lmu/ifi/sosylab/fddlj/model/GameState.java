@@ -42,10 +42,9 @@ public interface GameState extends Serializable {
   Optional<Player> getWinner();
 
   /**
-   * Returns a deep copy of the specified {@link GameState game state}.
+   * Returns a deep copy of the {@link GameState} this method is called for.
    *
-   * @return a deep copy of the given game state
+   * @return a deep copy of the game state
    */
-  GameState makeCopy(GameState gameState);
-
+  GameState makeCopy();
 }

@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * A game field represents the game field object in which the game stores the information about
  * which disks are on the different @{link Cell cells} on the game field.
- * 
+ *
  * @author Josef Feger, Leonard Ganz
  *
  */
@@ -32,7 +32,7 @@ public interface GameField extends Serializable {
 
   /**
    * Collect the {@link Cell cells} the specified {@link Player player} has a {@link Disk disk} on.
-   * 
+   *
    * @param player the player whose disks shall be retrieved
    * @return a set with the cells the specified player has a disk on
    */
@@ -58,10 +58,9 @@ public interface GameField extends Serializable {
   boolean isWithinBounds(Cell cell);
 
   /**
-   * Returns a deep copy of the specified {@link GameField game field}.
-   * 
-   * @return a deep copy of the given game field
+   * Returns a deep copy of the {@link GameField} this method is called for.
+   *
+   * @return a deep copy of the game field
    */
-  GameField makeCopy(GameField gameField);
-
+  GameField makeCopy();
 }
