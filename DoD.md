@@ -1,0 +1,7 @@
+ - Unit tests passed
+ - Code reviewed
+ - Acceptance criteria met
+ - Offers game modes single, hotseat and multiplayer
+ - Non-Functional requirements met
+ - Offers a rich and simple to use GUI
+ - JavaDoc comments were used where necessary
