@@ -39,16 +39,6 @@ public interface GameField extends Serializable {
   Set<Cell> getAllCellsForPlayer(Player player);
 
   /**
-   * Set a disk on the given {@link Cell cell}. Any {@link Disk disk} already on that cell will be
-   * overridden.
-   *
-   * @param cell cell to set disk on
-   * @param newValue new value (disk) to set on the cell
-   * @throws IllegalArgumentException if given cell is out of field bounds
-   */
-  void set(Cell cell, Disk newValue);
-
-  /**
    * Checks a {@link Cell cell} whether it is occupied by a disk and in case of success, whether it
    * belongs to the respective {@link Player player}.
    *
