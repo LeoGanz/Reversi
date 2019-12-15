@@ -28,11 +28,15 @@ public interface Model {
   boolean placeDisk(Disk disk, Cell cell);
 
   /**
-   * Computes all possible moves for the selected player. A move is the placement of a disk. Reversi
-   * rules apply.
+   * Computes all possible moves on the current game board for the selected player. A move is the
+   * placement of a disk. Reversi rules apply.
    *
    * @param player the {@link Player player} whose moves shall be computed
    * @return a set of cells with all possible moves for the specified player
+   * @throws IllegalArgumentException if player is not equal to {@link
+   *     PlayerManagement#getPlayerOne() player one} or {@link PlayerManagement#getPlayerTwo()
+   *     player two} which can be accessed via the {@link PlayerManagement} of the game's {@link
+   *     #getState() state}
    */
   Set<Cell> getPossibleMovesForPlayer(Player player);
 
