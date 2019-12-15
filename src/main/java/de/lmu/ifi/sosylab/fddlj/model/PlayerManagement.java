@@ -40,3 +40,4 @@ public interface PlayerManagement {
    */
   Optional<Player> getWinner();
 }
+
