@@ -1,7 +1,11 @@
  - Unit tests passed
  - Code reviewed
  - Acceptance criteria met
+     - Project passes SpotBugs
+     - Project passes CheckStyle
  - Offers game modes single, hotseat and multiplayer
  - Non-Functional requirements met
+     - Project provides a read me file
+     - Project offers a changelog
  - Offers a rich and simple to use GUI
- - JavaDoc comments were used where necessary
+ - JavaDoc comments were used on all public methods and types
