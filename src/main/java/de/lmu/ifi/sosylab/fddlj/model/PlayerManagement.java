@@ -15,14 +15,14 @@ public interface PlayerManagement {
    *
    * @return a reference to player one
    */
-  Player getPlayeOne();
+  Player getPlayerOne();
 
   /**
    * Get the second {@link Player} playing the game.
    *
    * @return a reference to player two
    */
-  Player getPlayeTwo();
+  Player getPlayerTwo();
 
   /**
    * Return the player that is currently allowed to make a move.

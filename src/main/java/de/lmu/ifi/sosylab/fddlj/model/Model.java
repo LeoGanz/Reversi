@@ -28,13 +28,13 @@ public interface Model {
   boolean placeDisk(Disk disk, Cell cell);
 
   /**
-   * Computes all possible moves for a selected cell. Reversi rules apply.
+   * Computes all possible moves for the selected player. A move is the placement of a disk. Reversi
+   * rules apply.
    *
-   * @param cell the {@link Cell cell} that the {@link Disk disk} is currently positioned
-   * @return a set of cells with all possible moves for the selected disk, {@link Set#of() empty
-   *     set} if selected cell contains no disk
+   * @param player the {@link Player player} whose moves shall be computed
+   * @return a set of cells with all possible moves for the specified player
    */
-  Set<Cell> getPossibleMovesForDisk(Cell cell);
+  Set<Cell> getPossibleMovesForPlayer(Player player);
 
   /**
    * Add a {@link PropertyChangeListener} to the model that will be notified about the changes made
