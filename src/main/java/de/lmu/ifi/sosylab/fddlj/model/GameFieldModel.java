@@ -1,4 +1,103 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
-public class GameFieldModel {
+import java.io.Serializable;
+import java.util.*;
+
+/**
+ * The class GameFieldModel implements GameField and ModifiableGameField. GameFieldModel represents
+ * the game field and stores the information about which disks are on the Cells of the game field.
+ *
+ * @author Dora Pruteanu
+ */
+public class GameFieldModel implements GameField, ModifiableGameField {
+  private static final int SIZE = 8;
+
+  private Disk[][] field = new Disk[SIZE][SIZE];
+
+  /** The constructor GameFieldModel sets the game field to its initial state. */
+  public GameFieldModel() {
+    for (int i = 0; i < SIZE; i++) {
+      for (int j = 0; j < SIZE; j++) {
+        set(new Cell(i, j), null);
+      }
+    }
+  }
+
+  @Override
+  public void set(Cell cell, Disk newValue) {
+    throwErrorWhenOutOfBounds(cell);
+    field[cell.getColumn()][cell.getRow()] = newValue;
+  }
+
+  @Override
+  public Disk remove(Cell cell) {
+    throwErrorWhenOutOfBounds(cell);
+    field[cell.getColumn()][cell.getRow()] = null;
+    return null;
+  }
+
+  @Override
+  public Optional<Disk> get(Cell cell) {
+    throwErrorWhenOutOfBounds(cell);
+    Disk disk = field[cell.getColumn()][cell.getRow()];
+    if (disk != null) {
+      return Optional.of(disk);
+    }
+    return Optional.empty();
+  }
+
+  @Override
+  public Map<Cell, Player> getCellsOccupiedWithDisks() {
+    Map<Cell, Player> map = new HashMap<>();
+    for (int column = 0; column < SIZE; column++) {
+      for (int row = 0; row < SIZE; row++) {
+        if (field[column][row] != null) {
+          map.put(new Cell(column, row), field[column][row].getPlayer());
+        }
+      }
+    }
+    return map;
+  }
+
+  @Override
+  public Set<Cell> getAllCellsForPlayer(Player player) {
+    Set<Cell> set = new HashSet<>();
+    for (int column = 0; column < SIZE; column++) {
+      for (int row = 0; row < SIZE; row++) {
+        if (field[column][row] != null && field[column][row].getPlayer().equals(player)) {
+          set.add(new Cell(column, row));
+        }
+      }
+    }
+    return set;
+  }
+
+  @Override
+  public boolean isCellOfPlayer(Player player, Cell cell) {
+    return field[cell.getColumn()][cell.getRow()].getPlayer() == player;
+  }
+
+  @Override
+  public boolean isWithinBounds(Cell cell) {
+    return cell.getColumn() >= 0
+        && cell.getColumn() < SIZE
+        && cell.getRow() >= 0
+        && cell.getRow() < SIZE;
+  }
+
+  @Override
+  public GameField makeCopy() {
+    return null;
+  }
+
+  /**
+   * The method throwErrorWhenOutOfBounds checks if the given cell is within the game field. If the
+   * cell isn't within the game field an IllegalArgumentException is thrown.
+   */
+  private void throwErrorWhenOutOfBounds(Cell cell) {
+    if (!isWithinBounds(cell)) {
+      throw new IllegalArgumentException(
+          "The coordinates of the cell: " + cell + " are out of bounds");
+    }
+  }
 }
