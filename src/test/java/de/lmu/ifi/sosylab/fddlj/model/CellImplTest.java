@@ -71,7 +71,7 @@ public class CellImplTest {
     Assertions.assertEquals(
         column,
         cell.getColumn(),
-        "GetColumn() returned " + actual + "instead of expected " + column);
+        "GetColumn() returned " + actual + " instead of expected " + column);
   }
 
   private void testRowHelper(int row) {
@@ -79,7 +79,7 @@ public class CellImplTest {
     Cell cell = new CellImpl(column, row);
     int actual = cell.getRow();
     Assertions.assertEquals(
-        row, cell.getRow(), "GetRow() returned " + actual + "instead of expected " + row);
+        row, cell.getRow(), "GetRow() returned " + actual + " instead of expected " + row);
   }
 
   @Test
@@ -193,7 +193,7 @@ public class CellImplTest {
   @Test
   public void testToString_Regular() {
     Assertions.assertEquals(
-        "(5|-12)", new CellImpl(5, -12).toString(), "ToString did not diosplay cell correctly");
+        "(5|-12)", new CellImpl(5, -12).toString(), "ToString did not display cell correctly");
   }
 
   @Test
@@ -201,6 +201,6 @@ public class CellImplTest {
     Assertions.assertEquals(
         "(" + Integer.MIN_VALUE + "|" + Integer.MAX_VALUE + ")",
         new CellImpl(Integer.MIN_VALUE, Integer.MAX_VALUE).toString(),
-        "ToString did not diosplay cell correctly");
+        "ToString did not display cell correctly");
   }
 }
