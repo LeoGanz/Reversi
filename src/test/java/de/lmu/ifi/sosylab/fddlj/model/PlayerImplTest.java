@@ -59,13 +59,13 @@ public class PlayerImplTest {
 
     List<PlayerImpl> expected = new ArrayList<>();
     expected.add(new PlayerImpl(nameMax, colorOne));
-    expected.add(new PlayerImpl(nameMoritz, colorOne));
-    expected.add(new PlayerImpl(namePeter, colorOne));
     expected.add(new PlayerImpl(nameMax, colorTwo));
-    expected.add(new PlayerImpl(nameMoritz, colorTwo));
-    expected.add(new PlayerImpl(namePeter, colorTwo));
     expected.add(new PlayerImpl(nameMax, colorThree));
+    expected.add(new PlayerImpl(nameMoritz, colorOne));
+    expected.add(new PlayerImpl(nameMoritz, colorTwo));
     expected.add(new PlayerImpl(nameMoritz, colorThree));
+    expected.add(new PlayerImpl(namePeter, colorOne));
+    expected.add(new PlayerImpl(namePeter, colorTwo));
     expected.add(new PlayerImpl(namePeter, colorThree));
 
     ArrayList<PlayerImpl> sorted = new ArrayList<>(expected);
@@ -78,9 +78,9 @@ public class PlayerImplTest {
     PlayerImpl x = new PlayerImpl("Max", new Color(1.0, 1.0, 1.0, 1.0));
     PlayerImpl y = new PlayerImpl("Moritz", new Color(1.0, 1.0, 1.0, 1.0));
     PlayerImpl z = new PlayerImpl("Peter", new Color(1.0, 1.0, 1.0, 1.0));
-    Assertions.assertTrue(x.compareTo(y) > 0, "x should be before y");
-    Assertions.assertTrue(y.compareTo(z) > 0, "y should be before z");
-    Assertions.assertTrue(z.compareTo(x) > 0, "z should be before x");
+    Assertions.assertTrue(x.compareTo(y) < 0, "x should be before y");
+    Assertions.assertTrue(y.compareTo(z) < 0, "y should be before z");
+    Assertions.assertTrue(x.compareTo(z) < 0, "x should be before z because of transitivity");
   }
 
   @Test
@@ -133,7 +133,7 @@ public class PlayerImplTest {
   }
 
   @Test
-  public void testToString_Regular() {
+  public void testToString() {
     Player x = new PlayerImpl("Max", new Color(1.0, 1.0, 1.0, 1.0));
     Assertions.assertEquals("Max", x.toString(), "toString() did not display player correctly");
   }
