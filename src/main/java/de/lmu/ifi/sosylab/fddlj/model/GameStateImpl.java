@@ -2,49 +2,53 @@ package de.lmu.ifi.sosylab.fddlj.model;
 
 public class GameStateImpl implements GameState, ModifiableGameState {
 
+  private Phase phase;
+  private GameField field;
+  private PlayerManagement manager;
+
   public GameStateImpl() {
-    // Initiate GameState
+    this.phase = null;
+    this.field = null;
+    this.manager = null;
   }
 
   @Override
   public void setCurrentPhase(Phase phase) {
-    // TODO Auto-generated method stub
-
+    this.phase = phase;
   }
 
   @Override
   public void setGameField(GameField gameField) {
-    // TODO Auto-generated method stub
-
+    this.field = gameField;
   }
 
   @Override
   public void setPlayerManagement(PlayerManagement playerManagement) {
-    // TODO Auto-generated method stub
-
+    this.manager = playerManagement;
   }
 
   @Override
   public Phase getCurrentPhase() {
-    // TODO Auto-generated method stub
-    return null;
+    return phase;
   }
 
   @Override
   public GameField getField() {
-    // TODO Auto-generated method stub
-    return null;
+    return field;
   }
 
   @Override
   public PlayerManagement getPlayerManagement() {
-    // TODO Auto-generated method stub
-    return null;
+    return manager;
   }
 
   @Override
   public GameState makeCopy() {
-    // TODO Auto-generated method stub
-    return null;
+    GameStateImpl copy = new GameStateImpl();
+    copy.setCurrentPhase(this.getCurrentPhase());
+    copy.setGameField(this.getField().makeCopy());
+    ModifiablePlayerManagement managerCopy = null; // to be done: copy PlayerManagement !!
+    copy.setPlayerManagement(managerCopy);
+    return copy;
   }
 }
