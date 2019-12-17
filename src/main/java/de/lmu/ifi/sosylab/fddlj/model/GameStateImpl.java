@@ -1,8 +1,8 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
-public class GameStateReversi implements GameState, ModifiableGameState {
+public class GameStateImpl implements GameState, ModifiableGameState {
 
-  public GameStateReversi() {
+  public GameStateImpl() {
     // Initiate GameState
   }
 

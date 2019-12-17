@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 
-public class GameStateReversiTest {
+public class GameStateImplTest {
 
-  GameStateReversi state;
+  GameStateImpl state;
 
   @BeforeAll
   void setUpState() {
-    state = new GameStateReversi();
+    state = new GameStateImpl();
   }
 
   @Test
