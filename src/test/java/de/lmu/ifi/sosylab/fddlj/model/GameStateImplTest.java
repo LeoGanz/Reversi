@@ -26,15 +26,15 @@ public class GameStateImplTest {
   }
 
   @Test
+  void testSetAndGetPhase_WAITING() {
+    state.setCurrentPhase(Phase.WAITING);
+    Assertions.assertEquals(Phase.WAITING, state.getCurrentPhase());
+  }
+  
+  @Test
   void testSetAndGetPhase_null() {
     state.setCurrentPhase(null);
     Assertions.assertEquals(null, state.getCurrentPhase());
-  }
-
-  @Test
-  void testSetAndGetPhase_WAITING() {
-    state.setCurrentPhase(Phase.WAITING);
-    Assertions.assertEquals(Phase.FINISHED, state.getCurrentPhase());
   }
 
   @Test
