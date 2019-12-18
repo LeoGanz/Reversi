@@ -29,7 +29,7 @@ public class DiskImplTest {
     Assertions.assertEquals(
             player,
             disk.getPlayer(),
-            "GetPlayer() returned " + disk.getPlayer() + " instead of expected " + player);
+            "getPlayer() returned " + disk.getPlayer() + " instead of expected " + player);
   }
 
   @Test
