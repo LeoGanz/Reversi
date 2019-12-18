@@ -1,11 +1,19 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
-public class GameStateImpl implements GameState, ModifiableGameState {
+/**
+ * A concrete Implementation of {@link ModifiableGameState} and thus by extension an Implementation
+ * of {@link GameState}.
+ *
+ * @author Daniel Leidreiter
+ */
+public class GameStateImpl implements ModifiableGameState {
 
+  private static final long serialVersionUID = 1L;
   private Phase phase;
   private GameField field;
   private PlayerManagement manager;
 
+  /** Creates an empty GameState with all values nulled. */
   public GameStateImpl() {
     this.phase = null;
     this.field = null;
@@ -47,8 +55,7 @@ public class GameStateImpl implements GameState, ModifiableGameState {
     GameStateImpl copy = new GameStateImpl();
     copy.setCurrentPhase(this.getCurrentPhase());
     copy.setGameField(this.getField().makeCopy());
-    ModifiablePlayerManagement managerCopy = null; // to be done: copy PlayerManagement !!
-    copy.setPlayerManagement(managerCopy);
+    copy.setPlayerManagement(this.getPlayerManagement().makeCopy());
     return copy;
   }
 }
