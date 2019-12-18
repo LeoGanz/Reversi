@@ -36,7 +36,7 @@ public class DiskImpl implements Disk {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof Cell)) {
+    if (!(obj instanceof Disk)) {
       return false;
     }
 
