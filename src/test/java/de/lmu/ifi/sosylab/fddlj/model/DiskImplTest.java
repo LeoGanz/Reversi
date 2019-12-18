@@ -1,5 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
+import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,11 @@ import java.util.List;
 public class DiskImplTest {
 
   private Player playerCreator() {
-    Player player = new PlayerImpl();
+    return this.playerCreator("Max");
+  }
+
+  private Player playerCreator(String name) {
+    Player player = new PlayerImpl(name, new Color(1.0, 1.0, 1.0, 1.0));
 
     return player;
   }
@@ -43,9 +48,18 @@ public class DiskImplTest {
 
   @Test
   public void testEquals_Unequal() {
-    Player player = this.playerCreator();
-    Disk disk1 = new DiskImpl(player);
-    Disk disk2 = new DiskImpl(player);
+    Player player1 = this.playerCreator();
+    Disk disk1 = new DiskImpl(player1);
+    Player player2 = this.playerCreator("Tom");
+    Disk disk2 = new DiskImpl(player2);
+
+    Assertions.assertFalse(disk1.equals(disk2), disk1 + " should not be equal to " + disk2);
+
+    // Test with same Name, but different color
+    player1 = this.playerCreator();
+    disk1 = new DiskImpl(player1);
+    player2 = new PlayerImpl(player1.getName(), new Color(0.0, 0.0, 0.0, 1.0));
+    disk2 = new DiskImpl(player2);
 
     Assertions.assertFalse(disk1.equals(disk2), disk1 + " should not be equal to " + disk2);
   }
@@ -62,9 +76,20 @@ public class DiskImplTest {
 
   @Test
   public void testHashCode_Unequal() {
-    Player player = this.playerCreator();
-    Disk disk1 = new DiskImpl(player);
-    Disk disk2 = new DiskImpl(player);
+    Player player1 = this.playerCreator();
+    Disk disk1 = new DiskImpl(player1);
+    Player player2 = this.playerCreator("Tom");
+    Disk disk2 = new DiskImpl(player2);
+
+    Assertions.assertFalse(disk1.equals(disk2), disk1 + " should not be equal to " + disk2);
+    Assertions.assertNotEquals(
+            disk1.hashCode(), disk2.hashCode(), "HashCode should not be equal for unequal cells");
+
+    // Test with same Name, but different color
+    player1 = this.playerCreator();
+    disk1 = new DiskImpl(player1);
+    player2 = new PlayerImpl(player1.getName(), new Color(0.0, 0.0, 0.0, 1.0));
+    disk2 = new DiskImpl(player2);
 
     Assertions.assertFalse(disk1.equals(disk2), disk1 + " should not be equal to " + disk2);
     Assertions.assertNotEquals(
