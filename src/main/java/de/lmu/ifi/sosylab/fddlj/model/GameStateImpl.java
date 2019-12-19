@@ -1,8 +1,11 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
+import java.util.Objects;
+
 /**
  * A concrete Implementation of {@link ModifiableGameState} and thus by extension an Implementation
- * of {@link GameState}.
+ * of {@link GameState}. Provides the equals method. Equals depends on {@link
+ * GameField#equals(Object)} and {@link PlayerManagement#equals(Object)}.
  *
  * @author Daniel Leidreiter
  */
@@ -57,5 +60,20 @@ public class GameStateImpl implements ModifiableGameState {
     copy.setGameField(this.getField().makeCopy());
     copy.setPlayerManagement(this.getPlayerManagement().makeCopy());
     return copy;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof GameStateImpl)) {
+      return false;
+    }
+
+    GameStateImpl other = (GameStateImpl) obj;
+    return Objects.equals(this.phase, other.phase)
+        && Objects.equals(this.field, other.field)
+        && Objects.equals(this.manager, other.manager);
   }
 }

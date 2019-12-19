@@ -4,6 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 
+/**
+ * Unit Test for {@link GameStateImpl}
+ *
+ * @author Daniel Leidreiter
+ */
 public class GameStateImplTest {
 
   GameStateImpl state;
@@ -175,4 +180,16 @@ public class GameStateImplTest {
     Assertions.assertEquals(
         null, stateCopy.getPlayerManagement(), "makeCopy should have copied PlayerManagement!");
   }
+
+  @Test
+  void testEquals_allEqual() {}
+
+  @Test
+  void testEquals_PaseNotEqual() {}
+
+  @Test
+  void testEquals_GameFieldNotEqual() {}
+
+  @Test
+  void testEquals_PlayerManagementNotEqual() {}
 }
