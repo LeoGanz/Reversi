@@ -95,9 +95,12 @@ public class DiskImplTest {
 
   @Test
   public void testToString_Regular() {
+    Player player = this.playerCreator();
+    Disk disk = new DiskImpl(player);
+
     Assertions.assertEquals(
-        "Disk with player #",
-            new DiskImpl(this.playerCreator()).toString(),
+        "Disk with player " + player.toString(),
+            disk.toString(),
             "ToString did not display cell correctly");
   }
 
