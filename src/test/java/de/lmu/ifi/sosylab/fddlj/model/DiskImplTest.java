@@ -94,7 +94,7 @@ public class DiskImplTest {
   }
 
   @Test
-  public void testToString_Regular() {
+  public void testToString() {
     Player player = this.playerCreator();
     Disk disk = new DiskImpl(player);
 
