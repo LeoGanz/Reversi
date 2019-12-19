@@ -67,7 +67,8 @@ public class DiskImplTest {
     Disk disk2 = new DiskImpl(player);
 
     Assertions.assertTrue(disk1.equals(disk2), disk1 + " should be equal to " + disk2);
-    Assertions.assertEquals(disk1.hashCode(), disk2.hashCode(), "HashCode should be equal for equal cells");
+    Assertions.assertEquals(disk1.hashCode(), disk2.hashCode(),
+            "HashCode should be equal for equal cells");
   }
 
   @Test
@@ -95,7 +96,9 @@ public class DiskImplTest {
   @Test
   public void testToString_Regular() {
     Assertions.assertEquals(
-        "Disk with player #", new DiskImpl(this.playerCreator()).toString(), "ToString did not display cell correctly");
+        "Disk with player #",
+            new DiskImpl(this.playerCreator()).toString(),
+            "ToString did not display cell correctly");
   }
 
 }
