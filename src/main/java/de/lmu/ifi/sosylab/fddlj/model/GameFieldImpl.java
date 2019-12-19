@@ -9,16 +9,16 @@ import java.util.*;
  *
  * @author Dora Pruteanu
  */
-public class GameFieldModel implements GameField, ModifiableGameField {
+public class GameFieldImpl implements GameField, ModifiableGameField {
   private static final int SIZE = 8;
 
   private Disk[][] field = new Disk[SIZE][SIZE];
 
-  /** The constructor GameFieldModel sets the game field to its initial state. */
-  public GameFieldModel() {
+  /** The constructor GameFieldImpl sets the game field to its initial state. */
+  public GameFieldImpl() {
     for (int i = 0; i < SIZE; i++) {
       for (int j = 0; j < SIZE; j++) {
-        set(new Cell(i, j), null);
+        set(new CellImpl(i, j), null);
       }
     }
   }
@@ -52,7 +52,7 @@ public class GameFieldModel implements GameField, ModifiableGameField {
     for (int column = 0; column < SIZE; column++) {
       for (int row = 0; row < SIZE; row++) {
         if (field[column][row] != null) {
-          map.put(new Cell(column, row), field[column][row].getPlayer());
+          map.put(new CellImpl(column, row), field[column][row].getPlayer());
         }
       }
     }
@@ -65,7 +65,7 @@ public class GameFieldModel implements GameField, ModifiableGameField {
     for (int column = 0; column < SIZE; column++) {
       for (int row = 0; row < SIZE; row++) {
         if (field[column][row] != null && field[column][row].getPlayer().equals(player)) {
-          set.add(new Cell(column, row));
+          set.add(new CellImpl(column, row));
         }
       }
     }
@@ -86,7 +86,7 @@ public class GameFieldModel implements GameField, ModifiableGameField {
   }
 
   @Override
-  public GameField makeCopy() {
+  public GameFieldImpl makeCopy() {
     return null;
   }
 
