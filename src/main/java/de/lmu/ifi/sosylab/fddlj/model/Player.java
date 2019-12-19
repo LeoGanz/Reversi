@@ -15,12 +15,19 @@ public interface Player {
    * 
    * @return the player's name
    */
-  public String getName();
+  String getName();
 
   /**
    * Return the color the player wishes to use for all customizable parts in the GUI.
    * 
    * @return the player's favored color
    */
-  public Color getColor();
+  Color getColor();
+
+  /**
+   * Returns a deep copy of the {@link Player} this method is called for.
+   *
+   * @return a deep copy of the player
+   */
+  Player makeCopy();
 }
