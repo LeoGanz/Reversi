@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class GameFieldImplTest {
 
@@ -121,37 +123,37 @@ public class GameFieldImplTest {
     Cell cell3 = new CellImpl(4, 4);
     Cell cell4 = new CellImpl(3, 4);
     Cell cell5 = new CellImpl(3, 3);
-    field.set(cell1, PlayerManagement.playerOne);
-    field.set(cell2, PlayerManagement.playerOne);
-    field.set(cell3, PlayerManagement.playerOne);
-    field.set(cell4, PlayerManagement.playerOne);
-    field.set(cell5, PlayerManagement.playerTwo);
+    field.set(cell1, PlayerManagement.getPlayerOne());
+    field.set(cell2, PlayerManagement.getPlayerOne());
+    field.set(cell3, PlayerManagement.getPlayerOne());
+    field.set(cell4, PlayerManagement.getPlayerOne());
+    field.set(cell5, PlayerManagement.getPlayerTwo());
     return field;
   }
 
   @Test
   public void testIsCellOfPlayer_PlayerOneTrue() {
-    helperIsCellOfPlayer_True(4, 2, Player.playerOne);
+    helperIsCellOfPlayer_True(4, 2, PlayerManagement.getPlayerOne());
   }
 
   @Test
   public void testIsCellOfPlayer_PlayerTwoTrue() {
-    helperIsCellOfPlayer_True(3, 3, Player.playerTwo);
+    helperIsCellOfPlayer_True(3, 3, PlayerManagement.getPlayerTwo());
   }
 
   @Test
   public void testIsCellOfPlayer_PlayerOneFalse() {
-    helperIsCellOfPlayer_False(3, 3, Player.playerOne);
+    helperIsCellOfPlayer_False(3, 3, PlayerManagement.getPlayerOne());
   }
 
   @Test
   public void testIsCellOfPlayer_PlayerTwoFalse() {
-    helperIsCellOfPlayer_False(4, 4, Player.PlayerTwo);
+    helperIsCellOfPlayer_False(4, 4, PlayerManagement.getPlayerTwo());
   }
 
   @Test
   public void testIsCellOfPlayer_noPlayer() {
-    helperIsCellOfPlayer_False(4, 2, Player.playerOne);
+    helperIsCellOfPlayer_False(4, 2, PlayerManagement.getPlayerOne());
   }
 
   private void helperIsCellOfPlayer_True(int column, int row, Player player) {
@@ -170,14 +172,14 @@ public class GameFieldImplTest {
   public void testGet_playerOne() {
     Cell cell = new CellImpl(4, 2);
     Optional<Disk> test = createTestGameField().get(cell);
-    Assertions.assertEquals(test, Disk.playerOne);
+    Assertions.assertEquals(test, PlayerManagement.getPlayerOne());
   }
 
   @Test
   public void testGet_playerTwo() {
     Cell cell = new CellImpl(3, 3);
     Optional<Disk> test = createTestGameField().get(cell);
-    Assertions.assertEquals(test, Disk.playerTwo);
+    Assertions.assertEquals(test, PlayerManagement.getPlayerTwo());
   }
 
   @Test
@@ -211,5 +213,167 @@ public class GameFieldImplTest {
   private void helperTestSet(Disk newValue, int column, int row) {
     Cell cell = new CellImpl(column, row);
     createTestGameField().set(cell, newValue);
+    Assertions.assertEquals(
+        newValue,
+        createTestGameField().get(cell),
+        "Cell should have value: "
+            + newValue
+            + ", but has value: "
+            + createTestGameField().get(cell));
+  }
+
+  @Test
+  public void testSet_onEmptyCell00() {
+    helperTestSet(PlayerManagement.getPlayerOne(), 0, 0);
+  }
+
+  @Test
+  public void testSet_onEmptyCell64() {
+    helperTestSet(PlayerManagement.getPlayerTwo(), 6, 4);
+  }
+
+  @Test
+  public void testSet_onCellWithPlayerOneOne() {
+    helperTestSet(PlayerManagement.getPlayerOne(), 4, 2);
+  }
+
+  @Test
+  public void testSet_onCellWithPlayerOneTwo() {
+    helperTestSet(PlayerManagement.getPlayerTwo(), 4, 4);
+  }
+
+  @Test
+  public void testSet_onCellWithPlayerTwoOne() {
+    helperTestSet(PlayerManagement.getPlayerOne(), 3, 3);
+  }
+
+  @Test
+  public void testSet_onCellWithPlayerTwoTwo() {
+    helperTestSet(PlayerManagement.getPlayerTwo(), 3, 3);
+  }
+
+  @Test
+  public void testGetAllCellsForPlayer_playerOneV1() {
+    Cell cell1 = new CellImpl(4, 2);
+    Cell cell2 = new CellImpl(4, 3);
+    Cell cell3 = new CellImpl(4, 4);
+    Cell cell4 = new CellImpl(3, 4);
+    Set<Cell> list = createTestGameField().getAllCellsForPlayer(PlayerManagement.getPlayerOne());
+    list.remove(cell1);
+    list.remove(cell2);
+    list.remove(cell3);
+    list.remove(cell4);
+    Assertions.assertEquals(0, list.size());
+  }
+
+  @Test
+  public void testGetAllCellsForPlayer_playerOneV2() {
+    Cell cell1 = new CellImpl(4, 2);
+    Cell cell2 = new CellImpl(4, 3);
+    Cell cell3 = new CellImpl(4, 4);
+    Set<Cell> list = createTestGameField().getAllCellsForPlayer(PlayerManagement.getPlayerOne());
+    list.remove(cell1);
+    list.remove(cell2);
+    list.remove(cell3);
+    Assertions.assertEquals(1, list.size());
+  }
+
+  @Test
+  public void testGetAllCellsForPlayer_playerOneV3() {
+    Cell cell1 = new CellImpl(4, 2);
+    Cell cell4 = new CellImpl(3, 4);
+    Set<Cell> list = createTestGameField().getAllCellsForPlayer(PlayerManagement.getPlayerOne());
+    list.remove(cell1);
+    list.remove(cell4);
+    Assertions.assertEquals(2, list.size());
+  }
+
+  @Test
+  public void testGetAllCellsForPlayer_playerOneV4() {
+    Set<Cell> list = createTestGameField().getAllCellsForPlayer(PlayerManagement.getPlayerOne());
+    Assertions.assertEquals(4, list.size());
+  }
+
+  @Test
+  public void testGetAllCellsForPlayer_playerTwoV1() {
+    Set<Cell> list = createTestGameField().getAllCellsForPlayer(PlayerManagement.getPlayerOne());
+    Assertions.assertEquals(1, list.size());
+  }
+
+  @Test
+  public void testGetAllCellsForPlayer_playerTwoV2() {
+    Cell cell = new CellImpl(3, 3);
+    Set<Cell> list = createTestGameField().getAllCellsForPlayer(PlayerManagement.getPlayerTwo());
+    list.remove(cell);
+    Assertions.assertEquals(0, list.size());
+  }
+
+  @Test
+  public void testGetCellsOccupiedWithDisks_V1() {
+    Map<Cell, Player> list = createTestGameField().getCellsOccupiedWithDisks();
+    Assertions.assertEquals(5, list.size());
+  }
+
+  @Test
+  public void testGetCellsOccupiedWithDisks_V2() {
+    Cell cell1 = new CellImpl(4, 2);
+    Cell cell2 = new CellImpl(4, 3);
+    Cell cell3 = new CellImpl(4, 4);
+    Cell cell4 = new CellImpl(3, 4);
+    Cell cell5 = new CellImpl(3, 3);
+    Map<Cell, Player> list = createTestGameField().getCellsOccupiedWithDisks();
+    list.remove(cell1);
+    list.remove(cell2);
+    list.remove(cell3);
+    list.remove(cell4);
+    list.remove(cell5);
+    Assertions.assertEquals(0, list.size());
+  }
+
+  @Test
+  public void testGetCellsOccupiedWithDisks_V3() {
+    Cell cell1 = new CellImpl(4, 2);
+    Cell cell2 = new CellImpl(4, 3);
+    Cell cell3 = new CellImpl(4, 4);
+    Map<Cell, Player> list = createTestGameField().getCellsOccupiedWithDisks();
+    list.remove(cell1);
+    list.remove(cell2);
+    list.remove(cell3);
+    Assertions.assertEquals(2, list.size());
+  }
+
+  @Test
+  public void testGetCellsOccupiedWithDisks_V4() {
+    Cell cell1 = new CellImpl(4, 2);
+    Cell cell2 = new CellImpl(4, 3);
+    Cell cell4 = new CellImpl(3, 4);
+    Cell cell5 = new CellImpl(3, 3);
+    Map<Cell, Player> list = createTestGameField().getCellsOccupiedWithDisks();
+    list.remove(cell1);
+    list.remove(cell2);
+    list.remove(cell4);
+    list.remove(cell5);
+    Assertions.assertEquals(1, list.size());
+  }
+
+  @Test
+  public void testGetCellsOccupiedWithDisks_V5() {
+    Cell cell2 = new CellImpl(4, 3);
+    Map<Cell, Player> list = createTestGameField().getCellsOccupiedWithDisks();
+    list.remove(cell2);
+    Assertions.assertEquals(4, list.size());
+  }
+
+  @Test
+  public void testMakeCopy_gameField() {
+    GameFieldImpl field = createTestGameField().makeCopy();
+    Assertions.assertEquals(createTestGameField(), field);
+  }
+
+  @Test
+  public void testMakeCopy_testWithList() {
+    GameFieldImpl field = createTestGameField().makeCopy();
+    Map<Cell, Player> list = field.getCellsOccupiedWithDisks();
+    Assertions.assertEquals(5, list.size());
   }
 }

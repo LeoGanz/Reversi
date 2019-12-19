@@ -87,7 +87,16 @@ public class GameFieldImpl implements GameField, ModifiableGameField {
 
   @Override
   public GameFieldImpl makeCopy() {
-    return null;
+    GameFieldImpl newField = new GameFieldImpl();
+    for (int column = 0; column < SIZE; column++) {
+      for (int row = 0; row < SIZE; row++) {
+        if (field[column][row] != null) {
+          newField.set(
+              new CellImpl(column, row), new Disk(field[column][row].getPlayer().makeCopy()));
+        }
+      }
+    }
+    return newField;
   }
 
   /**
