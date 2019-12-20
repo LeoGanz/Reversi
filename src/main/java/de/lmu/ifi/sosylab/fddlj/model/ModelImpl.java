@@ -4,8 +4,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Set;
 
-import chess.model.GameState;
-
 public class ModelImpl implements Model{
 
   private final PropertyChangeSupport support;
