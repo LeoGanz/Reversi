@@ -13,6 +13,9 @@ public class ModelImpl implements Model {
   private ModifiableGameState state;
   private GameMode mode;
   // private AI ai;
+  private static final int DISKS_PER_PLAYER = 32;
+  private int numberOfPlayerOneDisks = DISKS_PER_PLAYER;
+  private int numberOfPlayerTwoDisks = DISKS_PER_PLAYER;
 
   // HotSeat and Single
   public ModelImpl(GameMode mode, PlayerManagement manager) {
@@ -23,7 +26,7 @@ public class ModelImpl implements Model {
     state.setPlayerManagement(manager);
   }
 
-  // Multiplayer
+  /*// Multiplayer
   public ModelImpl(Player thisClient, PlayerManagement manager) {
     state = new GameStateImpl();
     state.setPlayerManagement(manager);
@@ -34,12 +37,38 @@ public class ModelImpl implements Model {
     }
     state.setGameField(new GameFieldImpl());
     this.mode = GameMode.MULTIPLAYER;
-  }
+  }*/
 
   @Override
   public boolean placeDisk(Disk disk, Cell cell) {
-    // TODO Auto-generated method stub
-    return false;
+    if (!state.getCurrentPhase().equals(Phase.RUNNING)) {
+      return false;
+    }
+    if ((state.getPlayerManagement().getCurrentPlayer()
+            == state.getPlayerManagement().getPlayerOne())
+        && numberOfPlayerOneDisks <= 0) {
+      return false;
+    }
+    if ((state.getPlayerManagement().getCurrentPlayer()
+            == state.getPlayerManagement().getPlayerTwo())
+        && numberOfPlayerTwoDisks <= 0) {
+      return false;
+    }
+    if (checkIfLegalMove(disk, cell)) {
+      ModifiableGameField field = (ModifiableGameField) state.getField();
+      field.set(cell, disk);
+      /*changeDisks();*/
+      if (state.getPlayerManagement().getCurrentPlayer()
+          == state.getPlayerManagement().getPlayerOne()) {
+        numberOfPlayerOneDisks--;
+      }
+      if (state.getPlayerManagement().getCurrentPlayer()
+          == state.getPlayerManagement().getPlayerTwo()) {
+        numberOfPlayerTwoDisks--;
+      } /*
+        checkIfGameIsFinished();
+        changePlayer();*/
+    }
   }
 
   @Override
