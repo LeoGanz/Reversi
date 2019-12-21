@@ -18,10 +18,11 @@ public class PlayerManagementImpl implements ModifiablePlayerManagement {
 
   /**
    * Create a new {@link PlayerManagement} with the provided players. Initially it will be player
-   * one's turn and nobady has won yet.
+   * one's turn and nobody has won yet.
    *
    * @param playerOne the first player
    * @param playerTwo the second player
+   * @throws NullPointerException if playerOne or playerTwo is null
    */
   public PlayerManagementImpl(Player playerOne, Player playerTwo) {
     this.playerOne = Objects.requireNonNull(playerOne);
