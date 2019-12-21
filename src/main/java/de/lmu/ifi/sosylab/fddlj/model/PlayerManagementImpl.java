@@ -128,6 +128,7 @@ public class PlayerManagementImpl implements ModifiablePlayerManagement {
         && Objects.equals(playerTwo, other.playerTwo)
         && (current == other.current)
         && (winner == other.winner);
+
   }
 
   private enum PlayerEnum {
