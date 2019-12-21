@@ -92,7 +92,7 @@ public class GameFieldImpl implements GameField, ModifiableGameField {
       for (int row = 0; row < SIZE; row++) {
         if (field[column][row] != null) {
           newField.set(
-              new CellImpl(column, row), new Disk(field[column][row].getPlayer().makeCopy()));
+              new CellImpl(column, row), new DiskImpl(field[column][row].getPlayer().makeCopy()));
         }
       }
     }
