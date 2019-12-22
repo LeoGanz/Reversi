@@ -1,8 +1,10 @@
 package de.lmu.ifi.sosylab.fddlj;
 
+import javax.swing.JOptionPane;
+
 /**
  * Main class of the reversi application.
- * 
+ *
  * @author Josef Feger.
  */
 public class ReversiMain {
@@ -19,11 +21,14 @@ public class ReversiMain {
 
   /**
    * Parse input arguments and start the game accordingly.
-   * 
+   *
    * @param args the input arguments to parse
    */
   private static void showGame(String[] args) {
     // TODO initialize Controller and call start screen
+    JOptionPane.showMessageDialog(null, "Reversi by FDDLJ will be coming soon!", "Coming soon",
+        JOptionPane.INFORMATION_MESSAGE);
+
   }
 
 }
