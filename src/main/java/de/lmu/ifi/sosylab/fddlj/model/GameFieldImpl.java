@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @author Dora Pruteanu
  */
-public class GameFieldImpl implements GameField, ModifiableGameField {
+public class GameFieldImpl implements ModifiableGameField {
   private static final int SIZE = 8;
 
   private Disk[][] field = new Disk[SIZE][SIZE];
