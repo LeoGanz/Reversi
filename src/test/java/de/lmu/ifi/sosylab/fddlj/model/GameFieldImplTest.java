@@ -1,13 +1,12 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 public class GameFieldImplTest {
 

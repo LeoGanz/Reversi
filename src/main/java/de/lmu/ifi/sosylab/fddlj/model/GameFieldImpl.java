@@ -1,7 +1,10 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * The class GameFieldModel implements GameField and ModifiableGameField. GameFieldModel represents
