@@ -87,6 +87,14 @@ public class ModelImpl implements Model {
         ModifiablePlayerManagement manager =
             (ModifiablePlayerManagement) state.getPlayerManagement();
         manager.switchCurrentPlayer();
+        if (getPossibleMovesForPlayer(manager.getCurrentPlayer()).isEmpty()) {
+          manager.switchCurrentPlayer();
+          // If both need to miss a turn
+          if (getPossibleMovesForPlayer(manager.getCurrentPlayer()).isEmpty()) {
+            state.setCurrentPhase(Phase.FINISHED);
+            handleWinner();
+          }
+        }
       }
 
       notifyListeners();
@@ -133,6 +141,28 @@ public class ModelImpl implements Model {
   @Override
   public GameState getState() {
     return state;
+  }
+
+  @Override
+  public boolean setWaiting() {
+    if (state.getCurrentPhase() == Phase.RUNNING) {
+      state.setCurrentPhase(Phase.WAITING);
+      notifyListeners();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean unsetWaiting() {
+    if (state.getCurrentPhase() == Phase.WAITING) {
+      state.setCurrentPhase(Phase.RUNNING);
+      notifyListeners();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   // TODO add method to interface to set the Model to Waiting if running

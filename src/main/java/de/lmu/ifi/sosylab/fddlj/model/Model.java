@@ -8,8 +8,8 @@ import java.util.Set;
  * The main interface of the reversi model. It provides all necessary methods for accessing and
  * manipulating the data such that a game can be played successfully.
  *
- * <p>When something changes in the model, the model notifies its observers by firing a
- * {@link PropertyChangeEvent change-event}.
+ * <p>When something changes in the model, the model notifies its observers by firing a {@link
+ * PropertyChangeEvent change-event}.
  *
  * @author Leonard Ganz, Josef Feger
  */
@@ -62,4 +62,18 @@ public interface Model {
    * @return the {@code GameState}-object
    */
   GameState getState();
+
+  /**
+   * If the {@link Phase} is {@code Phase.WAITING} this method sets it to {@code Phase.RUNNING}
+   *
+   * @return {@code true} if the operation was successful and {@code false} otherwise.
+   */
+  boolean unsetWaiting();
+
+  /**
+   * If the {@link Phase} is {@code Phase.RUNNING} this method sets it to {@code Phase.WAITING}
+   *
+   * @return {@code true} if the operation was successful and {@code false} otherwise.
+   */
+  boolean setWaiting();
 }
