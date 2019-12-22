@@ -1,5 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
+import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -116,7 +117,9 @@ public class GameFieldImplTest {
     Assertions.assertFalse(test);
   }
 
-  PlayerManagement manager;
+  PlayerManagementImpl manager =
+      new PlayerManagementImpl(
+          new PlayerImpl("One", Color.ALICEBLUE), new PlayerImpl("two", Color.ANTIQUEWHITE));
 
   private GameFieldImpl createTestGameField() {
     GameFieldImpl field = new GameFieldImpl();
@@ -155,7 +158,7 @@ public class GameFieldImplTest {
 
   @Test
   public void testIsCellOfPlayer_noPlayer() {
-    helperIsCellOfPlayer_False(4, 2, manager.getPlayerOne());
+    helperIsCellOfPlayer_False(4, 1, manager.getPlayerOne());
   }
 
   private void helperIsCellOfPlayer_True(int column, int row, Player player) {
@@ -174,14 +177,14 @@ public class GameFieldImplTest {
   public void testGet_playerOne() {
     Cell cell = new CellImpl(4, 2);
     Optional<Disk> test = createTestGameField().get(cell);
-    Assertions.assertEquals(test, new DiskImpl(manager.getPlayerOne()));
+    Assertions.assertEquals(test, Optional.of(new DiskImpl(manager.getPlayerOne())));
   }
 
   @Test
   public void testGet_playerTwo() {
     Cell cell = new CellImpl(3, 3);
     Optional<Disk> test = createTestGameField().get(cell);
-    Assertions.assertEquals(test, new DiskImpl(manager.getPlayerTwo()));
+    Assertions.assertEquals(test, Optional.of(new DiskImpl(manager.getPlayerTwo())));
   }
 
   @Test
@@ -213,11 +216,22 @@ public class GameFieldImplTest {
   }
 
   private void helperTestSet(Disk newValue, int column, int row) {
-    Cell cell = new CellImpl(column, row);
-    createTestGameField().set(cell, newValue);
+    CellImpl cell = new CellImpl(column, row);
+    GameFieldImpl gameField = new GameFieldImpl();
+    Cell cell1 = new CellImpl(4, 2);
+    Cell cell2 = new CellImpl(4, 3);
+    Cell cell3 = new CellImpl(4, 4);
+    Cell cell4 = new CellImpl(3, 4);
+    Cell cell5 = new CellImpl(3, 3);
+    gameField.set(cell1, new DiskImpl(manager.getPlayerOne()));
+    gameField.set(cell2, new DiskImpl(manager.getPlayerOne()));
+    gameField.set(cell3, new DiskImpl(manager.getPlayerOne()));
+    gameField.set(cell4, new DiskImpl(manager.getPlayerOne()));
+    gameField.set(cell5, new DiskImpl(manager.getPlayerTwo()));
+    gameField.set(cell, newValue);
     Assertions.assertEquals(
-        newValue,
-        createTestGameField().get(cell),
+        Optional.of(newValue),
+        gameField.get(cell),
         "Cell should have value: "
             + newValue
             + ", but has value: "
@@ -226,6 +240,7 @@ public class GameFieldImplTest {
 
   @Test
   public void testSet_onEmptyCell00() {
+
     helperTestSet(new DiskImpl(manager.getPlayerOne()), 0, 0);
   }
 
@@ -298,7 +313,7 @@ public class GameFieldImplTest {
 
   @Test
   public void testGetAllCellsForPlayer_playerTwoV1() {
-    Set<Cell> list = createTestGameField().getAllCellsForPlayer(manager.getPlayerOne());
+    Set<Cell> list = createTestGameField().getAllCellsForPlayer(manager.getPlayerTwo());
     Assertions.assertEquals(1, list.size());
   }
 
@@ -369,13 +384,14 @@ public class GameFieldImplTest {
   @Test
   public void testMakeCopy_gameField() {
     GameFieldImpl field = createTestGameField().makeCopy();
-    Assertions.assertEquals(createTestGameField(), field);
+    Assertions.assertEquals(
+        createTestGameField().getCellsOccupiedWithDisks(), field.getCellsOccupiedWithDisks());
   }
 
   @Test
   public void testMakeCopy_testWithList() {
     GameFieldImpl field = createTestGameField().makeCopy();
     Map<Cell, Player> list = field.getCellsOccupiedWithDisks();
-    Assertions.assertEquals(5, list.size(),"We expected 5 but got: "+ list.size());
+    Assertions.assertEquals(5, list.size(), "We expected 5 but got: " + list.size());
   }
 }

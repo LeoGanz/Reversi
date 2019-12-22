@@ -74,7 +74,11 @@ public class GameFieldImpl implements GameField, ModifiableGameField {
 
   @Override
   public boolean isCellOfPlayer(Player player, Cell cell) {
-    return field[cell.getColumn()][cell.getRow()].getPlayer() == player;
+    if (getCellsOccupiedWithDisks().containsKey(cell)) {
+      return field[cell.getColumn()][cell.getRow()].getPlayer() == player;
+    } else {
+      return false;
+    }
   }
 
   @Override
