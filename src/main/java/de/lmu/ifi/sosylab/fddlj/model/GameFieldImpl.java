@@ -13,7 +13,7 @@ import java.util.Set;
  * @author Dora Pruteanu
  */
 public class GameFieldImpl implements ModifiableGameField {
-  private static final int SIZE = 8;
+  public static final int SIZE = 8;
 
   private Disk[][] field = new Disk[SIZE][SIZE];
 
@@ -35,7 +35,11 @@ public class GameFieldImpl implements ModifiableGameField {
   @Override
   public Disk remove(Cell cell) {
     throwErrorWhenOutOfBounds(cell);
-    field[cell.getColumn()][cell.getRow()] = null;
+    Disk disk = field[cell.getColumn()][cell.getRow()];
+    if (disk != null) {
+      field[cell.getColumn()][cell.getRow()] = null;
+      return disk;
+    }
     return null;
   }
 
@@ -77,7 +81,7 @@ public class GameFieldImpl implements ModifiableGameField {
 
   @Override
   public boolean isCellOfPlayer(Player player, Cell cell) {
-    if (getCellsOccupiedWithDisks().containsKey(cell)) {
+    if (field[cell.getColumn()][cell.getRow()] != null) {
       return field[cell.getColumn()][cell.getRow()].getPlayer() == player;
     } else {
       return false;

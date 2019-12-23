@@ -197,14 +197,14 @@ public class GameFieldImplTest {
   public void testRemove_playerOne() {
     Cell cell = new CellImpl(4, 2);
     Disk test = createTestGameField().remove(cell);
-    Assertions.assertNull(test);
+    Assertions.assertEquals(new DiskImpl(manager.getPlayerOne()), test);
   }
 
   @Test
   public void testRemove_playerTwo() {
     Cell cell = new CellImpl(3, 3);
     Disk test = createTestGameField().remove(cell);
-    Assertions.assertNull(test);
+    Assertions.assertEquals(new DiskImpl(manager.getPlayerTwo()), test);
   }
 
   @Test
