@@ -12,6 +12,8 @@ releases/reversi-fddlj.jar
 /.classpath
 /.project
 /.settings/
-
-# JetBrains IDEs
+.DS_Store
 .idea
+
+
+
