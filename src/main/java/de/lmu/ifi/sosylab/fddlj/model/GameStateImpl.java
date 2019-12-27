@@ -4,8 +4,7 @@ import java.util.Objects;
 
 /**
  * A concrete Implementation of {@link ModifiableGameState} and thus by extension an Implementation
- * of {@link GameState}. Provides the equals method. Equals depends on {@link
- * GameField#equals(Object)} and {@link PlayerManagement#equals(Object)}.
+ * of {@link GameState}. Provides the equals and hashCode methods.
  *
  * @author Daniel Leidreiter
  */
@@ -57,8 +56,12 @@ public class GameStateImpl implements ModifiableGameState {
   public GameState makeCopy() {
     GameStateImpl copy = new GameStateImpl();
     copy.setCurrentPhase(this.getCurrentPhase());
-    copy.setGameField(this.getField().makeCopy());
-    copy.setPlayerManagement(this.getPlayerManagement().makeCopy());
+    if (this.getField() != null) {
+      copy.setGameField(this.getField().makeCopy());
+    }
+    if (this.getPlayerManagement() != null) {
+      copy.setPlayerManagement(this.getPlayerManagement().makeCopy());
+    }
     return copy;
   }
 
@@ -75,5 +78,10 @@ public class GameStateImpl implements ModifiableGameState {
     return Objects.equals(this.phase, other.phase)
         && Objects.equals(this.field, other.field)
         && Objects.equals(this.manager, other.manager);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(phase, field, manager);
   }
 }
