@@ -10,7 +10,6 @@ import java.util.Objects;
  */
 public class GameStateImpl implements ModifiableGameState {
 
-  private static final long serialVersionUID = 1L;
   private Phase phase;
   private GameField field;
   private PlayerManagement manager;
