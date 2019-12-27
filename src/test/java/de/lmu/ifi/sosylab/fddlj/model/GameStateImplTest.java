@@ -29,7 +29,7 @@ public class GameStateImplTest {
   }
 
   @Test
-  void testSetAndGetPhase_RUNNING() {
+  void testSetAndGetPhase_Running() {
     GameStateImpl state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
     Assertions.assertEquals(
@@ -37,7 +37,7 @@ public class GameStateImplTest {
   }
 
   @Test
-  void testSetAndGetPhase_FINISHED() {
+  void testSetAndGetPhase_Finished() {
     GameStateImpl state = new GameStateImpl();
     state.setCurrentPhase(Phase.FINISHED);
     Assertions.assertEquals(
@@ -45,7 +45,7 @@ public class GameStateImplTest {
   }
 
   @Test
-  void testSetAndGetPhase_WAITING() {
+  void testSetAndGetPhase_Waiting() {
     GameStateImpl state = new GameStateImpl();
     state.setCurrentPhase(Phase.WAITING);
     Assertions.assertEquals(
@@ -85,7 +85,8 @@ public class GameStateImplTest {
     Assertions.assertSame(
         manager,
         state.getPlayerManagement(),
-        "getPlayerManagement should return the same PlayerManagement that was set by setPlayerManagement!");
+        "getPlayerManagement should return the same"
+            + " PlayerManagement that was set by setPlayerManagement!");
   }
 
   @Test
