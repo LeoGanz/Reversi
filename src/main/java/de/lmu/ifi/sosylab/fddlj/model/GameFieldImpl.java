@@ -1,5 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Set;
 /**
  * The class GameFieldModel implements GameField and ModifiableGameField. GameFieldModel represents
  * the game field and stores the information about which disks are on the Cells of the game field.
+ * Provides the equals and hashCode methods.
  *
  * @author Dora Pruteanu
  */
@@ -119,5 +121,31 @@ public class GameFieldImpl implements ModifiableGameField {
       throw new IllegalArgumentException(
           "The coordinates of the cell: " + cell + " are out of bounds");
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof GameFieldImpl)) {
+      return false;
+    }
+
+    GameFieldImpl other = (GameFieldImpl) obj;
+    for (int i = 0; i < SIZE; i++) {
+      for (int j = 0; j < SIZE; j++) {
+        Cell toCheck = new CellImpl(i, j);
+        if (!(this.get(toCheck).equals(other.get(toCheck)))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  @Override
+  public int hashCode() {
+    return Arrays.deepHashCode(field);
   }
 }

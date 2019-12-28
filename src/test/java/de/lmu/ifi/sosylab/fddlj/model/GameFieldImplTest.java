@@ -393,4 +393,45 @@ public class GameFieldImplTest {
     Map<Cell, Player> list = field.getCellsOccupiedWithDisks();
     Assertions.assertEquals(5, list.size(), "We expected 5 but got: " + list.size());
   }
+
+  @Test
+  public void testEquals_isEqual() {
+    GameFieldImpl field1 = createTestGameField();
+    GameFieldImpl field2 = createTestGameField();
+
+    Assertions.assertEquals(field1, field2, "field1 and field2 should be equal!");
+  }
+
+  @Test
+  public void testEquals_NotEqual() {
+    GameFieldImpl field1 = createTestGameField();
+    GameFieldImpl field2 = new GameFieldImpl();
+
+    Assertions.assertNotEquals(
+        field1, field2, "field1 should not be equal to the empty GameField field2!");
+  }
+
+  @Test
+  public void testHashCode_isEqual() {
+    GameFieldImpl field1 = createTestGameField();
+    GameFieldImpl field2 = createTestGameField();
+
+    Assertions.assertEquals(field1, field2);
+    Assertions.assertEquals(
+        field1.hashCode(),
+        field2.hashCode(),
+        "equal GameFieldImpl instances should have the same hashCode()!");
+  }
+
+  @Test
+  public void testHashCode_NotEqual() {
+    GameFieldImpl field1 = createTestGameField();
+    GameFieldImpl field2 = new GameFieldImpl();
+
+    Assertions.assertNotEquals(field1, field2);
+    Assertions.assertNotEquals(
+        field1.hashCode(),
+        field2.hashCode(),
+        "different GameFieldIml instances should have a different hashCode()!");
+  }
 }
