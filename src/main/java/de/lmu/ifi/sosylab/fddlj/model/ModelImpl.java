@@ -113,9 +113,8 @@ public class ModelImpl implements Model {
   @Override
   public Set<Cell> getPossibleMovesForPlayer(Player player) {
     Set<Cell> listOfMoves = new HashSet<>();
-    // TODO Change 8 to GameFieldImpl.SIZE
-    for (int column = 0; column < 8; column++) {
-      for (int row = 0; row < 8; row++) {
+    for (int column = 0; column < GameFieldImpl.SIZE; column++) {
+      for (int row = 0; row < GameFieldImpl.SIZE; row++) {
         Cell checkedCell = new CellImpl(column, row);
         Disk disk = new DiskImpl(state.getPlayerManagement().getCurrentPlayer());
         if (checkIfLegalMove(disk, checkedCell)) {

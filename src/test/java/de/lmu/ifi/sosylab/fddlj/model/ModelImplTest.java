@@ -28,7 +28,6 @@ public class ModelImplTest {
     state.setGameField(field);
     state.setCurrentPhase(Phase.RUNNING);
     state.setPlayerManagement(manager);
-
     return state;
   }
 
