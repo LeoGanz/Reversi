@@ -4,10 +4,13 @@
 # Ignore Gradle build output directory
 build
 /bin/
+
+# Ignore release jar
+releases/reversi-fddlj.jar
+
+# Eclipse IDE
 /.classpath
 /.project
 /.settings/
-
-# JetBrains IDEs
-.idea
 .DS_Store
+.idea
