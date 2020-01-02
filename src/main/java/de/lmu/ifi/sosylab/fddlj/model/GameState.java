@@ -1,14 +1,12 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
-import java.io.Serializable;
-
 /**
  * Implementation of a data structure class that contains all necessary attributes in order to
  * successfully play a game.
  *
  * @author Josef Feger, Leonard Ganz, Dora Proteanu
  */
-public interface GameState extends Serializable {
+public interface GameState {
 
   /**
    * Return the current {@link Phase phase} of the game.

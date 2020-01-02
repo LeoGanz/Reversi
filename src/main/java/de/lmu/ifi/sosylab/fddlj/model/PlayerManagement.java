@@ -39,5 +39,12 @@ public interface PlayerManagement {
    *     winner
    */
   Optional<Player> getWinner();
+
+  /**
+   * Returns a deep copy of the {@link PlayerManagement} this method is called for.
+   *
+   * @return a deep copy of the player management
+   */
+  PlayerManagement makeCopy();
 }
 

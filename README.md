@@ -1,7 +1,6 @@
-# Sample project
+# Reversi game
 
-This project consists of a simple gradle config and some example source files
-done for the SEP WS19/20 at LMU Munich.
+This project is going to contain our version of the reversi game.
 
 ## Dependencies
 
@@ -29,8 +28,8 @@ run all checks and create an executable jar:
 ./gradlew.bat build jar
 ```
 
-If the command succeeds, the jar is found in `build/libs/sample.jar`.
-This jar can be executed with `java -jar build/libs/sample.jar`
+If the command succeeds, the jar is found in `build/libs/reversi-fddlj.jar`.
+This jar can be executed with `java -jar build/libs/reversi-fddlj.jar`
 
 
 ## Running the Program
