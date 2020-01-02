@@ -11,26 +11,6 @@ import org.junit.jupiter.api.Test;
 public class MessageTest {
 
   @Test
-  public void testIntMessage() {
-    Message intMessage = new Message<>("int", 12);
-  }
-
-  @Test
-  public void testStringMessage() {
-    Message stringMessage = new Message<>("string", "Hey");
-  }
-
-  @Test
-  public void testBoolMessage() {
-    Message booleanMessage = new Message<>("boolean", true);
-  }
-
-  @Test
-  public void testObjectMessage() {
-    Message objectMessage = new Message<>("object", new Object());
-  }
-
-  @Test
   public void testGetType() {
     String type = "my-type";
     Message message = new Message<>(type, new Object());
