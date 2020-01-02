@@ -102,7 +102,7 @@ public class ModelImplTest {
     return state;
   }
 
-  private ModifiableGameState midToLateGame_playerTwosTurn() {
+  private ModifiableGameState midToLateGame_PlayerTwosTurn() {
     Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
     Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
     ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
@@ -332,22 +332,18 @@ public class ModelImplTest {
     for (int row = 2; row < 7; row++) {
       createdFakeList.add(new CellImpl(2, row));
     }
-    ModifiableGameState state = earlyGame_PlayerTwosTurn();
-    ModelImpl model = new ModelImpl(state);
-    Set<Cell> actualList =
-        model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer());
-    Assertions.assertEquals(createdFakeList, actualList);
+    helperGetPossibleMovesForPlayer(earlyGame_PlayerTwosTurn(), createdFakeList);
   }
 
   @Test
-  public void testGetPossibleMovesForPlayer_midGamePlayerTwo(){
+  public void testGetPossibleMovesForPlayer_midGamePlayerTwo() {
     Set<Cell> createdFakeList = new HashSet<>();
-    CellImpl cell1 = new CellImpl(0,3);
-    CellImpl cell2 = new CellImpl(0,4);
-    CellImpl cell3 = new CellImpl(0,5);
-    CellImpl cell4 = new CellImpl(1,5);
-    CellImpl cell5 = new CellImpl(1,6);
-    CellImpl cell6 = new CellImpl(2,6);
+    CellImpl cell1 = new CellImpl(0, 3);
+    CellImpl cell2 = new CellImpl(0, 4);
+    CellImpl cell3 = new CellImpl(0, 5);
+    CellImpl cell4 = new CellImpl(1, 5);
+    CellImpl cell5 = new CellImpl(1, 6);
+    CellImpl cell6 = new CellImpl(2, 6);
     createdFakeList.add(cell1);
     createdFakeList.add(cell2);
     createdFakeList.add(cell3);
@@ -355,11 +351,40 @@ public class ModelImplTest {
     createdFakeList.add(cell5);
     createdFakeList.add(cell6);
 
-    ModifiableGameState state = midGame_PlayerTwosTurn();
+    helperGetPossibleMovesForPlayer(midGame_PlayerTwosTurn(), createdFakeList);
+  }
+
+  @Test
+  public void testGetPossibleMovesForPlayer_MidToLatePlayerTwo() {
+    Set<Cell> createdFakeList = new HashSet<>();
+    CellImpl cell1 = new CellImpl(0, 2);
+    CellImpl cell2 = new CellImpl(0, 3);
+    CellImpl cell3 = new CellImpl(0, 4);
+    CellImpl cell4 = new CellImpl(4, 1);
+    CellImpl cell5 = new CellImpl(5, 2);
+
+    createdFakeList.add(cell1);
+    createdFakeList.add(cell2);
+    createdFakeList.add(cell3);
+    createdFakeList.add(cell4);
+    createdFakeList.add(cell5);
+
+    helperGetPossibleMovesForPlayer(midToLateGame_PlayerTwosTurn(), createdFakeList);
+  }
+
+  @Test
+  public void testGetPossibleMovesForPlayer_LateGamePlayerTwo() {
+    Set<Cell> createdFakeList = new HashSet<>();
+    createdFakeList.add(new CellImpl(7, 3));
+
+    helperGetPossibleMovesForPlayer(veryLateGame_PlayerTwosTurn(), createdFakeList);
+  }
+
+  private void helperGetPossibleMovesForPlayer(ModifiableGameState methodState, Set<Cell> list) {
+    ModifiableGameState state = methodState;
     ModelImpl model = new ModelImpl(state);
     Set<Cell> actualList =
-            model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer());
-    Assertions.assertEquals(createdFakeList, actualList);
-
+        model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer());
+    Assertions.assertEquals(list, actualList);
   }
 }
