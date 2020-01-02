@@ -141,4 +141,101 @@ public class ModelImplTest {
 
     return state;
   }
+
+  private ModifiableGameState lastMove06Game_PlayerOnesTurn() {
+    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiableGameField field = new GameFieldImpl();
+
+    for (int row = 0; row < 5; row++) {
+      field.set(new CellImpl(0, row), new DiskImpl(one));
+    }
+
+    for (int column = 1; column < 3; column++) {
+      for (int row = 6; row < 8; row++) {
+        field.set(new CellImpl(column, row), new DiskImpl(one));
+      }
+    }
+    for (int column = 2; column < 8; column++) {
+      field.set(new CellImpl(column, 0), new DiskImpl(one));
+    }
+    for (int row = 1; row < 7; row++) {
+      field.set(new CellImpl(7, row), new DiskImpl(one));
+    }
+    field.set(new CellImpl(3, 1), new DiskImpl(one));
+    field.set(new CellImpl(4, 1), new DiskImpl(one));
+    field.set(new CellImpl(6, 1), new DiskImpl(one));
+    field.set(new CellImpl(2, 2), new DiskImpl(one));
+    field.set(new CellImpl(5, 2), new DiskImpl(one));
+    field.set(new CellImpl(5, 3), new DiskImpl(one));
+    field.set(new CellImpl(3, 4), new DiskImpl(one));
+    field.set(new CellImpl(4, 4), new DiskImpl(one));
+    field.set(new CellImpl(5, 5), new DiskImpl(one));
+    field.set(new CellImpl(6, 6), new DiskImpl(one));
+    field.set(new CellImpl(6, 7), new DiskImpl(one));
+    field.set(new CellImpl(0, 7), new DiskImpl(one));
+
+    for (int row = 0; row < 5; row++) {
+      field.set(new CellImpl(1, row), new DiskImpl(two));
+    }
+    for (int column = 0; column < 5; column++) {
+      field.set(new CellImpl(column, 5), new DiskImpl(two));
+    }
+    for (int column = 3; column < 6; column++) {
+      for (int row = 6; row < 8; row++) {
+        field.set(new CellImpl(column, row), new DiskImpl(two));
+      }
+    }
+    for (int row = 2; row < 6; row++) {
+      field.set(new CellImpl(6, row), new DiskImpl(two));
+    }
+    field.set(new CellImpl(2, 1), new DiskImpl(two));
+    field.set(new CellImpl(2, 3), new DiskImpl(two));
+    field.set(new CellImpl(2, 4), new DiskImpl(two));
+    field.set(new CellImpl(3, 2), new DiskImpl(two));
+    field.set(new CellImpl(3, 3), new DiskImpl(two));
+    field.set(new CellImpl(4, 2), new DiskImpl(two));
+    field.set(new CellImpl(4, 3), new DiskImpl(two));
+    field.set(new CellImpl(5, 1), new DiskImpl(two));
+    field.set(new CellImpl(5, 4), new DiskImpl(two));
+    field.set(new CellImpl(7, 7), new DiskImpl(two));
+
+    ModifiableGameState state = new GameStateImpl();
+    state.setCurrentPhase(Phase.RUNNING);
+    state.setGameField(field);
+    state.setPlayerManagement(manager);
+
+    return state;
+  }
+
+  private ModifiableGameState midGame_PlayerOnesTurn() {
+    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiableGameField field = new GameFieldImpl();
+
+    for (int column = 1; column < 6; column++) {
+      field.set(new CellImpl(column, 4), new DiskImpl(one));
+    }
+    field.set(new CellImpl(2, 3), new DiskImpl(one));
+    field.set(new CellImpl(4, 3), new DiskImpl(one));
+    field.set(new CellImpl(5, 3), new DiskImpl(one));
+    field.set(new CellImpl(4, 1), new DiskImpl(one));
+
+    for (int column = 1; column < 7; column++) {
+      field.set(new CellImpl(column, 2), new DiskImpl(two));
+    }
+    field.set(new CellImpl(7, 1), new DiskImpl(two));
+    field.set(new CellImpl(1, 3), new DiskImpl(two));
+    field.set(new CellImpl(3, 3), new DiskImpl(two));
+    field.set(new CellImpl(3, 5), new DiskImpl(two));
+
+    ModifiableGameState state = new GameStateImpl();
+    state.setCurrentPhase(Phase.RUNNING);
+    state.setGameField(field);
+    state.setPlayerManagement(manager);
+
+    return state;
+  }
 }
