@@ -2,6 +2,8 @@ package de.lmu.ifi.sosylab.fddlj.model;
 
 import javafx.scene.paint.Color;
 
+import org.junit.jupiter.api.Test;
+
 public class ModelImplTest {
 
   private ModifiableGameState earlyGame_PlayerTwosTurn() {
@@ -232,6 +234,86 @@ public class ModelImplTest {
     field.set(new CellImpl(3, 5), new DiskImpl(two));
 
     ModifiableGameState state = new GameStateImpl();
+    state.setCurrentPhase(Phase.RUNNING);
+    state.setGameField(field);
+    state.setPlayerManagement(manager);
+
+    return state;
+  }
+
+  private ModifiableGameState earlyGame_PlayerOnesTurn() {
+    ModifiableGameField field = new GameFieldImpl();
+    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    Disk diskOne = new DiskImpl(one);
+    Disk diskTwo = new DiskImpl(two);
+
+    field.set(new CellImpl(4, 1), diskOne);
+    field.set(new CellImpl(2, 2), diskOne);
+    field.set(new CellImpl(3, 2), diskTwo);
+    field.set(new CellImpl(4, 2), diskOne);
+    field.set(new CellImpl(5, 2), diskTwo);
+    field.set(new CellImpl(1, 3), diskTwo);
+    field.set(new CellImpl(2, 3), diskTwo);
+    field.set(new CellImpl(3, 3), diskTwo);
+    field.set(new CellImpl(4, 3), diskTwo);
+    field.set(new CellImpl(5, 3), diskTwo);
+    field.set(new CellImpl(2, 4), diskOne);
+    field.set(new CellImpl(3, 4), diskOne);
+    field.set(new CellImpl(4, 4), diskOne);
+
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiableGameState state = new GameStateImpl();
+    state.setCurrentPhase(Phase.RUNNING);
+    state.setGameField(field);
+    state.setPlayerManagement(manager);
+
+    return state;
+  }
+
+  private ModifiableGameState midToLateGame_PlayerOnesTurn() {
+    ModifiableGameField field = new GameFieldImpl();
+    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    Disk diskOne = new DiskImpl(one);
+    Disk diskTwo = new DiskImpl(two);
+
+    for (int i = 0; i < 8; i++) {
+      for (int j = 1; j < 3; j++) {
+        field.set(new CellImpl(i, j), diskTwo);
+      }
+    }
+    field.set(new CellImpl(4, 1), diskOne);
+    field.set(new CellImpl(5, 1), diskOne);
+    field.remove(new CellImpl(7, 2));
+    for (int i = 2; i < 4; i++) {
+      for (int j = 0; j < 8; j++) {
+        field.set(new CellImpl(i, j), diskTwo);
+      }
+    }
+    field.remove(new CellImpl(2, 0));
+    field.set(new CellImpl(2, 5), diskOne);
+    field.remove(new CellImpl(2, 7));
+
+    field.set(new CellImpl(4, 0), diskTwo);
+    field.set(new CellImpl(5, 0), diskOne);
+    field.set(new CellImpl(1, 3), diskOne);
+    field.set(new CellImpl(4, 3), diskTwo);
+    field.set(new CellImpl(5, 3), diskTwo);
+    field.set(new CellImpl(1, 4), diskOne);
+    field.set(new CellImpl(4, 4), diskOne);
+    field.set(new CellImpl(5, 4), diskOne);
+    field.set(new CellImpl(6, 4), diskOne);
+    field.set(new CellImpl(7, 4), diskOne);
+    field.set(new CellImpl(0, 5), diskTwo);
+    field.set(new CellImpl(1, 5), diskTwo);
+    field.set(new CellImpl(4, 5), diskOne);
+    field.set(new CellImpl(4, 6), diskTwo);
+    field.set(new CellImpl(1, 7), diskOne);
+    field.set(new CellImpl(5, 7), diskTwo);
+
+    ModifiableGameState state = new GameStateImpl();
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
     state.setPlayerManagement(manager);
