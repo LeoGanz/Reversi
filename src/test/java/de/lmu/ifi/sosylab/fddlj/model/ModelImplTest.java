@@ -2,11 +2,15 @@ package de.lmu.ifi.sosylab.fddlj.model;
 
 import javafx.scene.paint.Color;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ModelImplTest {
 
-  private ModifiableGameState earlyGame_PlayerTwosTurn() {
+  public ModifiableGameState earlyGame_PlayerTwosTurn() {
     Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
     Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
     ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
@@ -23,6 +27,8 @@ public class ModelImplTest {
     ModifiableGameState state = new GameStateImpl();
     state.setGameField(field);
     state.setCurrentPhase(Phase.RUNNING);
+    state.setPlayerManagement(manager);
+
     return state;
   }
 
@@ -319,5 +325,42 @@ public class ModelImplTest {
     state.setPlayerManagement(manager);
 
     return state;
+  }
+
+  @Test
+  public void testGetPossibleMovesForPlayer_earlyGamePlayerTwo() {
+    Set<Cell> createdFakeList = new HashSet<>();
+    for (int row = 2; row < 7; row++) {
+      createdFakeList.add(new CellImpl(2, row));
+    }
+    ModifiableGameState state = earlyGame_PlayerTwosTurn();
+    ModelImpl model = new ModelImpl(state);
+    Set<Cell> actualList =
+        model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer());
+    Assertions.assertEquals(createdFakeList, actualList);
+  }
+
+  @Test
+  public void testGetPossibleMovesForPlayer_midGamePlayerTwo(){
+    Set<Cell> createdFakeList = new HashSet<>();
+    CellImpl cell1 = new CellImpl(0,3);
+    CellImpl cell2 = new CellImpl(0,4);
+    CellImpl cell3 = new CellImpl(0,5);
+    CellImpl cell4 = new CellImpl(1,5);
+    CellImpl cell5 = new CellImpl(1,6);
+    CellImpl cell6 = new CellImpl(2,6);
+    createdFakeList.add(cell1);
+    createdFakeList.add(cell2);
+    createdFakeList.add(cell3);
+    createdFakeList.add(cell4);
+    createdFakeList.add(cell5);
+    createdFakeList.add(cell6);
+
+    ModifiableGameState state = midGame_PlayerTwosTurn();
+    ModelImpl model = new ModelImpl(state);
+    Set<Cell> actualList =
+            model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer());
+    Assertions.assertEquals(createdFakeList, actualList);
+
   }
 }
