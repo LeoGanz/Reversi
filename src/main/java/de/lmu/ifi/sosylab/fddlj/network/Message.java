@@ -6,7 +6,7 @@ package de.lmu.ifi.sosylab.fddlj.network;
  *
  * @param <T> concrete data the message contains
  */
-public class Message <T> {
+public class Message<T> {
 
   /**
    * The message type, automatically set to the class name of the given object.
@@ -25,8 +25,7 @@ public class Message <T> {
    * @param type Type of the message as string.
    * @param data Data of the message
    */
-  public Message(String type, T data)
-  {
+  public Message(String type, T data) {
     this.type = type;
     this.data = data;
   }
