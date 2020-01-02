@@ -94,4 +94,51 @@ public class ModelImplTest {
 
     return state;
   }
+
+  private ModifiableGameState midToLateGame_playerTwosTurn() {
+    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    manager.switchCurrentPlayer();
+    ModifiableGameField field = new GameFieldImpl();
+    field.set(new CellImpl(0, 7), new DiskImpl(one));
+    field.set(new CellImpl(0, 6), new DiskImpl(one));
+    field.set(new CellImpl(0, 5), new DiskImpl(one));
+    field.set(new CellImpl(1, 7), new DiskImpl(one));
+    field.set(new CellImpl(1, 6), new DiskImpl(one));
+    field.set(new CellImpl(1, 5), new DiskImpl(one));
+    field.set(new CellImpl(1, 4), new DiskImpl(one));
+    field.set(new CellImpl(1, 3), new DiskImpl(one));
+    field.set(new CellImpl(2, 4), new DiskImpl(one));
+    field.set(new CellImpl(3, 3), new DiskImpl(one));
+    field.set(new CellImpl(4, 4), new DiskImpl(one));
+    field.set(new CellImpl(4, 3), new DiskImpl(one));
+    field.set(new CellImpl(4, 2), new DiskImpl(one));
+    field.set(new CellImpl(0, 1), new DiskImpl(two));
+    field.set(new CellImpl(1, 2), new DiskImpl(two));
+    field.set(new CellImpl(2, 2), new DiskImpl(two));
+    field.set(new CellImpl(2, 3), new DiskImpl(two));
+    field.set(new CellImpl(3, 1), new DiskImpl(two));
+    field.set(new CellImpl(3, 2), new DiskImpl(two));
+    field.set(new CellImpl(2, 5), new DiskImpl(two));
+    field.set(new CellImpl(2, 6), new DiskImpl(two));
+    field.set(new CellImpl(3, 4), new DiskImpl(two));
+    field.set(new CellImpl(3, 5), new DiskImpl(two));
+    field.set(new CellImpl(3, 6), new DiskImpl(two));
+    field.set(new CellImpl(4, 5), new DiskImpl(two));
+    field.set(new CellImpl(4, 6), new DiskImpl(two));
+    field.set(new CellImpl(5, 3), new DiskImpl(two));
+    field.set(new CellImpl(5, 4), new DiskImpl(two));
+    field.set(new CellImpl(5, 5), new DiskImpl(two));
+    field.set(new CellImpl(6, 4), new DiskImpl(two));
+    field.set(new CellImpl(6, 5), new DiskImpl(two));
+    field.set(new CellImpl(7, 4), new DiskImpl(two));
+
+    ModifiableGameState state = new GameStateImpl();
+    state.setCurrentPhase(Phase.RUNNING);
+    state.setGameField(field);
+    state.setPlayerManagement(manager);
+
+    return state;
+  }
 }
