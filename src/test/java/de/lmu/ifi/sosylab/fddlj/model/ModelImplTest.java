@@ -381,8 +381,7 @@ public class ModelImplTest {
   }
 
   private void helperGetPossibleMovesForPlayer(ModifiableGameState methodState, Set<Cell> list) {
-    ModifiableGameState state = methodState;
-    ModelImpl model = new ModelImpl(state);
+    ModelImpl model = new ModelImpl(methodState);
     Set<Cell> actualList =
         model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer());
     Assertions.assertEquals(list, actualList);
