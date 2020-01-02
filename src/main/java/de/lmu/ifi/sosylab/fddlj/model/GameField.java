@@ -1,6 +1,5 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -10,9 +9,8 @@ import java.util.Set;
  * which disks are on the different @{link Cell cells} on the game field.
  *
  * @author Josef Feger, Leonard Ganz
- *
  */
-public interface GameField extends Serializable {
+public interface GameField {
 
   /**
    * Return an {@link Optional} that may contain a {@link Disk}, depending on if there is one
