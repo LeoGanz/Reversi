@@ -177,7 +177,7 @@ public class ModelImpl implements Model {
     Player player = state.getField().get(cell).get().getPlayer();
 
     Player opponentPlayer =
-        (player == state.getPlayerManagement().getPlayerOne())
+        (player.equals(state.getPlayerManagement().getPlayerOne()))
             ? state.getPlayerManagement().getPlayerTwo()
             : state.getPlayerManagement().getPlayerOne();
 
@@ -223,7 +223,7 @@ public class ModelImpl implements Model {
    */
   private boolean checkIfLegalMove(Disk disk, Cell cell) {
 
-    if (!(disk.getPlayer() == state.getPlayerManagement().getCurrentPlayer())) {
+    if (!(disk.getPlayer().equals(state.getPlayerManagement().getCurrentPlayer()))) {
       return false;
     }
     if (state.getField().get(cell).isPresent()) {

@@ -90,9 +90,10 @@ public class ModelImplTest {
     }
     field.set(new CellImpl(5, 0), diskTwo);
     field.set(new CellImpl(5, 1), diskTwo);
-    field.set(new CellImpl(4, 7), diskTwo);
-    field.set(new CellImpl(5, 7), diskTwo);
-    field.set(new CellImpl(6, 7), diskTwo);
+    field.set(new CellImpl(7, 2), diskOne);
+    field.set(new CellImpl(7, 4), diskTwo);
+    field.set(new CellImpl(7, 5), diskTwo);
+    field.set(new CellImpl(7, 6), diskTwo);
 
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);

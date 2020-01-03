@@ -84,7 +84,7 @@ public class GameFieldImpl implements ModifiableGameField {
   @Override
   public boolean isCellOfPlayer(Player player, Cell cell) {
     if (field[cell.getColumn()][cell.getRow()] != null) {
-      return field[cell.getColumn()][cell.getRow()].getPlayer() == player;
+      return field[cell.getColumn()][cell.getRow()].getPlayer().equals(player);
     } else {
       return false;
     }
