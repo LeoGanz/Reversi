@@ -1,16 +1,16 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
+import java.util.HashSet;
+import java.util.Set;
 import javafx.scene.paint.Color;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+
 
 public class ModelImplTest {
 
-  public ModifiableGameState earlyGame_PlayerTwosTurn() {
+  private ModifiableGameState earlyGame_PlayerTwosTurn() {
     Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
     Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
     ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
@@ -153,7 +153,6 @@ public class ModelImplTest {
   private ModifiableGameState lastMove06Game_PlayerOnesTurn() {
     Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
     Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
     ModifiableGameField field = new GameFieldImpl();
 
     for (int row = 0; row < 5; row++) {
@@ -209,6 +208,7 @@ public class ModelImplTest {
     field.set(new CellImpl(5, 4), new DiskImpl(two));
     field.set(new CellImpl(7, 7), new DiskImpl(two));
 
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
@@ -220,7 +220,7 @@ public class ModelImplTest {
   private ModifiableGameState midGame_PlayerOnesTurn() {
     Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
     Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+
     ModifiableGameField field = new GameFieldImpl();
 
     for (int column = 1; column < 6; column++) {
@@ -239,6 +239,7 @@ public class ModelImplTest {
     field.set(new CellImpl(3, 3), new DiskImpl(two));
     field.set(new CellImpl(3, 5), new DiskImpl(two));
 
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
@@ -386,5 +387,62 @@ public class ModelImplTest {
     Set<Cell> actualList =
         model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer());
     Assertions.assertEquals(list, actualList);
+  }
+
+  @Test
+  public void testGetPossibleMovesForPlayer_LastMove06GamePlayerOne() {
+    Set<Cell> createdFakeList = new HashSet<>();
+    createdFakeList.add(new CellImpl(0, 6));
+    helperGetPossibleMovesForPlayer(lastMove06Game_PlayerOnesTurn(), createdFakeList);
+  }
+
+  @Test
+  public void testGetPossibleMovesForPlayer_MidGamePlayerOne() {
+    Set<Cell> createdFakeList = new HashSet<>();
+    createdFakeList.add(new CellImpl(0, 1));
+    createdFakeList.add(new CellImpl(1, 1));
+    createdFakeList.add(new CellImpl(2, 1));
+    createdFakeList.add(new CellImpl(3, 1));
+    createdFakeList.add(new CellImpl(5, 1));
+    createdFakeList.add(new CellImpl(6, 1));
+    createdFakeList.add(new CellImpl(0, 2));
+    createdFakeList.add(new CellImpl(0, 3));
+    createdFakeList.add(new CellImpl(6, 3));
+    createdFakeList.add(new CellImpl(2, 6));
+    createdFakeList.add(new CellImpl(3, 6));
+    createdFakeList.add(new CellImpl(4, 6));
+    helperGetPossibleMovesForPlayer(midGame_PlayerOnesTurn(), createdFakeList);
+  }
+
+  @Test
+  public void testGetPossibleMovesForPlayer_earlyGamePlayerOne() {
+    Set<Cell> createdFakeList = new HashSet<>();
+    createdFakeList.add(new CellImpl(3, 1));
+    createdFakeList.add(new CellImpl(6, 1));
+    createdFakeList.add(new CellImpl(0, 2));
+    createdFakeList.add(new CellImpl(1, 2));
+    createdFakeList.add(new CellImpl(6, 2));
+    createdFakeList.add(new CellImpl(6, 3));
+    createdFakeList.add(new CellImpl(0, 4));
+    createdFakeList.add(new CellImpl(1, 4));
+    createdFakeList.add(new CellImpl(6, 4));
+    helperGetPossibleMovesForPlayer(earlyGame_PlayerOnesTurn(), createdFakeList);
+  }
+
+  @Test
+  public void testGetPossibleMovesForPlayer_midToLateGamePlayerOne() {
+    Set<Cell> createdFakeList = new HashSet<>();
+    createdFakeList.add(new CellImpl(0, 0));
+    createdFakeList.add(new CellImpl(1, 0));
+    createdFakeList.add(new CellImpl(2, 0));
+    createdFakeList.add(new CellImpl(7, 0));
+    createdFakeList.add(new CellImpl(7, 2));
+    createdFakeList.add(new CellImpl(6, 3));
+    createdFakeList.add(new CellImpl(7, 3));
+    createdFakeList.add(new CellImpl(0, 6));
+    createdFakeList.add(new CellImpl(1, 6));
+    createdFakeList.add(new CellImpl(2, 7));
+    createdFakeList.add(new CellImpl(4, 7));
+    helperGetPossibleMovesForPlayer(midToLateGame_PlayerOnesTurn(), createdFakeList);
   }
 }

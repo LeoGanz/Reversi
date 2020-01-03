@@ -64,14 +64,14 @@ public interface Model {
   GameState getState();
 
   /**
-   * If the {@link Phase} is {@code Phase.WAITING} this method sets it to {@code Phase.RUNNING}
+   * If the {@link Phase} is {@code Phase.WAITING} this method sets it to {@code Phase.RUNNING}.
    *
    * @return {@code true} if the operation was successful and {@code false} otherwise.
    */
   boolean unsetWaiting();
 
   /**
-   * If the {@link Phase} is {@code Phase.RUNNING} this method sets it to {@code Phase.WAITING}
+   * If the {@link Phase} is {@code Phase.RUNNING} this method sets it to {@code Phase.WAITING}.
    *
    * @return {@code true} if the operation was successful and {@code false} otherwise.
    */

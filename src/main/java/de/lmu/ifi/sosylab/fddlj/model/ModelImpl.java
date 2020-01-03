@@ -266,7 +266,8 @@ public class ModelImpl implements Model {
     return false;
   }
 
-  /** Notifies all Listeners of a changed {@link GameState}. */
+  /** Notifies all
+   * Listeners of a changed {@link GameState}. */
   private void notifyListeners() {
     support.firePropertyChange("State changed", null, state.makeCopy());
   }
