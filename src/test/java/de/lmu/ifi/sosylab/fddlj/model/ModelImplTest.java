@@ -600,10 +600,9 @@ public class ModelImplTest {
           model.placeDisk(
               new DiskImpl(model.getState().getPlayerManagement().getPlayerTwo()),
               new CellImpl(-1, 0));
-      Assertions.fail("No exception on #get");
       Assertions.assertFalse(move);
-    } catch (IllegalArgumentException e) {
-      System.out.println("It recognised that the cell is out of bounds.");
+    } catch (Exception e) {
+      Assertions.assertTrue(e instanceof IllegalArgumentException);
     }
     ModelImpl createdModel = new ModelImpl(midGame_PlayerTwosTurn());
     helperPlaceDisk_NoWinner(createdModel, model);
