@@ -1,8 +1,11 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+
 import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -633,5 +636,175 @@ public class ModelImplTest {
             .getState()
             .getField()
             .getAllCellsForPlayer(model.getState().getPlayerManagement().getPlayerTwo()));
+  }
+
+  @Test
+  public void testGetState() {
+    ModelImpl game = new ModelImpl(midGame_PlayerTwosTurn());
+    Assertions.assertEquals(midGame_PlayerTwosTurn(), game.getState());
+  }
+
+  // Dummy class to allow testing of add and remove PropertyChangeListener
+  private class Pcldummy implements PropertyChangeListener {
+
+    GameState state;
+
+    Pcldummy() {
+      // Do Nothing
+    }
+
+    // Needed to appease Spotbugs. Always returns true.
+    @SuppressWarnings("unused")
+    boolean dummyMethod() {
+      GameState temp = earlyGame_PlayerTwosTurn();
+      if (temp.getCurrentPhase().equals(Phase.RUNNING)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    GameState getEventState() {
+      return state;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      state = (GameState) evt.getNewValue();
+    }
+  }
+
+  @Test
+  public void testAddListener_null() {
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    try {
+      game.addListener(null);
+    } catch (Exception e) {
+      Assertions.assertTrue(e instanceof NullPointerException);
+      return;
+    }
+    Assertions.fail();
+  }
+
+  @Test
+  public void testAddListener_notNull() {
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    Pcldummy dummy = new Pcldummy();
+    game.addListener(dummy);
+    game.placeDisk(
+        new DiskImpl(game.getState().getPlayerManagement().getCurrentPlayer()), new CellImpl(2, 2));
+    Assertions.assertNotNull(dummy.getEventState());
+  }
+
+  @Test
+  public void testRemoveListener_null() {
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    try {
+      game.removeListener(null);
+    } catch (Exception e) {
+      Assertions.assertTrue(e instanceof NullPointerException);
+      return;
+    }
+    Assertions.fail();
+  }
+
+  @Test
+  public void testRemoveListener_notNull() {
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    Pcldummy dummy = new Pcldummy();
+    game.addListener(dummy);
+    game.removeListener(dummy);
+    game.placeDisk(
+        new DiskImpl(game.getState().getPlayerManagement().getCurrentPlayer()), new CellImpl(2, 2));
+    Assertions.assertNull(dummy.getEventState());
+  }
+
+  @Test
+  public void testSetWaiting_gameRunning() {
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    Assertions.assertTrue(game.setWaiting());
+    Assertions.assertEquals(Phase.WAITING, game.getState().getCurrentPhase());
+  }
+
+  @Test
+  public void testSetWaiting_gameWaiting() {
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    game.setWaiting();
+    Assertions.assertFalse(game.setWaiting());
+    Assertions.assertEquals(Phase.WAITING, game.getState().getCurrentPhase());
+  }
+
+  @Test
+  public void testSetWaiting_gameFinished() {
+    ModifiableGameState state = earlyGame_PlayerTwosTurn();
+    state.setCurrentPhase(Phase.FINISHED);
+    ModelImpl game = new ModelImpl(state);
+    Assertions.assertFalse(game.setWaiting());
+    Assertions.assertEquals(Phase.FINISHED, game.getState().getCurrentPhase());
+  }
+
+  @Test
+  public void testUnsetWaiting_gameWaiting() {
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    game.setWaiting();
+    Assertions.assertTrue(game.unsetWaiting());
+    Assertions.assertEquals(Phase.RUNNING, game.getState().getCurrentPhase());
+  }
+
+  @Test
+  public void testUnsetWaiting_gameRunning() {
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    Assertions.assertFalse(game.unsetWaiting());
+    Assertions.assertEquals(Phase.RUNNING, game.getState().getCurrentPhase());
+  }
+
+  @Test
+  public void testUnsetWaiting_gameFinished() {
+    ModifiableGameState state = earlyGame_PlayerTwosTurn();
+    state.setCurrentPhase(Phase.FINISHED);
+    ModelImpl game = new ModelImpl(state);
+    Assertions.assertFalse(game.unsetWaiting());
+    Assertions.assertEquals(Phase.FINISHED, game.getState().getCurrentPhase());
+  }
+
+  @Test
+  public void testPlacementOfFirstDisks() {
+    Set<Cell> expectedMoves = new HashSet<>();
+    expectedMoves.add(new CellImpl(3, 3));
+    expectedMoves.add(new CellImpl(3, 4));
+    expectedMoves.add(new CellImpl(4, 3));
+    expectedMoves.add(new CellImpl(4, 4));
+
+    Player one = new PlayerImpl("Tina", Color.ALICEBLUE);
+    Player two = new PlayerImpl("Rhea", Color.ANTIQUEWHITE);
+    ModelImpl game = new ModelImpl(GameMode.HOTSEAT, one, two);
+
+    helperGetPossibleMovesForPlayer((ModifiableGameState) game.getState(), expectedMoves);
+
+    Assertions.assertTrue(
+        game.placeDisk(
+            new DiskImpl(game.getState().getPlayerManagement().getCurrentPlayer()),
+            new CellImpl(3, 3)));
+    expectedMoves.remove(new CellImpl(3, 3));
+    helperGetPossibleMovesForPlayer((ModifiableGameState) game.getState(), expectedMoves);
+
+    Assertions.assertTrue(
+        game.placeDisk(
+            new DiskImpl(game.getState().getPlayerManagement().getCurrentPlayer()),
+            new CellImpl(3, 4)));
+    expectedMoves.remove(new CellImpl(3, 4));
+    helperGetPossibleMovesForPlayer((ModifiableGameState) game.getState(), expectedMoves);
+
+    Assertions.assertTrue(
+        game.placeDisk(
+            new DiskImpl(game.getState().getPlayerManagement().getCurrentPlayer()),
+            new CellImpl(4, 3)));
+    expectedMoves.remove(new CellImpl(4, 3));
+    helperGetPossibleMovesForPlayer((ModifiableGameState) game.getState(), expectedMoves);
+
+    Assertions.assertTrue(
+        game.placeDisk(
+            new DiskImpl(game.getState().getPlayerManagement().getCurrentPlayer()),
+            new CellImpl(4, 4)));
   }
 }
