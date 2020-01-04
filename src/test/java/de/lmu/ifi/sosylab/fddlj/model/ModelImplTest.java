@@ -2,7 +2,6 @@ package de.lmu.ifi.sosylab.fddlj.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -521,37 +520,8 @@ public class ModelImplTest {
   }
 
   private void helperPlaceDisk_NoWinner(ModelImpl createdModel, ModelImpl model) {
-    Assertions.assertEquals(
-        createdModel.getState().getCurrentPhase(), model.getState().getCurrentPhase());
-    Assertions.assertEquals(
-        createdModel.getState().getField().getCellsOccupiedWithDisks(),
-        model.getState().getField().getCellsOccupiedWithDisks());
-    Assertions.assertEquals(
-        createdModel.getState().getPlayerManagement().getCurrentPlayer(),
-        model.getState().getPlayerManagement().getCurrentPlayer());
+    Assertions.assertEquals(createdModel.getState(), model.getState());
     Assertions.assertEquals(Optional.empty(), model.getState().getPlayerManagement().getWinner());
-    Assertions.assertEquals(
-        createdModel
-            .getState()
-            .getField()
-            .getAllCellsForPlayer(createdModel.getState().getPlayerManagement().getPlayerOne()),
-        model
-            .getState()
-            .getField()
-            .getAllCellsForPlayer(model.getState().getPlayerManagement().getPlayerOne()));
-    Assertions.assertEquals(
-        createdModel.getPossibleMovesForPlayer(
-            createdModel.getState().getPlayerManagement().getCurrentPlayer()),
-        model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer()));
-    Assertions.assertEquals(
-        createdModel
-            .getState()
-            .getField()
-            .getAllCellsForPlayer(createdModel.getState().getPlayerManagement().getPlayerTwo()),
-        model
-            .getState()
-            .getField()
-            .getAllCellsForPlayer(model.getState().getPlayerManagement().getPlayerTwo()));
   }
 
   @Test
