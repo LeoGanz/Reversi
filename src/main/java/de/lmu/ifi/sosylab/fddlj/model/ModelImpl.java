@@ -45,7 +45,8 @@ public class ModelImpl implements Model {
   }
 
   /**
-   * Creates a new game with a deep copy of the given {@link GameState}.
+   * Creates a new game with a deep copy of the given {@link GameState} and with the {@code
+   * GameMode.HOTSEAT}.
    *
    * @param newState with which the game shall be initialized.
    */
@@ -99,8 +100,8 @@ public class ModelImpl implements Model {
 
       notifyListeners();
 
-      if (mode.equals(GameMode.SINGLEPLAYER)) {
-        // TODO let AI move if SinglePlayer
+      if (mode.equals(GameMode.SINGLEPLAYER) /* && currentPlayer is the AI */) {
+        // TODO let AI move
         // TODO notify Listeners
       }
       return true;
@@ -163,8 +164,6 @@ public class ModelImpl implements Model {
       return false;
     }
   }
-
-  // TODO add method to interface to set the Model to Waiting if running
 
   /**
    * Turns all opponent's Disks lying between the placed Disk and another Disk of the same Player.
