@@ -229,8 +229,12 @@ public class ModelImpl implements Model {
     if (state.getField().get(cell).isPresent()) {
       return false;
     }
-    if (beginningMove(cell)) {
-      return true;
+    if (state.getField().getCellsOccupiedWithDisks().size() < 5) {
+      if (beginningMove(cell)) {
+        return true;
+      } else {
+        return false;
+      }
     }
     Player opponentPlayer =
         (state.getPlayerManagement().getCurrentPlayer()
