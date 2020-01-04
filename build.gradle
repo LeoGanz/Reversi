@@ -13,20 +13,35 @@ repositories {
 dependencies {
 	testCompile 'org.junit.jupiter:junit-jupiter:5.5.2'
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+	implementation 'com.google.code.gson:gson:2.8.6'
 }
 
+javafx {
+    modules = [ 'javafx.controls', 'javafx.fxml']
+    version = '11.0.2'
+}
+
+mainClassName = 'de.lmu.ifi.sosylab.fddlj.ReversiMain'
+
 application {
-    mainClassName = ''
+    mainClassName = "$mainClassName"
 }
 
 jar {
   manifest {
     attributes(
-      'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-      'Main-Class': 'de.lmu.ifi.sosylab.fddlj.ReversiMain'
+//      'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '), 
+      'Main-Class': "$mainClassName"
     )
   }
+  from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }{
+    exclude "*.dll"
+    exclude "module-info.class"
+  }
 }
+
 
 checkstyle {
   configFile = file('test/checkstyle.xml')
@@ -47,7 +62,3 @@ test {
 	}
 }
 
-javafx {
-	modules = [ 'javafx.controls', 'javafx.fxml']
-	version = '11.0.2'
-}
