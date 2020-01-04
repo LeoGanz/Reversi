@@ -2,6 +2,7 @@ package de.lmu.ifi.sosylab.fddlj.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -330,6 +331,33 @@ public class ModelImplTest {
     return state;
   }
 
+  private ModifiableGameState playerTwoCantMoveGame_PlayerOnesTurn() {
+    ModifiableGameField field = new GameFieldImpl();
+    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    Disk diskOne = new DiskImpl(one);
+    Disk diskTwo = new DiskImpl(two);
+
+    for (int column = 2; column < 7; column++) {
+      field.set(new CellImpl(column, 6), diskOne);
+    }
+    for (int column = 1; column < 8; column++) {
+      field.set(new CellImpl(column, 7), diskOne);
+    }
+    field.set(new CellImpl(0, 6), diskTwo);
+    field.set(new CellImpl(0, 7), diskTwo);
+    field.set(new CellImpl(1, 6), diskTwo);
+    field.set(new CellImpl(2, 5), diskTwo);
+
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiableGameState state = new GameStateImpl();
+    state.setCurrentPhase(Phase.RUNNING);
+    state.setGameField(field);
+    state.setPlayerManagement(manager);
+
+    return state;
+  }
+
   @Test
   public void testGetPossibleMovesForPlayer_earlyGamePlayerTwo() {
     Set<Cell> createdFakeList = new HashSet<>();
@@ -446,6 +474,20 @@ public class ModelImplTest {
     createdFakeList.add(new CellImpl(2, 7));
     createdFakeList.add(new CellImpl(4, 7));
     helperGetPossibleMovesForPlayer(midToLateGame_PlayerOnesTurn(), createdFakeList);
+  }
+
+  @Test
+  public void testGetPossibleMovesForPlayer_PlayerTwoSkipMove() {
+    ModelImpl model = new ModelImpl(playerTwoCantMoveGame_PlayerOnesTurn());
+    GameFieldImpl field = (GameFieldImpl) model.getState().getField();
+    field.set(
+        new CellImpl(7, 6), new DiskImpl(model.getState().getPlayerManagement().getPlayerOne()));
+    PlayerManagementImpl manager = (PlayerManagementImpl) model.getState().getPlayerManagement();
+    manager.switchCurrentPlayer();
+    Set<Cell> list = new HashSet<>();
+    Assertions.assertEquals(
+        list,
+        model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getPlayerTwo()));
   }
 
   @Test
@@ -602,9 +644,7 @@ public class ModelImplTest {
         (PlayerManagementImpl) createdModel.getState().getPlayerManagement();
     manager.setWinner(Optional.of(createdModel.getState().getPlayerManagement().getPlayerOne()));
 
-
-    Assertions.assertEquals(
-        Phase.FINISHED, model.getState().getCurrentPhase());
+    Assertions.assertEquals(Phase.FINISHED, model.getState().getCurrentPhase());
     Assertions.assertEquals(
         createdModel.getState().getField().getCellsOccupiedWithDisks(),
         model.getState().getField().getCellsOccupiedWithDisks());
@@ -636,6 +676,188 @@ public class ModelImplTest {
             .getState()
             .getField()
             .getAllCellsForPlayer(model.getState().getPlayerManagement().getPlayerTwo()));
+  }
+
+  @Test
+  public void testPlaceDisk_OnPhaseFinished() {
+    ModelImpl model = new ModelImpl(lastMove06Game_PlayerOnesTurn());
+    model.placeDisk(
+        new DiskImpl(model.getState().getPlayerManagement().getPlayerOne()), new CellImpl(0, 6));
+    boolean move =
+        model.placeDisk(
+            new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer()),
+            new CellImpl(1, 6));
+    boolean extraMove =
+        model.placeDisk(
+            new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer()),
+            new CellImpl(5, 6));
+    Assertions.assertFalse(move);
+    Assertions.assertFalse(extraMove);
+    ModelImpl createdModel = new ModelImpl(lastMove06Game_PlayerOnesTurn());
+    GameFieldImpl field = (GameFieldImpl) createdModel.getState().getField();
+    field.set(
+        new CellImpl(0, 5),
+        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
+    field.set(
+        new CellImpl(0, 6),
+        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
+    field.set(
+        new CellImpl(1, 5),
+        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
+    field.set(
+        new CellImpl(2, 4),
+        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
+    field.set(
+        new CellImpl(3, 3),
+        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
+    field.set(
+        new CellImpl(4, 2),
+        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
+    field.set(
+        new CellImpl(5, 1),
+        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
+    PlayerManagementImpl manager =
+        (PlayerManagementImpl) createdModel.getState().getPlayerManagement();
+    manager.setWinner(Optional.of(createdModel.getState().getPlayerManagement().getPlayerOne()));
+
+    Assertions.assertEquals(Phase.FINISHED, model.getState().getCurrentPhase());
+    Assertions.assertEquals(
+        createdModel.getState().getField().getCellsOccupiedWithDisks(),
+        model.getState().getField().getCellsOccupiedWithDisks());
+    Assertions.assertEquals(
+        createdModel.getState().getPlayerManagement().getCurrentPlayer(),
+        model.getState().getPlayerManagement().getCurrentPlayer());
+    Assertions.assertEquals(
+        createdModel.getState().getPlayerManagement().getWinner(),
+        model.getState().getPlayerManagement().getWinner());
+    Assertions.assertEquals(
+        createdModel
+            .getState()
+            .getField()
+            .getAllCellsForPlayer(createdModel.getState().getPlayerManagement().getPlayerOne()),
+        model
+            .getState()
+            .getField()
+            .getAllCellsForPlayer(model.getState().getPlayerManagement().getPlayerOne()));
+    Assertions.assertEquals(
+        createdModel.getPossibleMovesForPlayer(
+            createdModel.getState().getPlayerManagement().getCurrentPlayer()),
+        model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer()));
+    Assertions.assertEquals(
+        createdModel
+            .getState()
+            .getField()
+            .getAllCellsForPlayer(createdModel.getState().getPlayerManagement().getPlayerTwo()),
+        model
+            .getState()
+            .getField()
+            .getAllCellsForPlayer(model.getState().getPlayerManagement().getPlayerTwo()));
+  }
+
+  @Test
+  public void testPlaceDisk_NotCurrentPlayer_midToLateGamePlayerOne() {
+    ModelImpl model = new ModelImpl(midToLateGame_PlayerOnesTurn());
+    ModelImpl createdModel = new ModelImpl(midToLateGame_PlayerOnesTurn());
+    boolean move =
+        model.placeDisk(
+            new DiskImpl(model.getState().getPlayerManagement().getPlayerTwo()),
+            new CellImpl(6, 0));
+    Assertions.assertFalse(move);
+    helperPlaceDisk_NoWinner(createdModel, model);
+  }
+
+  @Test
+  public void testPlaceDisk_EmptyField() {
+    ModifiableGameField field = new GameFieldImpl();
+    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiableGameState state = new GameStateImpl();
+    state.setPlayerManagement(manager);
+    state.setGameField(field);
+    state.setCurrentPhase(Phase.RUNNING);
+    ModelImpl model = new ModelImpl(state);
+    boolean move = model.placeDisk(new DiskImpl(one), new CellImpl(3, 3));
+    Assertions.assertTrue(move);
+
+    ModifiableGameField createdField = new GameFieldImpl();
+    Player one1 = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two1 = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(one1, two1);
+    createdField.set(new CellImpl(3, 3), new DiskImpl(one1));
+    createdManager.switchCurrentPlayer();
+    ModifiableGameState createdState = new GameStateImpl();
+    createdState.setPlayerManagement(createdManager);
+    createdState.setGameField(createdField);
+    createdState.setCurrentPhase(Phase.RUNNING);
+    ModelImpl createdModel = new ModelImpl(createdState);
+
+    helperPlaceDisk_NoWinner(createdModel, model);
+  }
+
+  @Test
+  public void testPlaceDisk_EmptyField_InvalidMove() {
+    ModifiableGameField field = new GameFieldImpl();
+    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiableGameState state = new GameStateImpl();
+    state.setPlayerManagement(manager);
+    state.setGameField(field);
+    state.setCurrentPhase(Phase.RUNNING);
+    ModelImpl model = new ModelImpl(state);
+    boolean move = model.placeDisk(new DiskImpl(one), new CellImpl(7, 3));
+    Assertions.assertFalse(move);
+
+    ModifiableGameField createdField = new GameFieldImpl();
+    Player one1 = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two1 = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(one1, two1);
+    ModifiableGameState createdState = new GameStateImpl();
+    createdState.setPlayerManagement(createdManager);
+    createdState.setGameField(createdField);
+    createdState.setCurrentPhase(Phase.RUNNING);
+    ModelImpl createdModel = new ModelImpl(createdState);
+
+    helperPlaceDisk_NoWinner(createdModel, model);
+  }
+
+  @Test
+  public void testPlaceDisk_PlayerTwoSkipMove() {
+    ModelImpl model = new ModelImpl(playerTwoCantMoveGame_PlayerOnesTurn());
+    GameFieldImpl field = (GameFieldImpl) model.getState().getField();
+    field.set(
+        new CellImpl(6, 6), new DiskImpl(model.getState().getPlayerManagement().getPlayerTwo()));
+    boolean move =
+        model.placeDisk(
+            new DiskImpl(model.getState().getPlayerManagement().getPlayerOne()),
+            new CellImpl(7, 6));
+    Assertions.assertTrue(move);
+
+    ModifiableGameField createdField = new GameFieldImpl();
+    Player one1 = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+    Player two1 = new PlayerImpl("Rhea", Color.ALICEBLUE);
+    Disk diskOne = new DiskImpl(one1);
+    Disk diskTwo = new DiskImpl(two1);
+
+    for (int column = 2; column < 8; column++) {
+      createdField.set(new CellImpl(column, 6), diskOne);
+    }
+    for (int column = 1; column < 8; column++) {
+      createdField.set(new CellImpl(column, 7), diskOne);
+    }
+    createdField.set(new CellImpl(0, 6), diskTwo);
+    createdField.set(new CellImpl(0, 7), diskTwo);
+    createdField.set(new CellImpl(1, 6), diskTwo);
+    createdField.set(new CellImpl(2, 5), diskTwo);
+
+    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(one1, two1);
+    ModifiableGameState createdState = new GameStateImpl();
+    createdState.setCurrentPhase(Phase.RUNNING);
+    createdState.setGameField(createdField);
+    createdState.setPlayerManagement(createdManager);
+    ModelImpl createdModel = new ModelImpl(createdState);
+    helperPlaceDisk_NoWinner(createdModel, model);
   }
 
   @Test
