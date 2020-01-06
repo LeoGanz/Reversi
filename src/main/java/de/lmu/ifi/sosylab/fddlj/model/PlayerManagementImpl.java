@@ -114,7 +114,7 @@ public class PlayerManagementImpl implements ModifiablePlayerManagement {
   }
 
   @Override
-  public PlayerManagement makeCopy() {
+  public ModifiablePlayerManagement makeCopy() {
     return new PlayerManagementImpl(this);
   }
 

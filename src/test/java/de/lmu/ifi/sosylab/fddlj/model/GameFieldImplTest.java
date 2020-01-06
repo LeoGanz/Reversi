@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.Set;
 import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class GameFieldImplTest {
@@ -382,14 +381,14 @@ public class GameFieldImplTest {
 
   @Test
   public void testMakeCopy_gameField() {
-    GameFieldImpl field = createTestGameField().makeCopy();
+    ModifiableGameField field = createTestGameField().makeCopy();
     Assertions.assertEquals(
         createTestGameField().getCellsOccupiedWithDisks(), field.getCellsOccupiedWithDisks());
   }
 
   @Test
   public void testMakeCopy_testWithList() {
-    GameFieldImpl field = createTestGameField().makeCopy();
+    ModifiableGameField field = createTestGameField().makeCopy();
     Map<Cell, Player> list = field.getCellsOccupiedWithDisks();
     Assertions.assertEquals(5, list.size(), "We expected 5 but got: " + list.size());
   }

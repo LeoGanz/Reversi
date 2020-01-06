@@ -27,4 +27,7 @@ interface ModifiableGameField extends GameField {
    * @throws IllegalArgumentException if given cell is out of field bounds
    */
   Disk remove(Cell cell);
+
+  @Override
+  ModifiableGameField makeCopy();
 }
