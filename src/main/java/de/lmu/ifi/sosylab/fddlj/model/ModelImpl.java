@@ -68,16 +68,20 @@ public class ModelImpl implements Model {
       field.set(cell, disk);
       turnDisks(cell);
 
-      if (state.getPlayerManagement().getCurrentPlayer()
-          == state.getPlayerManagement().getPlayerOne()) {
+      if (state
+          .getPlayerManagement()
+          .getCurrentPlayer()
+          .equals(state.getPlayerManagement().getPlayerOne())) {
         numberOfPlayerOneDisks--;
         if (numberOfPlayerTwoDisks <= 0) {
           state.setCurrentPhase(Phase.FINISHED);
           handleWinner();
         }
       }
-      if (state.getPlayerManagement().getCurrentPlayer()
-          == state.getPlayerManagement().getPlayerTwo()) {
+      if (state
+          .getPlayerManagement()
+          .getCurrentPlayer()
+          .equals(state.getPlayerManagement().getPlayerTwo())) {
         numberOfPlayerTwoDisks--;
         if (numberOfPlayerOneDisks <= 0) {
           state.setCurrentPhase(Phase.FINISHED);
@@ -146,7 +150,7 @@ public class ModelImpl implements Model {
 
   @Override
   public boolean setWaiting() {
-    if (state.getCurrentPhase() == Phase.RUNNING) {
+    if (state.getCurrentPhase().equals(Phase.RUNNING)) {
       state.setCurrentPhase(Phase.WAITING);
       notifyListeners();
       return true;
@@ -157,7 +161,7 @@ public class ModelImpl implements Model {
 
   @Override
   public boolean unsetWaiting() {
-    if (state.getCurrentPhase() == Phase.WAITING) {
+    if (state.getCurrentPhase().equals(Phase.WAITING)) {
       state.setCurrentPhase(Phase.RUNNING);
       notifyListeners();
       return true;
@@ -238,8 +242,10 @@ public class ModelImpl implements Model {
       }
     }
     Player opponentPlayer =
-        (state.getPlayerManagement().getCurrentPlayer()
-                == state.getPlayerManagement().getPlayerOne())
+        (state
+                .getPlayerManagement()
+                .getCurrentPlayer()
+                .equals(state.getPlayerManagement().getPlayerOne()))
             ? state.getPlayerManagement().getPlayerTwo()
             : state.getPlayerManagement().getPlayerOne();
 
@@ -271,8 +277,7 @@ public class ModelImpl implements Model {
     return false;
   }
 
-  /** Notifies all
-   * Listeners of a changed {@link GameState}. */
+  /** Notifies all Listeners of a changed {@link GameState}. */
   private void notifyListeners() {
     support.firePropertyChange("State changed", null, state.makeCopy());
   }
