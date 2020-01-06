@@ -12,10 +12,11 @@ import org.junit.jupiter.api.Test;
 
 public class ModelImplTest {
 
+  private Player playerOne = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+  private Player playerTwo = new PlayerImpl("Rhea", Color.ALICEBLUE);
+
   private ModifiableGameState earlyGame_PlayerTwosTurn() {
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameField field = new GameFieldImpl();
     field.set(new CellImpl(3, 3), new DiskImpl(manager.getPlayerOne()));
     field.set(new CellImpl(3, 4), new DiskImpl(manager.getPlayerOne()));
@@ -34,14 +35,13 @@ public class ModelImplTest {
   }
 
   private ModifiableGameState midGame_PlayerTwosTurn() {
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     manager.switchCurrentPlayer();
 
     ModifiableGameField field = new GameFieldImpl();
-    Disk diskOne = new DiskImpl(one);
-    Disk diskTwo = new DiskImpl(two);
+    Disk diskOne = new DiskImpl(playerOne);
+    Disk diskTwo = new DiskImpl(playerTwo);
 
     field.set(new CellImpl(3, 1), diskTwo);
     field.set(new CellImpl(2, 2), diskTwo);
@@ -71,14 +71,13 @@ public class ModelImplTest {
   }
 
   private ModifiableGameState veryLateGame_PlayerTwosTurn() {
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     manager.switchCurrentPlayer();
 
     ModifiableGameField field = new GameFieldImpl();
-    Disk diskOne = new DiskImpl(one);
-    Disk diskTwo = new DiskImpl(two);
+    Disk diskOne = new DiskImpl(playerOne);
+    Disk diskTwo = new DiskImpl(playerTwo);
 
     for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 8; j++) {
@@ -106,43 +105,41 @@ public class ModelImplTest {
   }
 
   private ModifiableGameState midToLateGame_PlayerTwosTurn() {
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     manager.switchCurrentPlayer();
     ModifiableGameField field = new GameFieldImpl();
-    field.set(new CellImpl(0, 7), new DiskImpl(one));
-    field.set(new CellImpl(0, 6), new DiskImpl(one));
-    field.set(new CellImpl(0, 5), new DiskImpl(one));
-    field.set(new CellImpl(1, 7), new DiskImpl(one));
-    field.set(new CellImpl(1, 6), new DiskImpl(one));
-    field.set(new CellImpl(1, 5), new DiskImpl(one));
-    field.set(new CellImpl(1, 4), new DiskImpl(one));
-    field.set(new CellImpl(1, 3), new DiskImpl(one));
-    field.set(new CellImpl(2, 4), new DiskImpl(one));
-    field.set(new CellImpl(3, 3), new DiskImpl(one));
-    field.set(new CellImpl(4, 4), new DiskImpl(one));
-    field.set(new CellImpl(4, 3), new DiskImpl(one));
-    field.set(new CellImpl(4, 2), new DiskImpl(one));
-    field.set(new CellImpl(0, 1), new DiskImpl(two));
-    field.set(new CellImpl(1, 2), new DiskImpl(two));
-    field.set(new CellImpl(2, 2), new DiskImpl(two));
-    field.set(new CellImpl(2, 3), new DiskImpl(two));
-    field.set(new CellImpl(3, 1), new DiskImpl(two));
-    field.set(new CellImpl(3, 2), new DiskImpl(two));
-    field.set(new CellImpl(2, 5), new DiskImpl(two));
-    field.set(new CellImpl(2, 6), new DiskImpl(two));
-    field.set(new CellImpl(3, 4), new DiskImpl(two));
-    field.set(new CellImpl(3, 5), new DiskImpl(two));
-    field.set(new CellImpl(3, 6), new DiskImpl(two));
-    field.set(new CellImpl(4, 5), new DiskImpl(two));
-    field.set(new CellImpl(4, 6), new DiskImpl(two));
-    field.set(new CellImpl(5, 3), new DiskImpl(two));
-    field.set(new CellImpl(5, 4), new DiskImpl(two));
-    field.set(new CellImpl(5, 5), new DiskImpl(two));
-    field.set(new CellImpl(6, 4), new DiskImpl(two));
-    field.set(new CellImpl(6, 5), new DiskImpl(two));
-    field.set(new CellImpl(7, 4), new DiskImpl(two));
+    field.set(new CellImpl(0, 7), new DiskImpl(playerOne));
+    field.set(new CellImpl(0, 6), new DiskImpl(playerOne));
+    field.set(new CellImpl(0, 5), new DiskImpl(playerOne));
+    field.set(new CellImpl(1, 7), new DiskImpl(playerOne));
+    field.set(new CellImpl(1, 6), new DiskImpl(playerOne));
+    field.set(new CellImpl(1, 5), new DiskImpl(playerOne));
+    field.set(new CellImpl(1, 4), new DiskImpl(playerOne));
+    field.set(new CellImpl(1, 3), new DiskImpl(playerOne));
+    field.set(new CellImpl(2, 4), new DiskImpl(playerOne));
+    field.set(new CellImpl(3, 3), new DiskImpl(playerOne));
+    field.set(new CellImpl(4, 4), new DiskImpl(playerOne));
+    field.set(new CellImpl(4, 3), new DiskImpl(playerOne));
+    field.set(new CellImpl(4, 2), new DiskImpl(playerOne));
+    field.set(new CellImpl(0, 1), new DiskImpl(playerTwo));
+    field.set(new CellImpl(1, 2), new DiskImpl(playerTwo));
+    field.set(new CellImpl(2, 2), new DiskImpl(playerTwo));
+    field.set(new CellImpl(2, 3), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 1), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 2), new DiskImpl(playerTwo));
+    field.set(new CellImpl(2, 5), new DiskImpl(playerTwo));
+    field.set(new CellImpl(2, 6), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 4), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 5), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 6), new DiskImpl(playerTwo));
+    field.set(new CellImpl(4, 5), new DiskImpl(playerTwo));
+    field.set(new CellImpl(4, 6), new DiskImpl(playerTwo));
+    field.set(new CellImpl(5, 3), new DiskImpl(playerTwo));
+    field.set(new CellImpl(5, 4), new DiskImpl(playerTwo));
+    field.set(new CellImpl(5, 5), new DiskImpl(playerTwo));
+    field.set(new CellImpl(6, 4), new DiskImpl(playerTwo));
+    field.set(new CellImpl(6, 5), new DiskImpl(playerTwo));
+    field.set(new CellImpl(7, 4), new DiskImpl(playerTwo));
 
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
@@ -153,64 +150,62 @@ public class ModelImplTest {
   }
 
   private ModifiableGameState lastMove06Game_PlayerOnesTurn() {
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
     ModifiableGameField field = new GameFieldImpl();
 
     for (int row = 0; row < 5; row++) {
-      field.set(new CellImpl(0, row), new DiskImpl(one));
+      field.set(new CellImpl(0, row), new DiskImpl(playerOne));
     }
 
     for (int column = 1; column < 3; column++) {
       for (int row = 6; row < 8; row++) {
-        field.set(new CellImpl(column, row), new DiskImpl(one));
+        field.set(new CellImpl(column, row), new DiskImpl(playerOne));
       }
     }
     for (int column = 2; column < 8; column++) {
-      field.set(new CellImpl(column, 0), new DiskImpl(one));
+      field.set(new CellImpl(column, 0), new DiskImpl(playerOne));
     }
     for (int row = 1; row < 7; row++) {
-      field.set(new CellImpl(7, row), new DiskImpl(one));
+      field.set(new CellImpl(7, row), new DiskImpl(playerOne));
     }
-    field.set(new CellImpl(3, 1), new DiskImpl(one));
-    field.set(new CellImpl(4, 1), new DiskImpl(one));
-    field.set(new CellImpl(6, 1), new DiskImpl(one));
-    field.set(new CellImpl(2, 2), new DiskImpl(one));
-    field.set(new CellImpl(5, 2), new DiskImpl(one));
-    field.set(new CellImpl(5, 3), new DiskImpl(one));
-    field.set(new CellImpl(3, 4), new DiskImpl(one));
-    field.set(new CellImpl(4, 4), new DiskImpl(one));
-    field.set(new CellImpl(5, 5), new DiskImpl(one));
-    field.set(new CellImpl(6, 6), new DiskImpl(one));
-    field.set(new CellImpl(6, 7), new DiskImpl(one));
-    field.set(new CellImpl(0, 7), new DiskImpl(one));
+    field.set(new CellImpl(3, 1), new DiskImpl(playerOne));
+    field.set(new CellImpl(4, 1), new DiskImpl(playerOne));
+    field.set(new CellImpl(6, 1), new DiskImpl(playerOne));
+    field.set(new CellImpl(2, 2), new DiskImpl(playerOne));
+    field.set(new CellImpl(5, 2), new DiskImpl(playerOne));
+    field.set(new CellImpl(5, 3), new DiskImpl(playerOne));
+    field.set(new CellImpl(3, 4), new DiskImpl(playerOne));
+    field.set(new CellImpl(4, 4), new DiskImpl(playerOne));
+    field.set(new CellImpl(5, 5), new DiskImpl(playerOne));
+    field.set(new CellImpl(6, 6), new DiskImpl(playerOne));
+    field.set(new CellImpl(6, 7), new DiskImpl(playerOne));
+    field.set(new CellImpl(0, 7), new DiskImpl(playerOne));
 
     for (int row = 0; row < 5; row++) {
-      field.set(new CellImpl(1, row), new DiskImpl(two));
+      field.set(new CellImpl(1, row), new DiskImpl(playerTwo));
     }
     for (int column = 0; column < 5; column++) {
-      field.set(new CellImpl(column, 5), new DiskImpl(two));
+      field.set(new CellImpl(column, 5), new DiskImpl(playerTwo));
     }
     for (int column = 3; column < 6; column++) {
       for (int row = 6; row < 8; row++) {
-        field.set(new CellImpl(column, row), new DiskImpl(two));
+        field.set(new CellImpl(column, row), new DiskImpl(playerTwo));
       }
     }
     for (int row = 2; row < 6; row++) {
-      field.set(new CellImpl(6, row), new DiskImpl(two));
+      field.set(new CellImpl(6, row), new DiskImpl(playerTwo));
     }
-    field.set(new CellImpl(2, 1), new DiskImpl(two));
-    field.set(new CellImpl(2, 3), new DiskImpl(two));
-    field.set(new CellImpl(2, 4), new DiskImpl(two));
-    field.set(new CellImpl(3, 2), new DiskImpl(two));
-    field.set(new CellImpl(3, 3), new DiskImpl(two));
-    field.set(new CellImpl(4, 2), new DiskImpl(two));
-    field.set(new CellImpl(4, 3), new DiskImpl(two));
-    field.set(new CellImpl(5, 1), new DiskImpl(two));
-    field.set(new CellImpl(5, 4), new DiskImpl(two));
-    field.set(new CellImpl(7, 7), new DiskImpl(two));
+    field.set(new CellImpl(2, 1), new DiskImpl(playerTwo));
+    field.set(new CellImpl(2, 3), new DiskImpl(playerTwo));
+    field.set(new CellImpl(2, 4), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 2), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 3), new DiskImpl(playerTwo));
+    field.set(new CellImpl(4, 2), new DiskImpl(playerTwo));
+    field.set(new CellImpl(4, 3), new DiskImpl(playerTwo));
+    field.set(new CellImpl(5, 1), new DiskImpl(playerTwo));
+    field.set(new CellImpl(5, 4), new DiskImpl(playerTwo));
+    field.set(new CellImpl(7, 7), new DiskImpl(playerTwo));
 
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
@@ -220,28 +215,26 @@ public class ModelImplTest {
   }
 
   private ModifiableGameState midGame_PlayerOnesTurn() {
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
 
     ModifiableGameField field = new GameFieldImpl();
 
     for (int column = 1; column < 6; column++) {
-      field.set(new CellImpl(column, 4), new DiskImpl(one));
+      field.set(new CellImpl(column, 4), new DiskImpl(playerOne));
     }
-    field.set(new CellImpl(2, 3), new DiskImpl(one));
-    field.set(new CellImpl(4, 3), new DiskImpl(one));
-    field.set(new CellImpl(5, 3), new DiskImpl(one));
-    field.set(new CellImpl(4, 1), new DiskImpl(one));
+    field.set(new CellImpl(2, 3), new DiskImpl(playerOne));
+    field.set(new CellImpl(4, 3), new DiskImpl(playerOne));
+    field.set(new CellImpl(5, 3), new DiskImpl(playerOne));
+    field.set(new CellImpl(4, 1), new DiskImpl(playerOne));
 
     for (int column = 1; column < 7; column++) {
-      field.set(new CellImpl(column, 2), new DiskImpl(two));
+      field.set(new CellImpl(column, 2), new DiskImpl(playerTwo));
     }
-    field.set(new CellImpl(7, 1), new DiskImpl(two));
-    field.set(new CellImpl(1, 3), new DiskImpl(two));
-    field.set(new CellImpl(3, 3), new DiskImpl(two));
-    field.set(new CellImpl(3, 5), new DiskImpl(two));
+    field.set(new CellImpl(7, 1), new DiskImpl(playerTwo));
+    field.set(new CellImpl(1, 3), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 3), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 5), new DiskImpl(playerTwo));
 
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
@@ -252,10 +245,8 @@ public class ModelImplTest {
 
   private ModifiableGameState earlyGame_PlayerOnesTurn() {
     ModifiableGameField field = new GameFieldImpl();
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    Disk diskOne = new DiskImpl(one);
-    Disk diskTwo = new DiskImpl(two);
+    Disk diskOne = new DiskImpl(playerOne);
+    Disk diskTwo = new DiskImpl(playerTwo);
 
     field.set(new CellImpl(4, 1), diskOne);
     field.set(new CellImpl(2, 2), diskOne);
@@ -271,7 +262,7 @@ public class ModelImplTest {
     field.set(new CellImpl(3, 4), diskOne);
     field.set(new CellImpl(4, 4), diskOne);
 
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
@@ -282,10 +273,8 @@ public class ModelImplTest {
 
   private ModifiableGameState midToLateGame_PlayerOnesTurn() {
     ModifiableGameField field = new GameFieldImpl();
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    Disk diskOne = new DiskImpl(one);
-    Disk diskTwo = new DiskImpl(two);
+    Disk diskOne = new DiskImpl(playerOne);
+    Disk diskTwo = new DiskImpl(playerTwo);
 
     for (int i = 0; i < 8; i++) {
       for (int j = 1; j < 3; j++) {
@@ -322,7 +311,7 @@ public class ModelImplTest {
     field.set(new CellImpl(5, 7), diskTwo);
 
     ModifiableGameState state = new GameStateImpl();
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
     state.setPlayerManagement(manager);
@@ -332,10 +321,8 @@ public class ModelImplTest {
 
   private ModifiableGameState playerTwoCantMoveGame_PlayerOnesTurn() {
     ModifiableGameField field = new GameFieldImpl();
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    Disk diskOne = new DiskImpl(one);
-    Disk diskTwo = new DiskImpl(two);
+    Disk diskOne = new DiskImpl(playerOne);
+    Disk diskTwo = new DiskImpl(playerTwo);
 
     for (int column = 2; column < 7; column++) {
       field.set(new CellImpl(column, 6), diskOne);
@@ -348,7 +335,7 @@ public class ModelImplTest {
     field.set(new CellImpl(1, 6), diskTwo);
     field.set(new CellImpl(2, 5), diskTwo);
 
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
@@ -499,10 +486,8 @@ public class ModelImplTest {
     Assertions.assertTrue(move);
 
     GameFieldImpl field = new GameFieldImpl();
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    Disk diskOne = new DiskImpl(one);
-    Disk diskTwo = new DiskImpl(two);
+    Disk diskOne = new DiskImpl(playerOne);
+    Disk diskTwo = new DiskImpl(playerTwo);
     field.set(new CellImpl(2, 3), diskTwo);
     field.set(new CellImpl(3, 3), diskTwo);
     field.set(new CellImpl(4, 3), diskTwo);
@@ -511,7 +496,7 @@ public class ModelImplTest {
     field.set(new CellImpl(4, 5), diskTwo);
     field.set(new CellImpl(3, 5), diskOne);
     ModifiableGameState state = new GameStateImpl();
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
     state.setPlayerManagement(manager);
@@ -672,22 +657,18 @@ public class ModelImplTest {
   @Test
   public void testPlaceDisk_EmptyField() {
     ModifiableGameField field = new GameFieldImpl();
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState state = new GameStateImpl();
     state.setPlayerManagement(manager);
     state.setGameField(field);
     state.setCurrentPhase(Phase.RUNNING);
     ModelImpl model = new ModelImpl(state, GameMode.HOTSEAT);
-    boolean move = model.placeDisk(new DiskImpl(one), new CellImpl(3, 3));
+    boolean move = model.placeDisk(new DiskImpl(playerOne), new CellImpl(3, 3));
     Assertions.assertTrue(move);
 
     ModifiableGameField createdField = new GameFieldImpl();
-    Player one1 = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two1 = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(one1, two1);
-    createdField.set(new CellImpl(3, 3), new DiskImpl(one1));
+    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(playerOne, playerTwo);
+    createdField.set(new CellImpl(3, 3), new DiskImpl(playerOne));
     createdManager.switchCurrentPlayer();
     ModifiableGameState createdState = new GameStateImpl();
     createdState.setPlayerManagement(createdManager);
@@ -701,21 +682,17 @@ public class ModelImplTest {
   @Test
   public void testPlaceDisk_EmptyField_InvalidMove() {
     ModifiableGameField field = new GameFieldImpl();
-    Player one = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(one, two);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState state = new GameStateImpl();
     state.setPlayerManagement(manager);
     state.setGameField(field);
     state.setCurrentPhase(Phase.RUNNING);
     ModelImpl model = new ModelImpl(state, GameMode.HOTSEAT);
-    boolean move = model.placeDisk(new DiskImpl(one), new CellImpl(7, 3));
+    boolean move = model.placeDisk(new DiskImpl(playerOne), new CellImpl(7, 3));
     Assertions.assertFalse(move);
 
     ModifiableGameField createdField = new GameFieldImpl();
-    Player one1 = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two1 = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(one1, two1);
+    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState createdState = new GameStateImpl();
     createdState.setPlayerManagement(createdManager);
     createdState.setGameField(createdField);
@@ -738,10 +715,8 @@ public class ModelImplTest {
     Assertions.assertTrue(move);
 
     ModifiableGameField createdField = new GameFieldImpl();
-    Player one1 = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-    Player two1 = new PlayerImpl("Rhea", Color.ALICEBLUE);
-    Disk diskOne = new DiskImpl(one1);
-    Disk diskTwo = new DiskImpl(two1);
+    Disk diskOne = new DiskImpl(playerOne);
+    Disk diskTwo = new DiskImpl(playerTwo);
 
     for (int column = 2; column < 8; column++) {
       createdField.set(new CellImpl(column, 6), diskOne);
@@ -754,7 +729,7 @@ public class ModelImplTest {
     createdField.set(new CellImpl(1, 6), diskTwo);
     createdField.set(new CellImpl(2, 5), diskTwo);
 
-    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(one1, two1);
+    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState createdState = new GameStateImpl();
     createdState.setCurrentPhase(Phase.RUNNING);
     createdState.setGameField(createdField);
@@ -900,9 +875,7 @@ public class ModelImplTest {
     expectedMoves.add(new CellImpl(4, 3));
     expectedMoves.add(new CellImpl(4, 4));
 
-    Player one = new PlayerImpl("Tina", Color.ALICEBLUE);
-    Player two = new PlayerImpl("Rhea", Color.ANTIQUEWHITE);
-    ModelImpl game = new ModelImpl(GameMode.HOTSEAT, one, two);
+    ModelImpl game = new ModelImpl(GameMode.HOTSEAT, playerOne, playerTwo);
 
     helperGetPossibleMovesForPlayer((ModifiableGameState) game.getState(), expectedMoves);
 
