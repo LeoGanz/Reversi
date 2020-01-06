@@ -273,7 +273,7 @@ public class ModelImpl implements Model {
   /** Notifies all Listeners of
    * a changed {@link GameState}. */
   private void notifyListeners() {
-    support.firePropertyChange("State changed", null, state.makeCopy());
+    support.firePropertyChange(Model.STATE_CHANGED, null, state.makeCopy());
   }
 
   /**
