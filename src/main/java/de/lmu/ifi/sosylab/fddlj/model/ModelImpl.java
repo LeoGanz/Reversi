@@ -20,6 +20,7 @@ public class ModelImpl implements Model {
   private ModifiableGameState state;
   private GameMode mode;
   // private AI ai;
+  private static final int NUMBER_OF_MOVES_IN_BEGINNING_PHASE = 4;
   private static final int DISKS_PER_PLAYER = 32;
   private int numberOfPlayerOneDisks = DISKS_PER_PLAYER;
   private int numberOfPlayerTwoDisks = DISKS_PER_PLAYER;
@@ -45,15 +46,15 @@ public class ModelImpl implements Model {
   }
 
   /**
-   * Creates a new game with a deep copy of the given {@link GameState} and with the {@code
-   * GameMode.HOTSEAT}.
+   * Creates a new game with a deep copy of the given {@link GameState} and {@link GameMode}.
    *
    * @param newState with which the game shall be initialized.
+   * @param mode with which the game shall be initialized.
    */
-  ModelImpl(GameState newState) {
+  public ModelImpl(GameState newState, GameMode mode) {
     support = new PropertyChangeSupport(this);
     state = (ModifiableGameState) newState.makeCopy();
-    this.mode = GameMode.HOTSEAT;
+    this.mode = mode;
   }
 
   @Override
@@ -166,7 +167,8 @@ public class ModelImpl implements Model {
   }
 
   /**
-   * Turns all opponent's Disks lying between the placed Disk and another Disk of the same Player.
+   * Turns all Disks belonging to the opponent lying between the placed Disk and another Disk of the
+   * same Player.
    *
    * @param cell at which a disk was recently placed. The cell must not be empty.
    */
@@ -228,8 +230,8 @@ public class ModelImpl implements Model {
     if (state.getField().get(cell).isPresent()) {
       return false;
     }
-    if (state.getField().getCellsOccupiedWithDisks().size() < 5) {
-      if (beginningMove(cell)) {
+    if (state.getField().getCellsOccupiedWithDisks().size() <= NUMBER_OF_MOVES_IN_BEGINNING_PHASE) {
+      if (isWithinMiddleSquare(cell)) {
         return true;
       } else {
         return false;
@@ -276,21 +278,22 @@ public class ModelImpl implements Model {
   }
 
   /**
-   * Checks whether a disk can be placed at the given {@link Cell} during the first four moves.
+   * Checks whether a {@link Cell} is part of the middle of the {@link GameField} in which {@link
+   * Disk} are placed during the very beginning of the game.
    *
    * @param cell which shall be checked.
-   * @return {@code true} if the disk can be placed at the cell during the first four moves, {@code
+   * @return {@code true} if the disk can be placed at the cell during the first moves, {@code
    *     false} otherwise.
    */
-  private boolean beginningMove(Cell cell) {
-    if (state.getField().getCellsOccupiedWithDisks().size() < 5) {
-      if (cell.getRow() > 2
-          && cell.getRow() < 5
-          && cell.getColumn() > 2
-          && cell.getColumn() < 5
-          && state.getField().get(cell).isEmpty()) {
-        return true;
-      }
+  private boolean isWithinMiddleSquare(Cell cell) {
+    int minCoordinate = GameFieldImpl.SIZE / 2 - 1;
+    int maxCoordinate = GameFieldImpl.SIZE / 2;
+    if (cell.getRow() >= minCoordinate
+        && cell.getRow() <= maxCoordinate
+        && cell.getColumn() >= minCoordinate
+        && cell.getColumn() <= maxCoordinate
+        && state.getField().get(cell).isEmpty()) {
+      return true;
     }
     return false;
   }
@@ -300,16 +303,19 @@ public class ModelImpl implements Model {
     if (!(state.getCurrentPhase().equals(Phase.FINISHED))) {
       return;
     }
-    int numberOfDiscsPlayerOne =
+    int numberOfDisksPlayerOne =
         state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerOne()).size();
-    int numberOfDiscsPlayerTwo =
+    int numberOfDisksPlayerTwo =
         state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerTwo()).size();
     ModifiablePlayerManagement manager = (ModifiablePlayerManagement) state.getPlayerManagement();
 
-    if (numberOfDiscsPlayerOne > numberOfDiscsPlayerTwo) {
-      manager.setWinner(Optional.of(manager.getPlayerOne()));
+    if (numberOfDisksPlayerOne == numberOfDisksPlayerTwo) {
+      manager.setWinner(Optional.empty());
+      return;
     }
-    if (numberOfDiscsPlayerOne < numberOfDiscsPlayerTwo) {
+    if (numberOfDisksPlayerOne > numberOfDisksPlayerTwo) {
+      manager.setWinner(Optional.of(manager.getPlayerOne()));
+    } else {
       manager.setWinner(Optional.of(manager.getPlayerTwo()));
     }
   }

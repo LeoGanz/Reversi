@@ -412,7 +412,7 @@ public class ModelImplTest {
   }
 
   private void helperGetPossibleMovesForPlayer(ModifiableGameState methodState, Set<Cell> list) {
-    ModelImpl model = new ModelImpl(methodState);
+    ModelImpl model = new ModelImpl(methodState, GameMode.HOTSEAT);
     Set<Cell> actualList =
         model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer());
     Assertions.assertEquals(list, actualList);
@@ -477,7 +477,7 @@ public class ModelImplTest {
 
   @Test
   public void testGetPossibleMovesForPlayer_PlayerTwoSkipMove() {
-    ModelImpl model = new ModelImpl(playerTwoCantMoveGame_PlayerOnesTurn());
+    ModelImpl model = new ModelImpl(playerTwoCantMoveGame_PlayerOnesTurn(), GameMode.HOTSEAT);
     GameFieldImpl field = (GameFieldImpl) model.getState().getField();
     field.set(
         new CellImpl(7, 6), new DiskImpl(model.getState().getPlayerManagement().getPlayerOne()));
@@ -491,7 +491,7 @@ public class ModelImplTest {
 
   @Test
   public void testPlaceDisk_earlyFieldPlayerTwo_correctMove() {
-    ModelImpl model = new ModelImpl(earlyGame_PlayerTwosTurn());
+    ModelImpl model = new ModelImpl(earlyGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     boolean move =
         model.placeDisk(
             new DiskImpl(model.getState().getPlayerManagement().getPlayerTwo()),
@@ -515,7 +515,7 @@ public class ModelImplTest {
     state.setCurrentPhase(Phase.RUNNING);
     state.setGameField(field);
     state.setPlayerManagement(manager);
-    ModelImpl createdModel = new ModelImpl(state);
+    ModelImpl createdModel = new ModelImpl(state, GameMode.HOTSEAT);
     helperPlaceDisk_NoWinner(createdModel, model);
   }
 
@@ -526,11 +526,11 @@ public class ModelImplTest {
 
   @Test
   public void testPlaceDisk_MidGamePlayerTwo_CorrectMove() {
-    ModelImpl model = new ModelImpl(midGame_PlayerTwosTurn());
+    ModelImpl model = new ModelImpl(midGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     model.placeDisk(
         new DiskImpl(model.getState().getPlayerManagement().getPlayerTwo()), new CellImpl(0, 4));
 
-    ModelImpl createdModel = new ModelImpl(midGame_PlayerTwosTurn());
+    ModelImpl createdModel = new ModelImpl(midGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     GameFieldImpl field = (GameFieldImpl) createdModel.getState().getField();
     field.set(
         new CellImpl(0, 4),
@@ -552,19 +552,19 @@ public class ModelImplTest {
 
   @Test
   public void testPlaceDisk_MidGamePlayerTwo_IncorrectMove() {
-    ModelImpl model = new ModelImpl(midGame_PlayerTwosTurn());
+    ModelImpl model = new ModelImpl(midGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     boolean move =
         model.placeDisk(
             new DiskImpl(model.getState().getPlayerManagement().getPlayerTwo()),
             new CellImpl(0, 0));
-    ModelImpl createdModel = new ModelImpl(midGame_PlayerTwosTurn());
+    ModelImpl createdModel = new ModelImpl(midGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     Assertions.assertFalse(move);
     helperPlaceDisk_NoWinner(createdModel, model);
   }
 
   @Test
   public void testPlaceDisk_InvalidCell() {
-    ModelImpl model = new ModelImpl(midGame_PlayerTwosTurn());
+    ModelImpl model = new ModelImpl(midGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     try {
       boolean move =
           model.placeDisk(
@@ -574,19 +574,19 @@ public class ModelImplTest {
     } catch (Exception e) {
       Assertions.assertTrue(e instanceof IllegalArgumentException);
     }
-    ModelImpl createdModel = new ModelImpl(midGame_PlayerTwosTurn());
+    ModelImpl createdModel = new ModelImpl(midGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     helperPlaceDisk_NoWinner(createdModel, model);
   }
 
   @Test
   public void testPlaceDisk_LastMove06GamePlayerOne_CorrectMove() {
-    ModelImpl model = new ModelImpl(lastMove06Game_PlayerOnesTurn());
+    ModelImpl model = new ModelImpl(lastMove06Game_PlayerOnesTurn(), GameMode.HOTSEAT);
     boolean move =
         model.placeDisk(
             new DiskImpl(model.getState().getPlayerManagement().getPlayerOne()),
             new CellImpl(0, 6));
     Assertions.assertTrue(move);
-    ModelImpl createdModel = new ModelImpl(lastMove06Game_PlayerOnesTurn());
+    ModelImpl createdModel = new ModelImpl(lastMove06Game_PlayerOnesTurn(), GameMode.HOTSEAT);
     GameFieldImpl field = (GameFieldImpl) createdModel.getState().getField();
     field.set(
         new CellImpl(0, 5),
@@ -649,7 +649,7 @@ public class ModelImplTest {
 
   @Test
   public void testPlaceDisk_OnPhaseFinished() {
-    ModelImpl model = new ModelImpl(lastMove06Game_PlayerOnesTurn());
+    ModelImpl model = new ModelImpl(lastMove06Game_PlayerOnesTurn(), GameMode.HOTSEAT);
     model.placeDisk(
         new DiskImpl(model.getState().getPlayerManagement().getPlayerOne()), new CellImpl(0, 6));
     boolean move =
@@ -662,7 +662,7 @@ public class ModelImplTest {
             new CellImpl(5, 6));
     Assertions.assertFalse(move);
     Assertions.assertFalse(extraMove);
-    ModelImpl createdModel = new ModelImpl(lastMove06Game_PlayerOnesTurn());
+    ModelImpl createdModel = new ModelImpl(lastMove06Game_PlayerOnesTurn(), GameMode.HOTSEAT);
     GameFieldImpl field = (GameFieldImpl) createdModel.getState().getField();
     field.set(
         new CellImpl(0, 5),
@@ -725,8 +725,8 @@ public class ModelImplTest {
 
   @Test
   public void testPlaceDisk_NotCurrentPlayer_midToLateGamePlayerOne() {
-    ModelImpl model = new ModelImpl(midToLateGame_PlayerOnesTurn());
-    ModelImpl createdModel = new ModelImpl(midToLateGame_PlayerOnesTurn());
+    ModelImpl model = new ModelImpl(midToLateGame_PlayerOnesTurn(), GameMode.HOTSEAT);
+    ModelImpl createdModel = new ModelImpl(midToLateGame_PlayerOnesTurn(), GameMode.HOTSEAT);
     boolean move =
         model.placeDisk(
             new DiskImpl(model.getState().getPlayerManagement().getPlayerTwo()),
@@ -745,7 +745,7 @@ public class ModelImplTest {
     state.setPlayerManagement(manager);
     state.setGameField(field);
     state.setCurrentPhase(Phase.RUNNING);
-    ModelImpl model = new ModelImpl(state);
+    ModelImpl model = new ModelImpl(state, GameMode.HOTSEAT);
     boolean move = model.placeDisk(new DiskImpl(one), new CellImpl(3, 3));
     Assertions.assertTrue(move);
 
@@ -759,7 +759,7 @@ public class ModelImplTest {
     createdState.setPlayerManagement(createdManager);
     createdState.setGameField(createdField);
     createdState.setCurrentPhase(Phase.RUNNING);
-    ModelImpl createdModel = new ModelImpl(createdState);
+    ModelImpl createdModel = new ModelImpl(createdState, GameMode.HOTSEAT);
 
     helperPlaceDisk_NoWinner(createdModel, model);
   }
@@ -774,7 +774,7 @@ public class ModelImplTest {
     state.setPlayerManagement(manager);
     state.setGameField(field);
     state.setCurrentPhase(Phase.RUNNING);
-    ModelImpl model = new ModelImpl(state);
+    ModelImpl model = new ModelImpl(state, GameMode.HOTSEAT);
     boolean move = model.placeDisk(new DiskImpl(one), new CellImpl(7, 3));
     Assertions.assertFalse(move);
 
@@ -786,14 +786,14 @@ public class ModelImplTest {
     createdState.setPlayerManagement(createdManager);
     createdState.setGameField(createdField);
     createdState.setCurrentPhase(Phase.RUNNING);
-    ModelImpl createdModel = new ModelImpl(createdState);
+    ModelImpl createdModel = new ModelImpl(createdState, GameMode.HOTSEAT);
 
     helperPlaceDisk_NoWinner(createdModel, model);
   }
 
   @Test
   public void testPlaceDisk_PlayerTwoSkipMove() {
-    ModelImpl model = new ModelImpl(playerTwoCantMoveGame_PlayerOnesTurn());
+    ModelImpl model = new ModelImpl(playerTwoCantMoveGame_PlayerOnesTurn(), GameMode.HOTSEAT);
     GameFieldImpl field = (GameFieldImpl) model.getState().getField();
     field.set(
         new CellImpl(6, 6), new DiskImpl(model.getState().getPlayerManagement().getPlayerTwo()));
@@ -825,13 +825,13 @@ public class ModelImplTest {
     createdState.setCurrentPhase(Phase.RUNNING);
     createdState.setGameField(createdField);
     createdState.setPlayerManagement(createdManager);
-    ModelImpl createdModel = new ModelImpl(createdState);
+    ModelImpl createdModel = new ModelImpl(createdState, GameMode.HOTSEAT);
     helperPlaceDisk_NoWinner(createdModel, model);
   }
 
   @Test
   public void testGetState() {
-    ModelImpl game = new ModelImpl(midGame_PlayerTwosTurn());
+    ModelImpl game = new ModelImpl(midGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     Assertions.assertEquals(midGame_PlayerTwosTurn(), game.getState());
   }
 
@@ -867,7 +867,7 @@ public class ModelImplTest {
 
   @Test
   public void testAddListener_null() {
-    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     try {
       game.addListener(null);
     } catch (Exception e) {
@@ -879,7 +879,7 @@ public class ModelImplTest {
 
   @Test
   public void testAddListener_notNull() {
-    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     Pcldummy dummy = new Pcldummy();
     game.addListener(dummy);
     game.placeDisk(
@@ -889,7 +889,7 @@ public class ModelImplTest {
 
   @Test
   public void testRemoveListener_null() {
-    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     try {
       game.removeListener(null);
     } catch (Exception e) {
@@ -901,7 +901,7 @@ public class ModelImplTest {
 
   @Test
   public void testRemoveListener_notNull() {
-    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     Pcldummy dummy = new Pcldummy();
     game.addListener(dummy);
     game.removeListener(dummy);
@@ -912,14 +912,14 @@ public class ModelImplTest {
 
   @Test
   public void testSetWaiting_gameRunning() {
-    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     Assertions.assertTrue(game.setWaiting());
     Assertions.assertEquals(Phase.WAITING, game.getState().getCurrentPhase());
   }
 
   @Test
   public void testSetWaiting_gameWaiting() {
-    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     game.setWaiting();
     Assertions.assertFalse(game.setWaiting());
     Assertions.assertEquals(Phase.WAITING, game.getState().getCurrentPhase());
@@ -929,14 +929,14 @@ public class ModelImplTest {
   public void testSetWaiting_gameFinished() {
     ModifiableGameState state = earlyGame_PlayerTwosTurn();
     state.setCurrentPhase(Phase.FINISHED);
-    ModelImpl game = new ModelImpl(state);
+    ModelImpl game = new ModelImpl(state, GameMode.HOTSEAT);
     Assertions.assertFalse(game.setWaiting());
     Assertions.assertEquals(Phase.FINISHED, game.getState().getCurrentPhase());
   }
 
   @Test
   public void testUnsetWaiting_gameWaiting() {
-    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     game.setWaiting();
     Assertions.assertTrue(game.unsetWaiting());
     Assertions.assertEquals(Phase.RUNNING, game.getState().getCurrentPhase());
@@ -944,7 +944,7 @@ public class ModelImplTest {
 
   @Test
   public void testUnsetWaiting_gameRunning() {
-    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn());
+    ModelImpl game = new ModelImpl(earlyGame_PlayerTwosTurn(), GameMode.HOTSEAT);
     Assertions.assertFalse(game.unsetWaiting());
     Assertions.assertEquals(Phase.RUNNING, game.getState().getCurrentPhase());
   }
@@ -953,7 +953,7 @@ public class ModelImplTest {
   public void testUnsetWaiting_gameFinished() {
     ModifiableGameState state = earlyGame_PlayerTwosTurn();
     state.setCurrentPhase(Phase.FINISHED);
-    ModelImpl game = new ModelImpl(state);
+    ModelImpl game = new ModelImpl(state, GameMode.HOTSEAT);
     Assertions.assertFalse(game.unsetWaiting());
     Assertions.assertEquals(Phase.FINISHED, game.getState().getCurrentPhase());
   }
