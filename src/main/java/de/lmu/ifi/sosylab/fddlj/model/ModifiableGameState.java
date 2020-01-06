@@ -17,17 +17,26 @@ interface ModifiableGameState extends GameState {
   void setCurrentPhase(Phase phase);
 
   /**
-   * Set the given {@link GameField game field} as the game's game field.
+   * Set the given ModifiableGameField as the game's game field.
    *
    * @param gameField the game field to set
    */
-  void setGameField(GameField gameField);
+  void setGameField(ModifiableGameField gameField);
 
   /**
-   * Set the given {@link PlayerManagement} as the game's new data manager for information about the
-   * involved players.
+   * Set the given ModifiablePlayerManagement as the game's new data manager for information about
+   * the involved players.
    *
    * @param playerManagement the new player management
    */
-  void setPlayerManagement(PlayerManagement playerManagement);
+  void setPlayerManagement(ModifiablePlayerManagement playerManagement);
+
+  @Override
+  ModifiableGameField getField();
+
+  @Override
+  ModifiablePlayerManagement getPlayerManagement();
+
+  @Override
+  ModifiableGameState makeCopy();
 }

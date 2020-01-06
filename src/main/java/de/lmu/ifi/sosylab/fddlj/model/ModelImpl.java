@@ -64,7 +64,7 @@ public class ModelImpl implements Model {
     }
 
     if (checkIfLegalMove(disk, cell)) {
-      ModifiableGameField field = (ModifiableGameField) state.getField();
+      ModifiableGameField field = state.getField();
       field.set(cell, disk);
       turnDisks(cell);
 
@@ -90,8 +90,7 @@ public class ModelImpl implements Model {
       }
 
       if (state.getCurrentPhase().equals(Phase.RUNNING)) {
-        ModifiablePlayerManagement manager =
-            (ModifiablePlayerManagement) state.getPlayerManagement();
+        ModifiablePlayerManagement manager = state.getPlayerManagement();
         manager.switchCurrentPlayer();
         if (getPossibleMovesForPlayer(manager.getCurrentPlayer()).isEmpty()) {
           manager.switchCurrentPlayer();
@@ -185,7 +184,7 @@ public class ModelImpl implements Model {
 
     for (int x = -1; x < 2; x++) {
       for (int y = -1; y < 2; y++) {
-        if (!(x == 0 && y == 0)) {
+        if (!((x == 0) && (y == 0))) {
           Cell cellChecked = new CellImpl(cell.getColumn() + x, cell.getRow() + y);
           if (state.getField().isWithinBounds(cellChecked)
               && (state.getField().isCellOfPlayer(opponentPlayer, cellChecked))) {
@@ -205,7 +204,7 @@ public class ModelImpl implements Model {
             if (state.getField().isWithinBounds(opponentCell)
                 && state.getField().isCellOfPlayer(player, opponentCell)) {
               for (Cell c : toTurn) {
-                ModifiableGameField field = (ModifiableGameField) state.getField();
+                ModifiableGameField field = state.getField();
                 field.set(c, new DiskImpl(player));
               }
             }
@@ -270,8 +269,9 @@ public class ModelImpl implements Model {
     return false;
   }
 
-  /** Notifies all Listeners of
-   * a changed {@link GameState}. */
+  /**
+   * Notifies all Listeners of a changed {@link GameState}.
+   */
   private void notifyListeners() {
     support.firePropertyChange(Model.STATE_CHANGED, null, state.makeCopy());
   }
@@ -285,12 +285,12 @@ public class ModelImpl implements Model {
    *     false} otherwise.
    */
   private boolean isWithinMiddleSquare(Cell cell) {
-    int minCoordinate = GameFieldImpl.SIZE / 2 - 1;
+    int minCoordinate = (GameFieldImpl.SIZE / 2) - 1;
     int maxCoordinate = GameFieldImpl.SIZE / 2;
-    if (cell.getRow() >= minCoordinate
-        && cell.getRow() <= maxCoordinate
-        && cell.getColumn() >= minCoordinate
-        && cell.getColumn() <= maxCoordinate
+    if ((cell.getRow() >= minCoordinate)
+        && (cell.getRow() <= maxCoordinate)
+        && (cell.getColumn() >= minCoordinate)
+        && (cell.getColumn() <= maxCoordinate)
         && state.getField().get(cell).isEmpty()) {
       return true;
     }
@@ -306,7 +306,7 @@ public class ModelImpl implements Model {
         state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerOne()).size();
     int numberOfDisksPlayerTwo =
         state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerTwo()).size();
-    ModifiablePlayerManagement manager = (ModifiablePlayerManagement) state.getPlayerManagement();
+    ModifiablePlayerManagement manager = state.getPlayerManagement();
 
     if (numberOfDisksPlayerOne == numberOfDisksPlayerTwo) {
       manager.setWinner(Optional.empty());
