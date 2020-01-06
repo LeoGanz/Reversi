@@ -579,79 +579,13 @@ public class ModelImplTest {
   }
 
   @Test
-  public void testPlaceDisk_LastMove06GamePlayerOne_CorrectMove() {
+  public void testPlaceDisk_LastMoveAndOnPhaseFinished() {
     ModelImpl model = new ModelImpl(lastMove06Game_PlayerOnesTurn(), GameMode.HOTSEAT);
-    boolean move =
+    boolean firstMove =
         model.placeDisk(
             new DiskImpl(model.getState().getPlayerManagement().getPlayerOne()),
             new CellImpl(0, 6));
-    Assertions.assertTrue(move);
-    ModelImpl createdModel = new ModelImpl(lastMove06Game_PlayerOnesTurn(), GameMode.HOTSEAT);
-    GameFieldImpl field = (GameFieldImpl) createdModel.getState().getField();
-    field.set(
-        new CellImpl(0, 5),
-        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
-    field.set(
-        new CellImpl(0, 6),
-        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
-    field.set(
-        new CellImpl(1, 5),
-        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
-    field.set(
-        new CellImpl(2, 4),
-        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
-    field.set(
-        new CellImpl(3, 3),
-        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
-    field.set(
-        new CellImpl(4, 2),
-        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
-    field.set(
-        new CellImpl(5, 1),
-        new DiskImpl(createdModel.getState().getPlayerManagement().getPlayerOne()));
-    PlayerManagementImpl manager =
-        (PlayerManagementImpl) createdModel.getState().getPlayerManagement();
-    manager.setWinner(Optional.of(createdModel.getState().getPlayerManagement().getPlayerOne()));
-
-    Assertions.assertEquals(Phase.FINISHED, model.getState().getCurrentPhase());
-    Assertions.assertEquals(
-        createdModel.getState().getField().getCellsOccupiedWithDisks(),
-        model.getState().getField().getCellsOccupiedWithDisks());
-    Assertions.assertEquals(
-        createdModel.getState().getPlayerManagement().getCurrentPlayer(),
-        model.getState().getPlayerManagement().getCurrentPlayer());
-    Assertions.assertEquals(
-        createdModel.getState().getPlayerManagement().getWinner(),
-        model.getState().getPlayerManagement().getWinner());
-    Assertions.assertEquals(
-        createdModel
-            .getState()
-            .getField()
-            .getAllCellsForPlayer(createdModel.getState().getPlayerManagement().getPlayerOne()),
-        model
-            .getState()
-            .getField()
-            .getAllCellsForPlayer(model.getState().getPlayerManagement().getPlayerOne()));
-    Assertions.assertEquals(
-        createdModel.getPossibleMovesForPlayer(
-            createdModel.getState().getPlayerManagement().getCurrentPlayer()),
-        model.getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer()));
-    Assertions.assertEquals(
-        createdModel
-            .getState()
-            .getField()
-            .getAllCellsForPlayer(createdModel.getState().getPlayerManagement().getPlayerTwo()),
-        model
-            .getState()
-            .getField()
-            .getAllCellsForPlayer(model.getState().getPlayerManagement().getPlayerTwo()));
-  }
-
-  @Test
-  public void testPlaceDisk_OnPhaseFinished() {
-    ModelImpl model = new ModelImpl(lastMove06Game_PlayerOnesTurn(), GameMode.HOTSEAT);
-    model.placeDisk(
-        new DiskImpl(model.getState().getPlayerManagement().getPlayerOne()), new CellImpl(0, 6));
+    Assertions.assertTrue(firstMove);
     boolean move =
         model.placeDisk(
             new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer()),
