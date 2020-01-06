@@ -119,6 +119,29 @@ public class PlayerManagementImplTest {
   }
 
   @Test
+  public void testGetOpponentPlayer_PlayerOne() {
+    Assertions.assertEquals(
+        playerTwo,
+        pm.getOpponentPlayer(playerOne),
+        "Opponent player of player one should be player two");
+  }
+
+  @Test
+  public void testGetOpponentPlayer_PlayerTwo() {
+    pm.switchCurrentPlayer();
+    Assertions.assertEquals(
+        playerOne,
+        pm.getOpponentPlayer(playerTwo),
+        "Opponent player of player two should be player one");
+  }
+  
+  @Test
+  public void testGetOpponentPlayer_UnknownPlayer() {
+    Player unknown = new PlayerImpl("P3", Color.BLACK);
+    Assertions.assertNull(pm.getOpponentPlayer(unknown));
+  }
+
+  @Test
   public void testGetAndSetWinner_PlayerOne() {
     pm.setWinner(Optional.of(playerOne));
     Assertions.assertTrue(

@@ -181,10 +181,7 @@ public class ModelImpl implements Model {
     assert state.getField().get(cell).isPresent();
     Player player = state.getField().get(cell).get().getPlayer();
 
-    Player opponentPlayer =
-        (player.equals(state.getPlayerManagement().getPlayerOne()))
-            ? state.getPlayerManagement().getPlayerTwo()
-            : state.getPlayerManagement().getPlayerOne();
+    Player opponentPlayer = state.getPlayerManagement().getOpponentPlayer(player);
 
     for (int x = -1; x < 2; x++) {
       for (int y = -1; y < 2; y++) {
@@ -241,13 +238,9 @@ public class ModelImpl implements Model {
         return false;
       }
     }
-    Player opponentPlayer =
-        (state
-                .getPlayerManagement()
-                .getCurrentPlayer()
-                .equals(state.getPlayerManagement().getPlayerOne()))
-            ? state.getPlayerManagement().getPlayerTwo()
-            : state.getPlayerManagement().getPlayerOne();
+
+    PlayerManagement manager = state.getPlayerManagement();
+    Player opponentPlayer = manager.getOpponentPlayer(manager.getCurrentPlayer());
 
     for (int x = -1; x < 2; x++) {
       for (int y = -1; y < 2; y++) {

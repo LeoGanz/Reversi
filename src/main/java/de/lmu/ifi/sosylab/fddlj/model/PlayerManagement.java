@@ -32,6 +32,13 @@ public interface PlayerManagement {
   Player getCurrentPlayer();
 
   /**
+   * Return the opponent of the given player.
+   *
+   * @return the opponent of the given player
+   */
+  Player getOpponentPlayer(Player player);
+
+  /**
    * Return the winner of the current game. This method may only be called if the current game is
    * finished.
    *
