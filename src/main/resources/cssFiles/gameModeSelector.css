@@ -1,0 +1,47 @@
+#left-part{
+	-fx-background-color: transparent;
+	-fx-padding: 0 50 100 50;
+	
+}
+
+#selection-pane{
+	-fx-background-color: transparent;
+	-fx-margin: 0 0 30 0;
+}
+
+#request{
+	-fx-background-color: #576385;
+	-fx-text-fill: #FFFFFF;
+}
+
+#login-form{
+	-fx-background-color: rgba(181,181,181,0.8);
+	-fx-padding: 20;
+	-fx-margin: 0 0 30 0;
+}
+
+#text-field{
+	-fx-border-color: transparent transparent #ffffff transparent;
+	-fx-background-color: transparent;
+	-fx-text-fill: #494949;
+	-fx-prompt-text-fill: #494949;
+	-fx-border-style: none solid solid none;
+	-fx-focus-color: #faff00;
+	-fx-faint-focus-color: #faff00;
+}
+
+
+#button{
+	-fx-background-color: #576385;
+	-fx-text-fill: #ffffff;
+}
+
+#main-pane{
+	-fx-background-color: #576385;
+}
+
+#color-pane{
+	-fx-border-radius: 50;
+	-fx-background-radius: 50;
+	-fx-padding: 50;
+}
