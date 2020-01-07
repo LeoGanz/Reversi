@@ -60,6 +60,17 @@ public class PlayerManagementImpl implements ModifiablePlayerManagement {
   }
 
   @Override
+  public Player getOpponentPlayer(Player player) {
+    if (player.equals(playerOne)) {
+      return playerTwo;
+    }
+    if (player.equals(playerTwo)) {
+      return playerOne;
+    }
+    return null;
+  }
+
+  @Override
   public Optional<Player> getWinner() {
     if (winner == PlayerEnum.PLAYER_ONE) {
       return Optional.of(playerOne);
@@ -103,7 +114,7 @@ public class PlayerManagementImpl implements ModifiablePlayerManagement {
   }
 
   @Override
-  public PlayerManagement makeCopy() {
+  public ModifiablePlayerManagement makeCopy() {
     return new PlayerManagementImpl(this);
   }
 

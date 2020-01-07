@@ -389,14 +389,14 @@ public class GameFieldImplTest {
 
   @Test
   public void testMakeCopy_gameField() {
-    GameFieldImpl field = createTestGameField().makeCopy();
+    ModifiableGameField field = createTestGameField().makeCopy();
     Assertions.assertEquals(
         createTestGameField().getCellsOccupiedWithDisks(), field.getCellsOccupiedWithDisks());
   }
 
   @Test
   public void testMakeCopy_testWithList() {
-    GameFieldImpl field = createTestGameField().makeCopy();
+    ModifiableGameField field = createTestGameField().makeCopy();
     Map<Cell, Player> list = field.getCellsOccupiedWithDisks();
     Assertions.assertEquals(5, list.size(), "We expected 5 but got: " + list.size());
   }

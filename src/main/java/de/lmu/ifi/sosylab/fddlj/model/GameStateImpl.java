@@ -3,22 +3,22 @@ package de.lmu.ifi.sosylab.fddlj.model;
 import java.util.Objects;
 
 /**
- * A concrete Implementation of {@link ModifiableGameState} and thus by extension an Implementation
- * of {@link GameState}. Provides the equals and hashCode methods.
+ * A concrete Implementation of ModifiableGameState and thus by extension an implementation of
+ * {@link GameState}. Provides the equals and hashCode methods.
  *
  * @author Daniel Leidreiter
  */
 public class GameStateImpl implements ModifiableGameState {
 
   private Phase phase;
-  private GameField field;
-  private PlayerManagement manager;
+  private ModifiableGameField field;
+  private ModifiablePlayerManagement manager;
 
   /** Creates an empty GameState with all values nulled. */
   public GameStateImpl() {
-    this.phase = null;
-    this.field = null;
-    this.manager = null;
+    phase = null;
+    field = null;
+    manager = null;
   }
 
   @Override
@@ -27,13 +27,13 @@ public class GameStateImpl implements ModifiableGameState {
   }
 
   @Override
-  public void setGameField(GameField gameField) {
-    this.field = gameField;
+  public void setGameField(ModifiableGameField gameField) {
+    field = gameField;
   }
 
   @Override
-  public void setPlayerManagement(PlayerManagement playerManagement) {
-    this.manager = playerManagement;
+  public void setPlayerManagement(ModifiablePlayerManagement playerManagement) {
+    manager = playerManagement;
   }
 
   @Override
@@ -42,24 +42,24 @@ public class GameStateImpl implements ModifiableGameState {
   }
 
   @Override
-  public GameField getField() {
+  public ModifiableGameField getField() {
     return field;
   }
 
   @Override
-  public PlayerManagement getPlayerManagement() {
+  public ModifiablePlayerManagement getPlayerManagement() {
     return manager;
   }
 
   @Override
-  public GameState makeCopy() {
+  public ModifiableGameState makeCopy() {
     GameStateImpl copy = new GameStateImpl();
-    copy.setCurrentPhase(this.getCurrentPhase());
-    if (this.getField() != null) {
-      copy.setGameField(this.getField().makeCopy());
+    copy.setCurrentPhase(getCurrentPhase());
+    if (getField() != null) {
+      copy.setGameField(getField().makeCopy());
     }
-    if (this.getPlayerManagement() != null) {
-      copy.setPlayerManagement(this.getPlayerManagement().makeCopy());
+    if (getPlayerManagement() != null) {
+      copy.setPlayerManagement(getPlayerManagement().makeCopy());
     }
     return copy;
   }
@@ -74,9 +74,9 @@ public class GameStateImpl implements ModifiableGameState {
     }
 
     GameStateImpl other = (GameStateImpl) obj;
-    return Objects.equals(this.phase, other.phase)
-        && Objects.equals(this.field, other.field)
-        && Objects.equals(this.manager, other.manager);
+    return Objects.equals(phase, other.phase)
+        && Objects.equals(field, other.field)
+        && Objects.equals(manager, other.manager);
   }
 
   @Override

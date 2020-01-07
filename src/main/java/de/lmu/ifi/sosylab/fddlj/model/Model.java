@@ -15,6 +15,8 @@ import java.util.Set;
  */
 public interface Model {
 
+  String STATE_CHANGED = "model changed state";
+
   /**
    * Place disk on a cell and deal with the consequences. Placing a disk only works if there is
    * currently a game running and if placing the disk on the specified cell is a valid reversi move.
