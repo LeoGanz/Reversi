@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.Set;
 import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class GameFieldImplTest {
@@ -116,7 +115,7 @@ public class GameFieldImplTest {
     Assertions.assertFalse(test);
   }
 
-  PlayerManagementImpl manager =
+  private PlayerManagementImpl manager =
       new PlayerManagementImpl(
           new PlayerImpl("One", Color.ALICEBLUE), new PlayerImpl("two", Color.ANTIQUEWHITE));
 
@@ -196,22 +195,30 @@ public class GameFieldImplTest {
   @Test
   public void testRemove_playerOne() {
     Cell cell = new CellImpl(4, 2);
-    Disk test = createTestGameField().remove(cell);
+    GameFieldImpl field = new GameFieldImpl();
+    field.set(cell,new DiskImpl(manager.getPlayerOne()));
+    Disk test = field.remove(cell);
     Assertions.assertEquals(new DiskImpl(manager.getPlayerOne()), test);
+    Assertions.assertEquals(Optional.empty(),field.get(cell));
   }
 
   @Test
   public void testRemove_playerTwo() {
     Cell cell = new CellImpl(3, 3);
-    Disk test = createTestGameField().remove(cell);
+    GameFieldImpl field = new GameFieldImpl();
+    field.set(cell,new DiskImpl(manager.getPlayerTwo()));
+    Disk test = field.remove(cell);
     Assertions.assertEquals(new DiskImpl(manager.getPlayerTwo()), test);
+    Assertions.assertEquals(Optional.empty(),field.get(cell));
   }
 
   @Test
   public void testRemove_Empty() {
     Cell cell = new CellImpl(1, 1);
-    Disk test = createTestGameField().remove(cell);
+    GameFieldImpl field = new GameFieldImpl();
+    Disk test = field.remove(cell);
     Assertions.assertNull(test);
+    Assertions.assertEquals(Optional.empty(),field.get(cell));
   }
 
   private void helperTestSet(Disk newValue, int column, int row) {
