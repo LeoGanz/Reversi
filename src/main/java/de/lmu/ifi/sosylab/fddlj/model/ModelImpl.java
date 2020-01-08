@@ -77,11 +77,7 @@ public class ModelImpl implements Model {
           state.setCurrentPhase(Phase.FINISHED);
           handleWinner();
         }
-      }
-      if (state
-          .getPlayerManagement()
-          .getCurrentPlayer()
-          .equals(state.getPlayerManagement().getPlayerTwo())) {
+      } else {
         numberOfPlayerTwoDisks--;
         if (numberOfPlayerOneDisks <= 0) {
           state.setCurrentPhase(Phase.FINISHED);
@@ -94,11 +90,8 @@ public class ModelImpl implements Model {
         manager.switchCurrentPlayer();
         if (getPossibleMovesForPlayer(manager.getCurrentPlayer()).isEmpty()) {
           manager.switchCurrentPlayer();
-          // If both need to miss a turn
-          if (getPossibleMovesForPlayer(manager.getCurrentPlayer()).isEmpty()) {
-            state.setCurrentPhase(Phase.FINISHED);
-            handleWinner();
-          }
+          state.setCurrentPhase(Phase.FINISHED);
+          handleWinner();
         }
       }
 
@@ -231,11 +224,7 @@ public class ModelImpl implements Model {
       return false;
     }
     if (state.getField().getCellsOccupiedWithDisks().size() <= NUMBER_OF_MOVES_IN_BEGINNING_PHASE) {
-      if (isWithinMiddleSquare(cell)) {
-        return true;
-      } else {
-        return false;
-      }
+      return isWithinMiddleSquare(cell);
     }
 
     PlayerManagement manager = state.getPlayerManagement();
@@ -273,7 +262,7 @@ public class ModelImpl implements Model {
    * Notifies all Listeners of a changed {@link GameState}.
    */
   private void notifyListeners() {
-    support.firePropertyChange(Model.STATE_CHANGED, null, state.makeCopy());
+    support.firePropertyChange(Model.STATE_CHANGED, null, state);
   }
 
   /**
@@ -287,14 +276,11 @@ public class ModelImpl implements Model {
   private boolean isWithinMiddleSquare(Cell cell) {
     int minCoordinate = (GameFieldImpl.SIZE / 2) - 1;
     int maxCoordinate = GameFieldImpl.SIZE / 2;
-    if ((cell.getRow() >= minCoordinate)
+    return (cell.getRow() >= minCoordinate)
         && (cell.getRow() <= maxCoordinate)
         && (cell.getColumn() >= minCoordinate)
         && (cell.getColumn() <= maxCoordinate)
-        && state.getField().get(cell).isEmpty()) {
-      return true;
-    }
-    return false;
+        && state.getField().get(cell).isEmpty();
   }
 
   /** Checks who has won if the game is finished and sets the winner. */

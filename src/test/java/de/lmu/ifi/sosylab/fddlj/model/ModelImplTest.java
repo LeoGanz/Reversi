@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 
 public class ModelImplTest {
 
-  private Player playerOne = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
-  private Player playerTwo = new PlayerImpl("Rhea", Color.ALICEBLUE);
+  private final Player playerOne = new PlayerImpl("Tina", Color.ANTIQUEWHITE);
+  private final Player playerTwo = new PlayerImpl("Rhea", Color.ALICEBLUE);
 
   private ModifiableGameState earlyGame_PlayerTwosTurn() {
     ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
@@ -699,42 +699,6 @@ public class ModelImplTest {
     createdState.setCurrentPhase(Phase.RUNNING);
     ModelImpl createdModel = new ModelImpl(createdState, GameMode.HOTSEAT);
 
-    helperPlaceDisk_NoWinner(createdModel, model);
-  }
-
-  @Test
-  public void testPlaceDisk_PlayerTwoSkipMove() {
-    ModelImpl model = new ModelImpl(playerTwoCantMoveGame_PlayerOnesTurn(), GameMode.HOTSEAT);
-    GameFieldImpl field = (GameFieldImpl) model.getState().getField();
-    field.set(
-        new CellImpl(6, 6), new DiskImpl(model.getState().getPlayerManagement().getPlayerTwo()));
-    boolean move =
-        model.placeDisk(
-            new DiskImpl(model.getState().getPlayerManagement().getPlayerOne()),
-            new CellImpl(7, 6));
-    Assertions.assertTrue(move);
-
-    ModifiableGameField createdField = new GameFieldImpl();
-    Disk diskOne = new DiskImpl(playerOne);
-    Disk diskTwo = new DiskImpl(playerTwo);
-
-    for (int column = 2; column < 8; column++) {
-      createdField.set(new CellImpl(column, 6), diskOne);
-    }
-    for (int column = 1; column < 8; column++) {
-      createdField.set(new CellImpl(column, 7), diskOne);
-    }
-    createdField.set(new CellImpl(0, 6), diskTwo);
-    createdField.set(new CellImpl(0, 7), diskTwo);
-    createdField.set(new CellImpl(1, 6), diskTwo);
-    createdField.set(new CellImpl(2, 5), diskTwo);
-
-    ModifiablePlayerManagement createdManager = new PlayerManagementImpl(playerOne, playerTwo);
-    ModifiableGameState createdState = new GameStateImpl();
-    createdState.setCurrentPhase(Phase.RUNNING);
-    createdState.setGameField(createdField);
-    createdState.setPlayerManagement(createdManager);
-    ModelImpl createdModel = new ModelImpl(createdState, GameMode.HOTSEAT);
     helperPlaceDisk_NoWinner(createdModel, model);
   }
 
