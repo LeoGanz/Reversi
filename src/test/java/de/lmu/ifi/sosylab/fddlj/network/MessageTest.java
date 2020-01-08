@@ -98,8 +98,8 @@ public class MessageTest {
               fromJson.getData().getClass()
       );
     }
-    */
 
   }
+  */
 
 }
