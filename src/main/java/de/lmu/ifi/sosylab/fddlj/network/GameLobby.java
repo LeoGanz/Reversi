@@ -17,7 +17,7 @@ public class GameLobby {
   private ClientConnection connTwo;
   private int lobbyID;
   private Model masterGame;
-  private Server server;
+  private ServerImpl server;
 
   /**
    * Create a new lobby for two connected players.
@@ -26,7 +26,8 @@ public class GameLobby {
    * @param connTwo connection to player two
    * @param lobbyID integer used to identify the game lobby
    */
-  public GameLobby(ClientConnection connOne, ClientConnection connTwo, int lobbyID, Server server) {
+  public GameLobby(
+      ClientConnection connOne, ClientConnection connTwo, int lobbyID, ServerImpl server) {
     this.connOne = connOne;
     this.connTwo = connTwo;
     this.lobbyID = lobbyID;

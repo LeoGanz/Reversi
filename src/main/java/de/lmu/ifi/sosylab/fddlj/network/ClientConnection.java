@@ -20,7 +20,7 @@ public class ClientConnection implements Runnable {
   private final Socket clientSocket;
   private BufferedReader in;
   private PrintWriter out;
-  private final Server server;
+  private final ServerImpl server;
   private boolean connectionRunning;
   private GameLobby lobby;
 
@@ -31,7 +31,7 @@ public class ClientConnection implements Runnable {
    * @param connectionID integer used to identify connections
    * @param server server that manages all client connections
    */
-  public ClientConnection(Socket clientSocket, int connectionID, Server server) {
+  public ClientConnection(Socket clientSocket, int connectionID, ServerImpl server) {
     this.clientSocket = clientSocket;
     this.connectionID = connectionID;
     this.server = server;
