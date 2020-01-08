@@ -7,8 +7,7 @@ package de.lmu.ifi.sosylab.fddlj.network;
  */
 public enum ServerNotification {
   SERVER_SHUTTING_DOWN,
-  PARTNER_DISCONNECTED,
-  YOU_ARE_WHITE,
-  YOU_ARE_BLACK,
-  START
+  PARTNER_LEFT,
+  START,
+  LOBBY_CLOSED
 }

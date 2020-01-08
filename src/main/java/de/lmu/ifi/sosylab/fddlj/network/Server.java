@@ -26,12 +26,12 @@ public class Server {
   private boolean serverRunning;
 
   private Map<Integer, ClientConnection> connections;
-  private Queue<Integer> waitingForLobby; //ClientConnections referenced by ID
+  private Queue<Integer> waitingForLobby; // ClientConnections referenced by ID
   private Map<Integer, GameLobby> lobbies;
 
   /**
-   * Initialize a new server. The server will be ready but needs to be started by
-   * calling {@link #startServer()}.
+   * Initialize a new server. The server will be ready but needs to be started by calling {@link
+   * #startServer()}.
    */
   public Server() {
     connections = new HashMap<>();
@@ -40,8 +40,8 @@ public class Server {
   }
 
   /**
-   * Start the server. The server will begin to listen for clients trying to
-   * connect and then establish a connection with those clients.
+   * Start the server. The server will begin to listen for clients trying to connect and then
+   * establish a connection with those clients.
    */
   public void startServer() {
     serverRunning = true;
@@ -65,8 +65,7 @@ public class Server {
       }
     } catch (@SuppressWarnings("unused") BindException e) {
       // TODO Handle server already running
-    } catch (
-        @SuppressWarnings("unused") IOException e) {
+    } catch (@SuppressWarnings("unused") IOException e) {
       // TODO Inform about exception
       initiateShutdown();
     }
@@ -99,7 +98,7 @@ public class Server {
       Integer connTwoID = waitingForLobby.remove();
       ClientConnection connTwo = connections.get(connTwoID);
 
-      GameLobby lobby = new GameLobby(connOne, connTwo, nextLobbyID++);
+      GameLobby lobby = new GameLobby(connOne, connTwo, nextLobbyID++, this);
       lobbies.put(lobby.getLobbyID(), lobby);
     }
   }
@@ -110,9 +109,9 @@ public class Server {
    *
    * @param clientConnection the connection that has (been) terminated
    */
-  synchronized void connectionTerminated(ClientConnection clientConnection) {
-    connections.remove(clientConnection.getConnectionID());
-    waitingForLobby.remove(clientConnection.getConnectionID());
+  synchronized void connectionTerminated(int connectionID) {
+    connections.remove(connectionID);
+    waitingForLobby.remove(connectionID);
   }
 
   /**
@@ -133,12 +132,12 @@ public class Server {
 
   private void terminateAllConnections() {
     connections
-    .values()
-    .forEach(
-        conn -> {
-          conn.sendNotification(ServerNotification.SERVER_SHUTTING_DOWN);
-          conn.terminate();
-        });
+        .values()
+        .forEach(
+            conn -> {
+              conn.sendNotification(ServerNotification.SERVER_SHUTTING_DOWN);
+              conn.terminate();
+            });
   }
 
   /**
@@ -150,4 +149,12 @@ public class Server {
     return serverRunning;
   }
 
+  /**
+   * Called when a {@link GameLobby} closes.
+   *
+   * @param lobbyID integer id to reference the closed lobby
+   */
+  public void lobbyClosed(int lobbyID) {
+    lobbies.remove(lobbyID);
+  }
 }
