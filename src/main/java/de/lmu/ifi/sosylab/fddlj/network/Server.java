@@ -1,160 +1,36 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
-import java.io.IOException;
-import java.net.BindException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-
 /**
- * The server provides means of communication for clients. It will accept connections and pair them
- * to enable them to play against each other. Furthermore the server sends notifications to manage
- * the game flow.
+ * A server is responsible for managing clients and games. This interface only provides methods for
+ * controlling the server.
  *
- * @see ServerNotification
  * @author Leonard Ganz
  */
-public class Server {
-
-  private static final int PORT = 43200;
-  private int nextConnectionID = 0;
-  private int nextLobbyID = 0;
-  private boolean serverRunning;
-
-  private Map<Integer, ClientConnection> connections;
-  private Queue<Integer> waitingForLobby; // ClientConnections referenced by ID
-  private Map<Integer, GameLobby> lobbies;
-
-  /**
-   * Initialize a new server. The server will be ready but needs to be started by calling {@link
-   * #startServer()}.
-   */
-  public Server() {
-    connections = new HashMap<>();
-    waitingForLobby = new LinkedList<>();
-    lobbies = new HashMap<>();
-  }
+public interface Server {
 
   /**
    * Start the server. The server will begin to listen for clients trying to connect and then
    * establish a connection with those clients.
-   */
-  public void startServer() {
-    serverRunning = true;
-    Thread connectorThread = new Thread(this::acceptConnections);
-    connectorThread.setDaemon(true);
-    connectorThread.start();
-  }
-
-  private void acceptConnections() {
-    try (ServerSocket socket = new ServerSocket(PORT)) {
-      while (serverRunning) {
-        @SuppressWarnings("resource") // ClientConnection manages socket
-        Socket newConnection = socket.accept();
-        if (newConnection != null) {
-          if (serverRunning) {
-            handleNewConnection(newConnection);
-          } else {
-            newConnection.close();
-          }
-        }
-      }
-    } catch (@SuppressWarnings("unused") BindException e) {
-      // TODO Handle server already running
-    } catch (@SuppressWarnings("unused") IOException e) {
-      // TODO Inform about exception
-      initiateShutdown();
-    }
-  }
-
-  private void handleNewConnection(Socket clientSocket) {
-    ClientConnection clientConnection =
-        new ClientConnection(clientSocket, nextConnectionID++, this);
-
-    connections.put(clientConnection.getConnectionID(), clientConnection);
-    Thread thread =
-        new Thread(clientConnection, "ClientConnection-" + clientConnection.getConnectionID());
-    thread.start();
-  }
-
-  /**
-   * Enqueue a connection in the queue of connections waiting to be assigned to a lobby.
    *
-   * @param connectionID id that specifies the connection
-   */
-  public synchronized void enqueueForLobbyBuilding(int connectionID) {
-    waitingForLobby.offer(connectionID);
-    buildLobbies();
-  }
-
-  private void buildLobbies() {
-    while (waitingForLobby.size() >= 2) {
-      Integer connOneID = waitingForLobby.remove();
-      ClientConnection connOne = connections.get(connOneID);
-      Integer connTwoID = waitingForLobby.remove();
-      ClientConnection connTwo = connections.get(connTwoID);
-
-      GameLobby lobby = new GameLobby(connOne, connTwo, nextLobbyID++, this);
-      lobbies.put(lobby.getLobbyID(), lobby);
-    }
-  }
-
-  /**
-   * Called when a {@link ClientConnection} is terminated. This is needed to maintain the list of
-   * connected clients.
+   * <p>It is never legal to start a server more than once. In particular, a server may not be
+   * restarted once a shutdown has been initiated.
    *
-   * @param clientConnection the connection that has (been) terminated
+   * @throws IllegalStateException if server was already started before
+   * @see #initiateShutdown()
    */
-  synchronized void connectionTerminated(int connectionID) {
-    connections.remove(connectionID);
-    waitingForLobby.remove(connectionID);
-  }
+  public void startServer();
 
   /**
    * This method initiates a shutdown. This is only a signal to the server thread that it should
-   * stop what ever it is doing. This means that no immediate shutdown is forced.
+   * stop what ever it is doing and terminate all connections. That means that no immediate shutdown
+   * is forced.
    */
-  public synchronized void initiateShutdown() {
-    serverRunning = false;
-    terminateAllConnections();
-    // TODO terminate all lobbies needed?
-    // Trigger accept(), so that the main while loop stops
-    try (Socket connection = new Socket(InetAddress.getLocalHost(), PORT)) {
-      assert true; // conform with checkstyle
-    } catch (@SuppressWarnings("unused") IOException e) {
-      // do nothing as server is already trying to shutdown
-    }
-  }
-
-  private void terminateAllConnections() {
-    connections
-        .values()
-        .forEach(
-            conn -> {
-              conn.sendNotification(ServerNotification.SERVER_SHUTTING_DOWN);
-              conn.terminate();
-            });
-  }
+  public void initiateShutdown();
 
   /**
    * Indicates whether the server is running.
    *
    * @return {@code true} if the server is running, otherwise {@code false}
    */
-  public boolean isRunning() {
-    return serverRunning;
-  }
-
-  /**
-   * Called when a {@link GameLobby} closes.
-   *
-   * @param lobbyID integer id to reference the closed lobby
-   */
-  public void lobbyClosed(int lobbyID) {
-    lobbies.remove(lobbyID);
-  }
+  public boolean isRunning();
 }
