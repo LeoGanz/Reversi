@@ -1,5 +1,8 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 /**
  * A generic Implementation for JSON serializable network messages. This kind of
  * structure give us the benefit to split meta data and concrete data.
@@ -46,6 +49,18 @@ public class Message<T> {
    */
   public T getData() {
     return data;
+  }
+
+  /**
+   * Converts this the message to a json object.
+   *
+   * @return
+   */
+  public String toJson() {
+    GsonBuilder builder = new GsonBuilder();
+    Gson gson = builder.create();
+
+    return gson.toJson(this);
   }
 
 }
