@@ -225,7 +225,7 @@ public class ModelImpl implements Model {
     if (state.getField().get(cell).isPresent()) {
       return false;
     }
-    if (state.getField().getCellsOccupiedWithDisks().size() <= NUMBER_OF_MOVES_IN_BEGINNING_PHASE) {
+    if (state.getField().getCellsOccupiedWithDisks().size() < NUMBER_OF_MOVES_IN_BEGINNING_PHASE) {
       return isWithinMiddleSquare(cell);
     }
 
