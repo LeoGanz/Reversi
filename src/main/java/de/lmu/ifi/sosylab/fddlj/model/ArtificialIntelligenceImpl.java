@@ -1,6 +1,7 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
 
@@ -14,7 +15,7 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
   public Cell calculateBestMove(GameState state) {
     Model game = new ModelImpl(state, GameMode.HOTSEAT);
     Player currentPlayer = state.getPlayerManagement().getCurrentPlayer();
-    Set<Cell> possibleMoves = game.getPossibleMovesForPlayer(currentPlayer);
+    Set<Cell> possibleMoves = new TreeSet<>(game.getPossibleMovesForPlayer(currentPlayer));
     double moveValue = Double.NEGATIVE_INFINITY;
     Cell bestMove = null;
 
@@ -41,7 +42,7 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
     }
 
     Player currentPlayer = game.getState().getPlayerManagement().getCurrentPlayer();
-    Set<Cell> possibleMoves = game.getPossibleMovesForPlayer(currentPlayer);
+    Set<Cell> possibleMoves = new TreeSet<>(game.getPossibleMovesForPlayer(currentPlayer));
     double moveValue;
     if (currentPlayer.equals(aiPlayer)) {
       moveValue = Double.NEGATIVE_INFINITY;
