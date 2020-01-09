@@ -41,4 +41,25 @@ public class ArtificialIntelligenceImplTest {
     Assertions.assertTrue(game.placeDisk(diskOne, new CellImpl(0,2)));
     Assertions.assertEquals(new CellImpl(5,3), ai.calculateBestMove(game.getState()));
   }
+
+  @Test
+  public void aiTest2(){
+    Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
+    ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(2);
+    Assertions.assertTrue(game.placeDisk(diskOne,new CellImpl(3,3)));
+    Assertions.assertEquals(new CellImpl(3,4), ai.calculateBestMove(game.getState()));
+    Assertions.assertTrue(game.placeDisk(diskTwo,new CellImpl(3,4)));
+    Assertions.assertTrue(game.placeDisk(diskOne,new CellImpl(4,3)));
+    Assertions.assertEquals(new CellImpl(4,4),ai.calculateBestMove(game.getState()));
+    Assertions.assertTrue(game.placeDisk(diskTwo,new CellImpl(4,4)));
+    Assertions.assertTrue(game.placeDisk(diskOne,new CellImpl(4,5)));
+    Assertions.assertEquals(new CellImpl(5,2),ai.calculateBestMove(game.getState()));
+    Assertions.assertTrue(game.placeDisk(diskTwo,new CellImpl(5,2)));
+    Assertions.assertTrue(game.placeDisk(diskOne,new CellImpl(3,5)));
+    Assertions.assertEquals(new CellImpl(2,5),ai.calculateBestMove(game.getState()));
+    Assertions.assertTrue(game.placeDisk(diskTwo,new CellImpl(2,5)));
+    Assertions.assertTrue(game.placeDisk(diskOne, new CellImpl(5,3)));
+    Assertions.assertEquals(new CellImpl(5,4), ai.calculateBestMove(game.getState()));
+    Assertions.assertTrue(game.placeDisk(diskTwo,new CellImpl(5,4)));
+  }
 }
