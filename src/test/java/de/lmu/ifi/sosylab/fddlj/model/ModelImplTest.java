@@ -734,7 +734,9 @@ public class ModelImplTest {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      state = (GameState) evt.getNewValue();
+      if (evt.getNewValue() instanceof GameState) {
+        state = (GameState) evt.getNewValue();
+      }
     }
   }
 
