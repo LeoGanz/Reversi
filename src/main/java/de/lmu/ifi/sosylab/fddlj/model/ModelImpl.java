@@ -95,7 +95,7 @@ public class ModelImpl implements Model {
         }
       }
 
-      notifyListeners();
+      notifyListenersOfChangedState();
 
       if (mode.equals(GameMode.SINGLEPLAYER) /* && currentPlayer is the AI */) {
         // TODO let AI move
@@ -127,12 +127,14 @@ public class ModelImpl implements Model {
   public void addListener(PropertyChangeListener pcl) {
     requireNonNull(pcl);
     support.addPropertyChangeListener(pcl);
+    notifyListenersOfChangedListeners();
   }
 
   @Override
   public void removeListener(PropertyChangeListener pcl) {
     requireNonNull(pcl);
     support.removePropertyChangeListener(pcl);
+    notifyListenersOfChangedListeners();
   }
 
   @Override
@@ -144,7 +146,7 @@ public class ModelImpl implements Model {
   public boolean setWaiting() {
     if (state.getCurrentPhase().equals(Phase.RUNNING)) {
       state.setCurrentPhase(Phase.WAITING);
-      notifyListeners();
+      notifyListenersOfChangedState();
       return true;
     } else {
       return false;
@@ -155,7 +157,7 @@ public class ModelImpl implements Model {
   public boolean unsetWaiting() {
     if (state.getCurrentPhase().equals(Phase.WAITING)) {
       state.setCurrentPhase(Phase.RUNNING);
-      notifyListeners();
+      notifyListenersOfChangedState();
       return true;
     } else {
       return false;
@@ -261,8 +263,13 @@ public class ModelImpl implements Model {
   /**
    * Notifies all Listeners of a changed {@link GameState}.
    */
-  private void notifyListeners() {
+  private void notifyListenersOfChangedState() {
     support.firePropertyChange(Model.STATE_CHANGED, null, state);
+  }
+
+  /** Notifies all listeners that a listener was added or removed. */
+  private void notifyListenersOfChangedListeners() {
+    support.firePropertyChange(Model.LISTENERS_CHANGED, null, this);
   }
 
   /**
