@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * The class GameFieldModel implements GameField and ModifiableGameField. GameFieldModel represents
+ * The class GameFieldImpl implements GameField and ModifiableGameField. GameFieldImpl represents
  * the game field and stores the information about which disks are on the Cells of the game field.
  * Provides the equals and hashCode methods.
  *
@@ -73,7 +73,7 @@ public class GameFieldImpl implements ModifiableGameField {
     Set<Cell> set = new HashSet<>();
     for (int column = 0; column < SIZE; column++) {
       for (int row = 0; row < SIZE; row++) {
-        if (field[column][row] != null && field[column][row].getPlayer().equals(player)) {
+        if ((field[column][row] != null) && field[column][row].getPlayer().equals(player)) {
           set.add(new CellImpl(column, row));
         }
       }
@@ -84,7 +84,7 @@ public class GameFieldImpl implements ModifiableGameField {
   @Override
   public boolean isCellOfPlayer(Player player, Cell cell) {
     if (field[cell.getColumn()][cell.getRow()] != null) {
-      return field[cell.getColumn()][cell.getRow()].getPlayer() == player;
+      return field[cell.getColumn()][cell.getRow()].getPlayer().equals(player);
     } else {
       return false;
     }
@@ -92,14 +92,14 @@ public class GameFieldImpl implements ModifiableGameField {
 
   @Override
   public boolean isWithinBounds(Cell cell) {
-    return cell.getColumn() >= 0
-        && cell.getColumn() < SIZE
-        && cell.getRow() >= 0
-        && cell.getRow() < SIZE;
+    return (cell.getColumn() >= 0)
+        && (cell.getColumn() < SIZE)
+        && (cell.getRow() >= 0)
+        && (cell.getRow() < SIZE);
   }
 
   @Override
-  public GameFieldImpl makeCopy() {
+  public ModifiableGameField makeCopy() {
     GameFieldImpl newField = new GameFieldImpl();
     for (int column = 0; column < SIZE; column++) {
       for (int row = 0; row < SIZE; row++) {
@@ -136,7 +136,7 @@ public class GameFieldImpl implements ModifiableGameField {
     for (int i = 0; i < SIZE; i++) {
       for (int j = 0; j < SIZE; j++) {
         Cell toCheck = new CellImpl(i, j);
-        if (!(this.get(toCheck).equals(other.get(toCheck)))) {
+        if (!(get(toCheck).equals(other.get(toCheck)))) {
           return false;
         }
       }

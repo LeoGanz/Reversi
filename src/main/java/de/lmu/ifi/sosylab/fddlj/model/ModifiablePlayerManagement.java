@@ -51,4 +51,7 @@ interface ModifiablePlayerManagement extends PlayerManagement {
    *     player two}
    */
   void setWinner(Optional<Player> winner);
+
+  @Override
+  ModifiablePlayerManagement makeCopy();
 }
