@@ -20,7 +20,7 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
     Cell bestMove = null;
 
     for (Cell cell : possibleMoves) {
-      double tempMoveValue = evaluateRecursively(state, cell, currentPlayer, 1);
+      double tempMoveValue = evaluateRecursively(state, cell, currentPlayer, 0);
       if (tempMoveValue > moveValue) {
         moveValue = tempMoveValue;
         bestMove = cell;
