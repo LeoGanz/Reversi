@@ -23,7 +23,8 @@ public class MessageTest {
   private final Player dummy = new PlayerImpl("Dummy", Color.BLUEVIOLET);
   private final Message<Player> dummyMessage = new Message<>(dummy);
   private final Message<Boolean> trueMessage = new Message<>(true);
-
+  private final Message<Message<Message<Player>>> nestedMessage =
+      new Message<>(new Message<>(dummyMessage));
 
   @Test
   public void testMessage_null() {
@@ -64,6 +65,7 @@ public class MessageTest {
     ArrayList<Message<?>> messages = new ArrayList<>();
     messages.add(trueMessage);
     messages.add(dummyMessage);
+    messages.add(nestedMessage);
 
     for (Message<?> message : messages) {
       testToJason(message);
@@ -74,31 +76,6 @@ public class MessageTest {
       Assertions.assertEquals(message.getData(), fromJson.getData());
       Assertions.assertEquals(message, fromJson);
     }
-  }
-
-  private void testToJason(Message<?> message) {
-    try {
-      testToJason(message, message.getDataClass().getName(), false);
-    } catch (@SuppressWarnings("unused") ClassNotFoundException e) {
-      Assertions.fail("Data class should have been found");
-    }
-  }
-
-  private void testToJason(Message<?> message, String dataClassName, boolean dataNull) {
-    Gson gson = new Gson();
-    String jsonString;
-    if (dataNull) {
-      jsonString = "{\"" + Message.DATA_CLASS_FIELD + "\":\"" + dataClassName + "\"}";
-    } else {
-      jsonString = "{\"" + Message.DATA_CLASS_FIELD + "\":\"" + dataClassName + "\","
-        + "\"" + Message.DATA_FIELD + "\":" + gson.toJson(message.getData()) + "}";
-    }
-    String jsonMessage = message.toJson();
-
-    Assertions.assertEquals(
-        jsonString,
-        jsonMessage,
-        "toJson() returned " + jsonMessage + " instead of expected " + jsonString);
   }
 
   @Test
@@ -144,6 +121,31 @@ public class MessageTest {
       // e.printStackTrace();
       Assertions.fail("Reflection should not have failed when setting private field");
     }
+  }
+
+  private void testToJason(Message<?> message) {
+    try {
+      testToJason(message, message.getDataClass().getName(), false);
+    } catch (@SuppressWarnings("unused") ClassNotFoundException e) {
+      Assertions.fail("Data class should have been found");
+    }
+  }
+
+  private void testToJason(Message<?> message, String dataClassName, boolean dataNull) {
+    Gson gson = new Gson();
+    String jsonString;
+    if (dataNull) {
+      jsonString = "{\"" + Message.DATA_CLASS_FIELD + "\":\"" + dataClassName + "\"}";
+    } else {
+      jsonString = "{\"" + Message.DATA_CLASS_FIELD + "\":\"" + dataClassName + "\","
+        + "\"" + Message.DATA_FIELD + "\":" + gson.toJson(message.getData()) + "}";
+    }
+    String jsonMessage = message.toJson();
+
+    Assertions.assertEquals(
+        jsonString,
+        jsonMessage,
+        "toJson() returned " + jsonMessage + " instead of expected " + jsonString);
   }
 
   @Test
