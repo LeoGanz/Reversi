@@ -1,7 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
 import javafx.scene.paint.Color;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -62,7 +61,7 @@ public class GameStateImplTest {
   @Test
   void testSetAndGetGameField_notNull() {
     GameStateImpl state = new GameStateImpl();
-    GameField field = setUpField();
+    ModifiableGameField field = setUpField();
     state.setGameField(field);
     Assertions.assertSame(
         field,
@@ -80,7 +79,7 @@ public class GameStateImplTest {
   @Test
   void testSetAndGetPlayerManagement_notNull() {
     GameStateImpl state = new GameStateImpl();
-    PlayerManagement manager = setUpManager();
+    ModifiablePlayerManagement manager = setUpManager();
     state.setPlayerManagement(manager);
     Assertions.assertSame(
         manager,
@@ -100,8 +99,8 @@ public class GameStateImplTest {
   @Test
   void testMakeCopy_notNull() {
     GameStateImpl state = new GameStateImpl();
-    GameField field = setUpField();
-    PlayerManagement manager = setUpManager();
+    ModifiableGameField field = setUpField();
+    ModifiablePlayerManagement manager = setUpManager();
     Phase phase = Phase.RUNNING;
 
     state.setCurrentPhase(phase);
@@ -128,8 +127,8 @@ public class GameStateImplTest {
   @Test
   void testMakeCopy_PhaseNull() {
     GameStateImpl state = new GameStateImpl();
-    GameField field = setUpField();
-    PlayerManagement manager = setUpManager();
+    ModifiableGameField field = setUpField();
+    ModifiablePlayerManagement manager = setUpManager();
 
     state.setCurrentPhase(null);
     state.setGameField(field);
@@ -155,7 +154,7 @@ public class GameStateImplTest {
   @Test
   void testMakeCopy_GameFieldNull() {
     GameStateImpl state = new GameStateImpl();
-    PlayerManagement manager = setUpManager();
+    ModifiablePlayerManagement manager = setUpManager();
     Phase phase = Phase.WAITING;
 
     state.setCurrentPhase(phase);
@@ -180,7 +179,7 @@ public class GameStateImplTest {
   @Test
   void testMakeCopy_PlayerManagementNull() {
     GameStateImpl state = new GameStateImpl();
-    GameField field = setUpField();
+    ModifiableGameField field = setUpField();
     Phase phase = Phase.FINISHED;
 
     state.setCurrentPhase(phase);
