@@ -1,6 +1,7 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
 import com.sun.glass.ui.Screen;
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import java.beans.PropertyChangeEvent;
 import javafx.application.Platform;
@@ -25,7 +26,11 @@ public class ReversiView implements View {
   private BorderPane root;
   private GameBoard gameBoard;
 
+  private Controller controller;
+
   public ReversiView(Stage stage, Model model, Controller controller) {
+
+    this.controller = controller;
 
     stage.setTitle("Reversi");
     stage.setMaximized(true);
@@ -41,7 +46,7 @@ public class ReversiView implements View {
     root.setLeft(left);
     BorderPane.setAlignment(left, Pos.CENTER);
 
-    gameBoard = new GameBoard(model, gameMode);
+    gameBoard = new GameBoard(model, gameMode, controller);
     root.setCenter(gameBoard);
     BorderPane.setAlignment(root, Pos.CENTER);
 
@@ -106,7 +111,7 @@ public class ReversiView implements View {
       root.layout();
     }
 
-    if (event.getPropertyName().equals(Model.MODEL_CHANGED)) {
+    if (event.getPropertyName().equals(Model.LISTENERS_CHANGED)) {
       if (event.getNewValue() instanceof Model) {
         this.model = (Model) event.getNewValue();
 

@@ -1,6 +1,7 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import java.beans.PropertyChangeListener;
 import javafx.stage.Stage;

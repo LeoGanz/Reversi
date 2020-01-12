@@ -1,5 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
 import javafx.event.ActionEvent;
@@ -28,11 +29,10 @@ public class PlayerCreation extends BorderPane {
     this.controller = controller;
     this.primaryStage = stage;
     setStyle("-fx-background-color: #ffffff");
-
   }
 
-  void getSinglePlayerInformation(Controller controller, GameModeSelector gameModeSelector,
-      boolean multiplayer) {
+  void getSinglePlayerInformation(
+      Controller controller, GameModeSelector gameModeSelector, boolean multiplayer) {
     VBox vbox = new VBox(5);
 
     TextField textField = new TextField();
@@ -43,29 +43,30 @@ public class PlayerCreation extends BorderPane {
     setCenter(vbox);
 
     Button start = getButton("Start");
-    start.setOnAction(e -> {
-      if (!isTextFieldInputValid(textField.getText())) {
-        textField.setStyle("-fx-border-color: red;");
-        return;
-      }
+    start.setOnAction(
+        e -> {
+          if (!isTextFieldInputValid(textField.getText())) {
+            textField.setStyle("-fx-border-color: red;");
+            return;
+          }
 
-      if (multiplayer) {
-        startMultiplayer(textField.getText(), colorPicker.getValue());
-      } else {
-        startSinglePlayer(textField.getText(), colorPicker.getValue());
-      }
-      gameModeSelector.close();
-    });
+          if (multiplayer) {
+            startMultiplayer(textField.getText(), colorPicker.getValue());
+          } else {
+            startSinglePlayer(textField.getText(), colorPicker.getValue());
+          }
+          gameModeSelector.close();
+        });
     setBottom(start);
     BorderPane.setAlignment(start, Pos.CENTER);
-
   }
 
   void getMultiplePlayersInformation(GameModeSelector gameModeSelector) {
 
     VBox vboxPlayerOne = new VBox();
     TextField textFieldOne = new TextField();
-    vboxPlayerOne.getChildren()
+    vboxPlayerOne
+        .getChildren()
         .add(getUsernameInputField(textFieldOne, "Geben Sie den Usernamen von Spieler 1 ein:"));
     ColorPicker colorPickerOne = new ColorPicker(Color.WHITE);
     vboxPlayerOne.getChildren().add(getColorPickerPane(colorPickerOne));
@@ -73,28 +74,33 @@ public class PlayerCreation extends BorderPane {
 
     VBox vboxPlayerTwo = new VBox();
     TextField textFieldTwo = new TextField();
-    vboxPlayerTwo.getChildren()
+    vboxPlayerTwo
+        .getChildren()
         .add(getUsernameInputField(textFieldTwo, "Geben Sie den Usernamen von Spieler 2 ein:"));
     ColorPicker colorPickerTwo = new ColorPicker(Color.WHITE);
     vboxPlayerTwo.getChildren().add(getColorPickerPane(colorPickerTwo));
     setRight(vboxPlayerTwo);
 
     Button start = getButton("Start");
-    start.setOnAction(e -> {
-      if (!isTextFieldInputValid(textFieldOne.getText())) {
-        textFieldOne.setStyle("-fx-border-color: red;");
-        return;
-      }
+    start.setOnAction(
+        e -> {
+          if (!isTextFieldInputValid(textFieldOne.getText())) {
+            textFieldOne.setStyle("-fx-border-color: red;");
+            return;
+          }
 
-      if (!isTextFieldInputValid(textFieldTwo.getText())) {
-        textFieldTwo.setStyle("-fx-border-color: red;");
-        return;
-      }
+          if (!isTextFieldInputValid(textFieldTwo.getText())) {
+            textFieldTwo.setStyle("-fx-border-color: red;");
+            return;
+          }
 
-      startHotseat(textFieldOne.getText(), colorPickerOne.getValue(), textFieldTwo.getText(),
-          colorPickerTwo.getValue());
-      gameModeSelector.close();
-    });
+          startHotseat(
+              textFieldOne.getText(),
+              colorPickerOne.getValue(),
+              textFieldTwo.getText(),
+              colorPickerTwo.getValue());
+          gameModeSelector.close();
+        });
     setBottom(start);
     BorderPane.setAlignment(start, Pos.CENTER);
   }
@@ -124,9 +130,10 @@ public class PlayerCreation extends BorderPane {
     color.setMaxHeight(50);
     color.setMinWidth(50);
     color.setMaxWidth(50);
-    colorPicker.setOnAction((ActionEvent t) -> {
-      color.setStyle("-fx-background-color: " + toRgbCode(colorPicker.getValue()) + ";");
-    });
+    colorPicker.setOnAction(
+        (ActionEvent t) -> {
+          color.setStyle("-fx-background-color: " + toRgbCode(colorPicker.getValue()) + ";");
+        });
 
     Label label = new Label("Wählen Sie eine Farbe aus:");
     vbox.getChildren().addAll(label, color, colorPicker);
@@ -148,8 +155,11 @@ public class PlayerCreation extends BorderPane {
 
   private String toRgbCode(Color color) {
 
-    return String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
-        (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+    return String.format(
+        "#%02X%02X%02X",
+        (int) (color.getRed() * 255),
+        (int) (color.getGreen() * 255),
+        (int) (color.getBlue() * 255));
   }
 
   private boolean isTextFieldInputValid(String input) {
@@ -160,21 +170,20 @@ public class PlayerCreation extends BorderPane {
     Player player = new PlayerImpl(playerName, playerColor);
     Player ai = new PlayerImpl("AI", Color.BLACK);
 
-    controller.start(GameMode.SINGLEPLAYER, primaryStage, player, ai);
+    controller.startMainView(GameMode.SINGLEPLAYER, primaryStage, player, ai);
   }
 
-  private void startHotseat(String playerOneName, Color playerOneColor, String playerTwoName,
-      Color playerTwoColor) {
+  private void startHotseat(
+      String playerOneName, Color playerOneColor, String playerTwoName, Color playerTwoColor) {
     Player playerOne = new PlayerImpl(playerOneName, playerOneColor);
     Player playerTwo = new PlayerImpl(playerTwoName, playerTwoColor);
 
-    controller.start(GameMode.HOTSEAT, primaryStage, playerOne, playerTwo);
+    controller.startMainView(GameMode.HOTSEAT, primaryStage, playerOne, playerTwo);
   }
 
   private void startMultiplayer(String playerName, Color playerColor) {
     Player player = new PlayerImpl(playerName, playerColor);
 
-    controller.start(GameMode.MULTIPLAYER, primaryStage, player, null);
+    controller.startMainView(GameMode.MULTIPLAYER, primaryStage, player, null);
   }
-
 }

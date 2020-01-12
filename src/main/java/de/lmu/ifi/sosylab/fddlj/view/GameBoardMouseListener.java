@@ -4,6 +4,7 @@ import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.CellImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Disk;
 import de.lmu.ifi.sosylab.fddlj.model.GameFieldImpl;
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.Phase;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
@@ -19,8 +20,8 @@ public class GameBoardMouseListener {
   private GameBoard gameBoard;
   private Controller controller;
 
-  public GameBoardMouseListener(GameMode gameMode, Model model, GameBoard gameBoard,
-      Controller controller) {
+  public GameBoardMouseListener(
+      GameMode gameMode, Model model, GameBoard gameBoard, Controller controller) {
     this.gameMode = gameMode;
     this.model = model;
     this.gameBoard = gameBoard;
@@ -30,7 +31,8 @@ public class GameBoardMouseListener {
   void handleMouseMoved(MouseEvent e) {
 
     if (gameMode == GameMode.SINGLEPLAYER
-        && model.getState().getCurrentPlayer() == model.getAiPlayer()) {
+        && model.getState().getPlayerManagement().getCurrentPlayer()
+            == model.getState().getPlayerManagement().getPlayerTwo()) {
       gameBoard.setCursor(Cursor.DEFAULT);
       return;
     }
@@ -51,9 +53,7 @@ public class GameBoardMouseListener {
       } else {
         gameBoard.setCursor(Cursor.DEFAULT);
       }
-
     }
-
   }
 
   void handleMouseClicked(MouseEvent e) {
@@ -63,19 +63,19 @@ public class GameBoardMouseListener {
         // Converts the cursor's current coordinates into a cell
         Cell current = getCellForCoordinates((int) e.getX(), (int) e.getY());
 
-        if (gameBoard.getCursor() == Cursor.HAND && model
-            .getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer())
-            .contains(current)) {
+        if (gameBoard.getCursor() == Cursor.HAND
+            && model
+                .getPossibleMovesForPlayer(
+                    model.getState().getPlayerManagement().getCurrentPlayer())
+                .contains(current)) {
           gameBoard.setCursor(Cursor.DEFAULT);
-          controller.place(current);
+          controller.placeDisk(current);
         }
       }
     }
   }
 
-  void handleScrollEvent(ScrollEvent e) {
-
-  }
+  void handleScrollEvent(ScrollEvent e) {}
 
   private boolean isMouseInGameField(MouseEvent e) {
     return e.getX() > gameBoard.getWidthOffsetForGameField()
@@ -86,7 +86,7 @@ public class GameBoardMouseListener {
 
   /**
    * Converts the given coordinates to a cell on the game field.
-   * 
+   *
    * @param x the x coordinate in the cell
    * @param y the y coordinate in the cell
    * @return the cell on the game field containing the coordinates
@@ -100,8 +100,6 @@ public class GameBoardMouseListener {
     row = (int) (row / (gameBoard.getCellHeight() + gameBoard.getSpacing()));
 
     return new CellImpl(column, (GameFieldImpl.SIZE - 1) - row);
-
-
   }
 
   Player getPlayerOnCell(Cell cell) {
@@ -112,5 +110,4 @@ public class GameBoardMouseListener {
       return null;
     }
   }
-
 }
