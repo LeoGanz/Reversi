@@ -28,9 +28,9 @@ public class MessageTest {
   @Test
   public void testMessage_null() {
     try {
-      @SuppressWarnings("unused")
       Message<Player> message = new Message<>(null);
       Assertions.fail("Class of null should not be found");
+      Assertions.assertNull(message, "Trick spotbugs");
     } catch (@SuppressWarnings("unused") NullPointerException e) {
       // expected
     }
