@@ -3,7 +3,6 @@ package de.lmu.ifi.sosylab.fddlj.view;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.Disk;
 import de.lmu.ifi.sosylab.fddlj.model.GameFieldImpl;
-import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import java.util.Map;
@@ -32,6 +31,7 @@ public class GameBoard extends Pane {
   private static final int OFFSET_SHADOW_X = 10;
   private static final int OFFSET_SHADOW_Y = 10;
 
+
   private static final Color SHADOW_COLOR = new Color(0, 0, 0, 1);
   private Font letterFont = new Font("Arial", 40);
 
@@ -42,9 +42,12 @@ public class GameBoard extends Pane {
   private Model model;
   private GameBoardMouseListener listener;
 
-  /** @param model */
-  public GameBoard(Model model, GameMode gameMode, Controller controller) {
-    listener = new GameBoardMouseListener(gameMode, model, this, controller);
+  /**
+   * 
+   * @param model
+   */
+  public GameBoard(Model model, GameMode gameMode) {
+    listener = new GameBoardMouseListener(gameMode);
     canvas = new Canvas(getWidth(), getHeight());
     getChildren().add(canvas);
     widthProperty().addListener(e -> canvas.setWidth(getWidth()));
@@ -69,6 +72,8 @@ public class GameBoard extends Pane {
     drawPlayers(gc);
     showPossibleMoves(gc);
     drawBoundaries(gc);
+
+
   }
 
   private void drawPlayers(GraphicsContext g) {
@@ -84,6 +89,8 @@ public class GameBoard extends Pane {
         drawDisk(optional.get().getPlayer(), g, padding, startX, startY, cellWidth, cellHeight);
       }
     }
+
+
   }
 
   /**
@@ -97,8 +104,8 @@ public class GameBoard extends Pane {
    * @param cellWidth The width of the cell.
    * @param cellHeight The height of the cell.
    */
-  private void drawDisk(
-      Player player, GraphicsContext g, int padding, int x, int y, int cellWidth, int cellHeight) {
+  private void drawDisk(Player player, GraphicsContext g, int padding, int x, int y, int cellWidth,
+      int cellHeight) {
 
     g.setFill(player.getColor());
     g.fillOval(x + padding, y + padding, cellWidth - 2 * padding, cellHeight - 2 * padding);
@@ -109,11 +116,12 @@ public class GameBoard extends Pane {
 
     g.applyEffect(
         new DropShadow(cellWidth - 2 * padding, OFFSET_SHADOW_X, OFFSET_SHADOW_Y, SHADOW_COLOR));
+
   }
 
   /**
    * Draws the the entire game field with white and black cells and the pawn on a cell if available.
-   *
+   * 
    * @param g the <code>GraphicsContext</code> object used for drawing
    */
   private void drawGameField(GraphicsContext g) {
@@ -143,6 +151,7 @@ public class GameBoard extends Pane {
         g.setStroke(Color.BLACK);
         g.setLineWidth(borderWidth);
         g.strokeRect(startX, startY, cellWidth, cellHeight);
+
       }
 
       g.setStroke(Color.WHITE);
@@ -150,18 +159,10 @@ public class GameBoard extends Pane {
 
       String letter = "" + ((char) (START_LETTER + i));
       String row = "" + ((START_ROW) - i);
-      int x =
-          (int)
-              ((i * (cellWidth + SPACING))
-                  + getWidthOffsetForGameField()
-                  + cellWidth / 2
-                  - new Text(letter).getLayoutBounds().getWidth() / 2);
-      int y =
-          (int)
-              ((i * (cellHeight + SPACING))
-                  + getHeightOffsetForGameField()
-                  + cellHeight / 2
-                  + letterFont.getSize() / 4);
+      int x = (int) ((i * (cellWidth + SPACING)) + getWidthOffsetForGameField() + cellWidth / 2
+          - new Text(letter).getLayoutBounds().getWidth() / 2);
+      int y = (int) ((i * (cellHeight + SPACING)) + getHeightOffsetForGameField() + cellHeight / 2
+          + letterFont.getSize() / 4);
       g.strokeText(letter, x, getHeightOffsetForGameField() - PADDING_FOR_LETTERS);
       g.strokeText(row, getWidthOffsetForGameField() - 2 * PADDING_FOR_LETTERS, y);
     }
@@ -169,7 +170,7 @@ public class GameBoard extends Pane {
 
   /**
    * Indicate the cells the user can possibly move to.
-   *
+   * 
    * @param g The <code>GraphicsContext</code> object used for drawing
    */
   private void showPossibleMoves(GraphicsContext g) {
@@ -183,27 +184,23 @@ public class GameBoard extends Pane {
   /**
    * Draws a circle on the given cell to indicate the user can move the currently selected pawn to
    * this cell.
-   *
+   * 
    * @param cell the cell to which a move is possible
    * @param g The <code>GraphicsContext</code> object used for drawing
    */
   private void indicatePossibleMove(Cell cell, GraphicsContext g) {
     g.setFill(new Color(20, 220, 20, 100));
-    int startX =
-        (int) (cell.getColumn() * (cellWidth + SPACING))
-            + getWidthOffsetForGameField()
-            + cellWidth / 4;
-    int startY =
-        (int) (((GameFieldImpl.SIZE - 1) - cell.getRow()) * (cellHeight + SPACING))
-            + getHeightOffsetForGameField()
-            + cellHeight / 4;
+    int startX = (int) (cell.getColumn() * (cellWidth + SPACING)) + getWidthOffsetForGameField()
+        + cellWidth / 4;
+    int startY = (int) (((GameFieldImpl.SIZE - 1) - cell.getRow()) * (cellHeight + SPACING))
+        + getHeightOffsetForGameField() + cellHeight / 4;
 
     g.fillOval(startX, startY, cellWidth / 2, cellHeight / 2);
   }
 
   /**
    * Draws a border around the entire game field.
-   *
+   * 
    * @param g The <code>GraphicsContext</code> object used for drawing
    */
   private void drawBoundaries(GraphicsContext g) {
@@ -212,39 +209,34 @@ public class GameBoard extends Pane {
     int width = getGameFieldWidth();
     int height = getGameFieldHeight();
 
-    g.strokeRect(
-        getWidthOffsetForGameField(),
-        getHeightOffsetForGameField(),
-        (int) (width + (borderWidth / 2)),
-        (int) (height + (borderWidth / 2)));
+    g.strokeRect(getWidthOffsetForGameField(), getHeightOffsetForGameField(),
+        (int) (width + (borderWidth / 2)), (int) (height + (borderWidth / 2)));
+
   }
 
   /**
    * Calculates an offset for the game field in order to center the game field horizontally.
-   *
+   * 
    * @return the calculated width offset for the game field.
    */
   int getWidthOffsetForGameField() {
-    return (int)
-        (((getWidth() / 2) - (GameFieldImpl.SIZE / 2) * cellWidth)
-            - ((GameFieldImpl.SIZE) / 2 + 1) * SPACING);
+    return (int) (((getWidth() / 2) - (GameFieldImpl.SIZE / 2) * cellWidth)
+        - ((GameFieldImpl.SIZE) / 2 + 1) * SPACING);
   }
 
   /**
    * Calculates an offset for the game field in order to center the game field vertically.
-   *
+   * 
    * @return the calculated height offset for the game field.
    */
   int getHeightOffsetForGameField() {
-    return (int)
-            (((getHeight() / 2) - (GameFieldImpl.SIZE / 2) * cellHeight)
-                - ((GameFieldImpl.SIZE) / 2 + 1) * SPACING)
-        + PADDING_FOR_LETTERS / 2;
+    return (int) (((getHeight() / 2) - (GameFieldImpl.SIZE / 2) * cellHeight)
+        - ((GameFieldImpl.SIZE) / 2 + 1) * SPACING) + PADDING_FOR_LETTERS / 2;
   }
 
   /**
    * Returns the width of the game field in pixels.
-   *
+   * 
    * @return the game field's width in pixels
    */
   int getGameFieldWidth() {
@@ -253,7 +245,7 @@ public class GameBoard extends Pane {
 
   /**
    * Returns the height of the game field in pixels.
-   *
+   * 
    * @return the game field's height in pixels
    */
   int getGameFieldHeight() {
@@ -279,4 +271,5 @@ public class GameBoard extends Pane {
   float getSpacing() {
     return SPACING;
   }
+
 }

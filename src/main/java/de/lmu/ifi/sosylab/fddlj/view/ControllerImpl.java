@@ -3,7 +3,6 @@ package de.lmu.ifi.sosylab.fddlj.view;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.Disk;
 import de.lmu.ifi.sosylab.fddlj.model.DiskImpl;
-import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import java.beans.PropertyChangeEvent;
