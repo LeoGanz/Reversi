@@ -2,114 +2,156 @@ package de.lmu.ifi.sosylab.fddlj.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.annotations.SerializedName;
 
 /**
- * A generic Implementation for JSON serializable network messages. This kind of
- * structure give us the benefit to split meta data and concrete data.
+ * A generic implementation for JSON serializable network messages. This kind of structure give us
+ * the benefit to split meta data and concrete data.
  *
- * @param <T> concrete data the message contains
+ * @param <T> concrete data type the message contains
+ * @author Leonard Ganz
+ * @author Florian Theimer (prototype)
  */
 public class Message<T> {
 
-  /**
-   * The message type, automatically set to the class name of the given object.
-   */
-  private String type;
+  public static final String DATA_CLASS_FIELD = "dataClass";
+  public static final String DATA_FIELD = "data";
 
   /**
-   * The class name of the data typed, which will be used for consistent serialization.
+   * The fully qualified class name of the data typed, which will be used for consistent
+   * serialization.
    */
-  private Class<T> dataClass;
+  @SerializedName(DATA_CLASS_FIELD)
+  private final String dataClass;
+
+  /** The concrete object which should be transferred by the message. */
+  @SerializedName(DATA_FIELD)
+  private final T data;
 
   /**
-   * The concrete object which should be transferred by the message.
-   */
-  private T data;
-
-  /**
-   * Create a new message with the given type and data.
-   * Message Type have to be defined clearly for all endpoints.
+   * Create a new message with the given data.
    *
-   * @param type Type of the message as string.
-   * @param data Data of the message
+   * @param data data of the message
+   * @throws NullPointerException if data is null
    */
-  public Message(String type, T data, Class<T> dataClass) {
-    this.type = type;
-    this.dataClass = dataClass;
+  public Message(T data) {
+    this.dataClass = data.getClass().getName();
     this.data = data;
   }
 
-  /**
-   * Get the type of the message.
-   *
-   * @return Type of the message as string
-   */
-  public String getType() {
-    return type;
+  /** Needed for reflection. */
+  @SuppressWarnings("unused")
+  private Message() {
+    dataClass = null;
+    data = null;
   }
 
   /**
    * Concrete data class of the message.
    *
-   * @return Data class of the message.
+   * @return data class of the message.
+   * @throws ClassNotFoundException if class of the message data field is not resolvable
    */
-  public Class<T> getDataClass() {
-    return dataClass;
+  public Class<?> getDataClass() throws ClassNotFoundException {
+    return Class.forName(dataClass);
   }
 
   /**
    * Concrete data of the message.
    *
-   * @return Data of the message.
+   * @return data of the message.
    */
   public T getData() {
     return data;
   }
 
   /**
-   * Converts this the message to a json object.
+   * Converts this message to its json representation.
    *
-   * @return
+   * @return a string containing this message encoded with json
    */
   public String toJson() {
-    GsonBuilder builder = new GsonBuilder();
-    Gson gson = builder.create();
+    Gson gson = new Gson();
 
     return gson.toJson(this);
   }
 
   /**
-   * Cuts off "class " in beginning of a class name to make it usable by
-   * Class.forName().
+   * Creates a {@link Message} from the given JSON string.
    *
-   * @param className Name of a class
-   * @return Sanitized name of the class
+   * @param json String which represents the message.
+   * @return Message decoded from the json string
    */
-  public static final String sanitizeToStringFromGetClass(String className) {
-    if (className.substring(0, 6).equals("class ")) {
-      className = className.substring(6);
-    }
+  public static Message<?> fromJson(String json) {
+    Gson gson =
+        new GsonBuilder()
+            .registerTypeAdapter(
+                Message.class, MessageJsonDeserializer.getContentJsonDeserializer())
+            .create();
 
-    return className;
+    return gson.fromJson(json, Message.class);
   }
 
   /**
-   * Creates a {@link Message} from the given JSON string.
+   * Convert a JSON string to pretty print version.
    *
-   * @param json String which represented the message.
-   * @return Message from the json
+   * @param jsonString json to be prettified
+   * @return a prettified version of the json string
    */
-  public static Message fromJson(String json) {
-    GsonBuilder builder = new GsonBuilder();
-    Gson gson = builder.create();
+  public static String prettifyJson(String jsonString) {
+    JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
 
-    System.out.println();
-    System.out.println(json);
-    System.out.println();
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    Message jsonParsedMessage = gson.fromJson(json, Message.class);
-
-    return jsonParsedMessage;
+    return gson.toJson(json);
   }
 
+  @Override
+  public final int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = (prime * result) + ((data == null) ? 0 : data.hashCode());
+    result = (prime * result) + ((dataClass == null) ? 0 : dataClass.hashCode());
+    return result;
+  }
+
+  @Override
+  public final boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof Message)) {
+      return false;
+    }
+    Message<?> other = (Message<?>) obj;
+    if (data == null) {
+      if (other.data != null) {
+        return false;
+      }
+    } else if (!data.equals(other.data)) {
+      return false;
+    }
+    if (dataClass == null) {
+      if (other.dataClass != null) {
+        return false;
+      }
+    } else if (!dataClass.equals(other.dataClass)) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder
+        .append("Message [dataClass=")
+        .append(dataClass)
+        .append(", data=")
+        .append(data)
+        .append("]");
+    return builder.toString();
+  }
 }
