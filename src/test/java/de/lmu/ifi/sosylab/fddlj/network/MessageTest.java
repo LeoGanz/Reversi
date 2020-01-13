@@ -68,7 +68,7 @@ public class MessageTest {
     messages.add(nestedMessage);
 
     for (Message<?> message : messages) {
-      testToJason(message);
+      testToJson(message);
       String jsonMessage = message.toJson();
 
       Message<?> fromJson = Message.fromJson(jsonMessage);
@@ -97,7 +97,7 @@ public class MessageTest {
         // expected
       }
 
-      testToJason(invalidMessage, fakeClassString, true);
+      testToJson(invalidMessage, fakeClassString, true);
       String jsonMessage = invalidMessage.toJson();
       Message<?> fromJson = Message.fromJson(jsonMessage);
       Assertions.assertEquals(
@@ -118,20 +118,19 @@ public class MessageTest {
         | InstantiationException
         | InvocationTargetException
         | NoSuchMethodException e) {
-      // e.printStackTrace();
       Assertions.fail("Reflection should not have failed when setting private field");
     }
   }
 
-  private void testToJason(Message<?> message) {
+  private void testToJson(Message<?> message) {
     try {
-      testToJason(message, message.getDataClass().getName(), false);
+      testToJson(message, message.getDataClass().getName(), false);
     } catch (@SuppressWarnings("unused") ClassNotFoundException e) {
       Assertions.fail("Data class should have been found");
     }
   }
 
-  private void testToJason(Message<?> message, String dataClassName, boolean dataNull) {
+  private void testToJson(Message<?> message, String dataClassName, boolean dataNull) {
     Gson gson = new Gson();
     String jsonString;
     if (dataNull) {
