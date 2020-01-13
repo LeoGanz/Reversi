@@ -14,7 +14,7 @@ public class ClientImpl {
   private Model model;
   private Socket connection;
   private BufferedReader in;
-  private ObjectOutputStream out;
+  private OutputStreamWriter out;
   private boolean connectionEstablished;
   private boolean running;
 
@@ -33,7 +33,7 @@ public class ClientImpl {
   private void communicateWithServer() {
     try {
       this.connection = new Socket(this.serverAddress, PORT);
-      this.out = new ObjectOutputStream(connection.getOutputStream());
+      this.out = new OutputStreamWriter(connection.getOutputStream());
       this.out.flush();
       this.in = new BufferedReader(
                       new InputStreamReader(this.connection.getInputStream(), StandardCharsets.UTF_8));
