@@ -3,6 +3,7 @@
 
 # Ignore Gradle build output directory
 build
+out
 /bin/
 
 # Ignore release jar
@@ -14,6 +15,3 @@ releases/reversi-fddlj.jar
 /.settings/
 .DS_Store
 .idea
-
-
-

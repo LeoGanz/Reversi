@@ -1,5 +1,6 @@
 # Libraries
-This application uses the library Gson (https://github.com/google/gson) by Google available under the Apache 2.0 license, which can be obtained from http://www.apache.org/licenses/LICENSE-2.0 and seen below.
+ - This application uses the library Gson (https://github.com/google/gson) by Google available under the Apache 2.0 license, which can be obtained from http://www.apache.org/licenses/LICENSE-2.0 and seen below.
+ - This application uses the library EqualsVerifier (https://jqno.nl/equalsverifier) by Jan Ouwens available under the Apache 2.0 license, which can be obtained from http://www.apache.org/licenses/LICENSE-2.0 and seen below.
 
 
 
