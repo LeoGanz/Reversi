@@ -40,7 +40,6 @@ public class ClientImpl {
 
       this.connectionEstablished = true;
     } catch (@SuppressWarnings("unused") IOException e) {
-      // chessController.handleClientConnectionFailed();
       terminate();
     }
 
