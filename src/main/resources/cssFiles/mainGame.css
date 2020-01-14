@@ -1,0 +1,20 @@
+#main-background{
+	-fx-background-color: #6e7175;
+}
+
+#button{
+	-fx-background-color: #46729c;
+	-fx-text-fill: #ffffff;
+}
+
+#graphic-cell:normal {
+	-fx-background-color: #f6f6f6; 
+	-fx-border-color: #d6d6d6;
+    -fx-border-width: 1.2;              
+}
+
+#graphic-cell:highlighted {
+	-fx-background-color: transparent; 
+	-fx-border-color: rgba(0,255,0,255);
+    -fx-border-width: 2.2;
+}

@@ -10,8 +10,21 @@ repositories {
   jcenter()
 }
 
+def currentOS = org.gradle.internal.os.OperatingSystem.current()
+def platform
+if (currentOS.isWindows()) {
+	platform = 'win'
+} else if (currentOS.isLinux()) {
+	platform = 'linux'
+} else if (currentOS.isMaxOsX()) {
+	platform = 'mac'
+}
+
 dependencies {
-	testCompile 'org.junit.jupiter:junit-jupiter:5.5.2'
+	implementation "org.openjfx:javafx-base:11:${platform}"
+	implementation "org.openjfx:javafx-controls:11:${platform}"
+	implementation "org.openjfx:javafx-graphics:11:${platform}"
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
 	implementation 'com.google.code.gson:gson:2.8.6'
 }
@@ -25,6 +38,15 @@ mainClassName = 'de.lmu.ifi.sosylab.fddlj.ReversiMain'
 
 application {
     mainClassName = "$mainClassName"
+}
+
+run {
+	doFirst {
+		jvmArgs = ['--module-path', classpath.asPath,
+			'--add-modules', 'javafx.controls',
+			'--add-modules', 'javafx.graphics',
+		]
+	}
 }
 
 jar {

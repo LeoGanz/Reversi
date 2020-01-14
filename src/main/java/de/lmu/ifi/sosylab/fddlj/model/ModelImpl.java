@@ -311,4 +311,22 @@ public class ModelImpl implements Model {
       manager.setWinner(Optional.of(manager.getPlayerTwo()));
     }
   }
+  
+  /**
+   * Returns the number of disks player one still has left
+   * 
+   * @return the remaining number of disks of player one
+   */
+  public int getNumberOfDisksPlayerOne() {
+      return numberOfPlayerOneDisks;
+  }
+  
+  /**
+   * Returns the number of disks player two still has left
+   * 
+   * @return the remaining number of disks of player two
+   */
+  public int getNumberOfDisksPlayerTwo() {
+      return numberOfPlayerTwoDisks;
+  }
 }

@@ -25,128 +25,135 @@ import javafx.stage.Stage;
  */
 public class ReversiView implements View {
 
-  private Model model;
+    private Model model;
 
-  private Stage stage;
-  private Scene scene;
-  private BorderPane root;
-  private GameBoard gameBoard;
+    private Stage stage;
+    private Scene scene;
+    private BorderPane root;
 
-  private Controller controller;
+    private Controller controller;
 
-  /**
-   * Constructor of this class initialises the main frame of the game.
-   *
-   * @param stage the stage created upon launching the application
-   * @param model a reference to the model instance
-   * @param controller a reference to the controller instance
-   */
-  public ReversiView(Stage stage, Model model, Controller controller) {
+    /**
+     * Constructor of this class initialises the main frame of the game.
+     *
+     * @param stage the stage created upon launching the application
+     * @param model a reference to the model instance
+     * @param controller a reference to the controller instance
+     */
+    public ReversiView(Stage stage, Model model, Controller controller) {
 
-    this.controller = controller;
-    this.stage = stage;
-    this.model = model;
+	this.controller = controller;
+	this.stage = stage;
+	this.model = model;
 
-    this.stage.setTitle("Reversi");
-    this.stage.setMaximized(true);
-    this.stage.setMinWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3.0);
-    this.stage.setMinHeight(Screen.getPrimary().getVisualBounds().getHeight() / 3.0);
-  }
-
-  @Override
-  public void showGame(GameMode gameMode) {
-    root = new BorderPane();
-    root.setStyle("-fx-background-color: #6e7175;");
-
-    VBox left = getDiskIndicators(gameMode);
-    root.setLeft(left);
-    BorderPane.setAlignment(left, Pos.CENTER);
-
-    // gameBoard = new GameBoard(model, gameMode, controller);
-    GameBoardGrid gameBoard = new GameBoardGrid(model, gameMode, controller, stage);
-    root.setCenter(gameBoard);
-    BorderPane.setAlignment(root, Pos.CENTER);
-    BorderPane.setMargin(gameBoard, new Insets(50));
-
-    if (gameMode != GameMode.MULTIPLAYER) {
-      Button reset = getButton("Reset game");
-      reset.setOnAction(e -> {});
-      root.setBottom(reset);
-      BorderPane.setAlignment(root, Pos.CENTER_LEFT);
+	this.stage.setTitle("Reversi");
+	this.stage.setMaximized(true);
+	this.stage.setMinWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3.0);
+	this.stage.setMinHeight(Screen.getPrimary().getVisualBounds().getHeight() / 2.0);
     }
 
-    scene = new Scene(root);
+    @Override
+    public void showGame(GameMode gameMode) {
+	root = new BorderPane();
+	root.getStylesheets().add("cssFiles/mainGame.css");
+	root.setId("main-background");
 
-    stage.setScene(scene);
-    stage.show();
-  }
+	VBox left = getDiskIndicators(gameMode);
+	root.setLeft(left);
+	BorderPane.setAlignment(left, Pos.CENTER);
 
-  private VBox getDiskIndicators(GameMode gameMode) {
+	// gameBoard = new GameBoard(model, gameMode, controller);
+	GameBoardGrid gameBoard = new GameBoardGrid(model, gameMode, controller, stage);
+	root.setCenter(gameBoard);
+	BorderPane.setAlignment(root, Pos.CENTER);
+	BorderPane.setMargin(gameBoard, new Insets(30,50,30,50));
 
-    VBox vbox = new VBox(5);
-    vbox.setAlignment(Pos.CENTER);
-    vbox.setPadding(new Insets(20));
 
-    DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:");
+	scene = new Scene(root);
 
-    if (gameMode == GameMode.HOTSEAT) {
-      vbox.getChildren().add(currentPlayer);
-    } else {
-      DiskIndicator ownDiskIndicator =
-          new DiskIndicator(model, "You are playing the following disks:");
-
-      Region spacer = new Region();
-      VBox.setVgrow(spacer, Priority.ALWAYS);
-
-      vbox.getChildren().addAll(currentPlayer, spacer, ownDiskIndicator);
+	stage.setScene(scene);
+	stage.show();
     }
 
-    return vbox;
-  }
+    private VBox getDiskIndicators(GameMode gameMode) {
 
-  @Override
-  public void propertyChange(PropertyChangeEvent event) {
-    Platform.runLater(
-        new Runnable() {
+	VBox vbox = new VBox(50);
+	vbox.setAlignment(Pos.CENTER);
+	vbox.setPadding(new Insets(20));
+	
+	Region spacerTop = new Region();
+	VBox.setVgrow(spacerTop, Priority.ALWAYS);
+	vbox.getChildren().add(spacerTop);
 
-          @Override
-          public void run() {
-            handleChangeEvent(event);
-          }
-        });
-  }
+	DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:");
 
-  /**
-   * The observable (= model) has just published that it has changed its state. The GUI needs to be
-   * updated accordingly here.
-   *
-   * @param event The event that has been fired by the model.
-   */
-  private void handleChangeEvent(PropertyChangeEvent event) {
+	if (gameMode == GameMode.HOTSEAT) {
+	    vbox.getChildren().add(currentPlayer);
+	} else {
+	    DiskIndicator ownDiskIndicator =
+		    new DiskIndicator(model, "You are playing the following disks:");
 
-    // the next lines are for demonstration purposes
-    if (event.getPropertyName().equals(Model.STATE_CHANGED)) {
-      if (model.getState().getCurrentPhase() == Phase.FINISHED) {
-        new GameFinishedScreen(controller, model, stage);
-      }
+	    
+
+	    vbox.getChildren().addAll(currentPlayer, ownDiskIndicator);
+	}
+
+	if (gameMode != GameMode.MULTIPLAYER) {
+	    Button reset = getButton("Reset game");
+	    reset.setOnAction(e -> {});
+	    
+	    Region spacer = new Region();
+	    VBox.setVgrow(spacer, Priority.ALWAYS);
+	    
+	    vbox.getChildren().addAll(spacer, reset);
+	}
+
+	return vbox;
     }
 
-    if (event.getPropertyName().equals(Model.LISTENERS_CHANGED)) {
-      if (event.getNewValue() instanceof Model) {
-        this.model = (Model) event.getNewValue();
-      }
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+	Platform.runLater(
+		new Runnable() {
+
+		    @Override
+		    public void run() {
+			handleChangeEvent(event);
+		    }
+		});
     }
-  }
 
-  private Button getButton(String text) {
-    Button button = new Button(text);
-    button.setId("button");
-    button.setMinHeight(50);
-    button.setMaxWidth(500);
-    button.setMinWidth(200);
-    button.setCursor(Cursor.HAND);
-    button.setFont(Font.font(18));
+    /**
+     * The observable (= model) has just published that it has changed its state. The GUI needs to be
+     * updated accordingly here.
+     *
+     * @param event The event that has been fired by the model.
+     */
+    private void handleChangeEvent(PropertyChangeEvent event) {
 
-    return button;
-  }
+	// the next lines are for demonstration purposes
+	if (event.getPropertyName().equals(Model.STATE_CHANGED)) {
+	    if (model.getState().getCurrentPhase() == Phase.FINISHED) {
+		new GameFinishedScreen(controller, model, stage);
+	    }
+	}
+
+	if (event.getPropertyName().equals(Model.LISTENERS_CHANGED)) {
+	    if (event.getNewValue() instanceof Model) {
+		this.model = (Model) event.getNewValue();
+	    }
+	}
+    }
+
+    private Button getButton(String text) {
+	Button button = new Button(text);
+	button.setId("button");
+	button.setMinHeight(50);
+	button.setMaxWidth(250);
+	button.setMinWidth(100);
+	button.setCursor(Cursor.HAND);
+	button.setFont(Font.font(18));
+
+	return button;
+    }
 }
