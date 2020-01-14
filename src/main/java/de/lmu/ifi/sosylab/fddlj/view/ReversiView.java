@@ -1,8 +1,8 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
-import com.sun.glass.ui.Screen;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.Phase;
 import java.beans.PropertyChangeEvent;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -15,8 +15,14 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+/**
+ * This class represents the game's main frame that holds all other GUI elements.
+ *
+ * @author Josef Feger
+ */
 public class ReversiView implements View {
 
   private Model model;
@@ -28,27 +34,39 @@ public class ReversiView implements View {
 
   private Controller controller;
 
+  /**
+   * Constructor of this class initialises the main frame of the game.
+   *
+   * @param stage the stage created upon launching the application
+   * @param model a reference to the model instance
+   * @param controller a reference to the controller instance
+   */
   public ReversiView(Stage stage, Model model, Controller controller) {
 
     this.controller = controller;
+    this.stage = stage;
+    this.model = model;
 
-    stage.setTitle("Reversi");
-    stage.setMaximized(true);
-    stage.setMinWidth(Screen.getMainScreen().getWidth() / 3);
-    stage.setMinHeight(Screen.getMainScreen().getHeight() / 3);
+    this.stage.setTitle("Reversi");
+    this.stage.setMaximized(true);
+    this.stage.setMinWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3.0);
+    this.stage.setMinHeight(Screen.getPrimary().getVisualBounds().getHeight() / 3.0);
   }
 
   @Override
   public void showGame(GameMode gameMode) {
     root = new BorderPane();
+    root.setStyle("-fx-background-color: #6e7175;");
 
     VBox left = getDiskIndicators(gameMode);
     root.setLeft(left);
     BorderPane.setAlignment(left, Pos.CENTER);
 
-    gameBoard = new GameBoard(model, gameMode, controller);
+    // gameBoard = new GameBoard(model, gameMode, controller);
+    GameBoardGrid gameBoard = new GameBoardGrid(model, gameMode, controller, stage);
     root.setCenter(gameBoard);
     BorderPane.setAlignment(root, Pos.CENTER);
+    BorderPane.setMargin(gameBoard, new Insets(50));
 
     if (gameMode != GameMode.MULTIPLAYER) {
       Button reset = getButton("Reset game");
@@ -108,14 +126,14 @@ public class ReversiView implements View {
 
     // the next lines are for demonstration purposes
     if (event.getPropertyName().equals(Model.STATE_CHANGED)) {
-      root.layout();
+      if (model.getState().getCurrentPhase() == Phase.FINISHED) {
+        new GameFinishedScreen(controller, model, stage);
+      }
     }
 
     if (event.getPropertyName().equals(Model.LISTENERS_CHANGED)) {
       if (event.getNewValue() instanceof Model) {
         this.model = (Model) event.getNewValue();
-
-        root.layout();
       }
     }
   }

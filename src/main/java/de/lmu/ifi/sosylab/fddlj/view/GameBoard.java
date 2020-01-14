@@ -14,12 +14,18 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-public class GameBoard extends Pane {
+/**
+ * This class offers a pane which shows a game board on which the game's current state is
+ * represented graphically.
+ *
+ * @author Josef Feger
+ */
+public class GameBoard extends BorderPane {
 
   private final Canvas canvas;
 
@@ -42,14 +48,31 @@ public class GameBoard extends Pane {
   private Model model;
   private GameBoardMouseListener listener;
 
-  /** @param model */
+  /**
+   * Constructor of this class sets up everything needed for a properly functional game board.
+   *
+   * @param model the reference to a model instance
+   * @param gameMode the game's current game mode
+   * @param controller the reference to a controller instance
+   */
   public GameBoard(Model model, GameMode gameMode, Controller controller) {
 
     listener = new GameBoardMouseListener(gameMode, model, this, controller);
     canvas = new Canvas(getWidth(), getHeight());
-    getChildren().add(canvas);
-    widthProperty().addListener(e -> canvas.setWidth(getWidth()));
-    heightProperty().addListener(e -> canvas.setHeight(getHeight()));
+    setStyle("-fx-background-color: #00FF00;");
+    setCenter(canvas);
+    widthProperty()
+        .addListener(
+            e -> {
+              canvas.setWidth(getWidth());
+              layoutChildren();
+            });
+    heightProperty()
+        .addListener(
+            e -> {
+              canvas.setHeight(getHeight());
+              layoutChildren();
+            });
 
     addEventFilter(MouseEvent.MOUSE_MOVED, e -> listener.handleMouseMoved(e));
     addEventFilter(MouseEvent.MOUSE_CLICKED, e -> listener.handleMouseClicked(e));
@@ -62,14 +85,18 @@ public class GameBoard extends Pane {
   protected void layoutChildren() {
     super.layoutChildren();
 
+    System.out.println("Called");
+
     GraphicsContext gc = canvas.getGraphicsContext2D();
 
     gc.clearRect(0, 0, getWidth(), getHeight());
+    gc.setFill(Color.DARKGRAY);
+    gc.fillRect(0, 0, 0, 0);
 
     drawGameField(gc);
-    drawPlayers(gc);
-    showPossibleMoves(gc);
-    drawBoundaries(gc);
+    // drawPlayers(gc);
+    // showPossibleMoves(gc);
+    // drawBoundaries(gc);
   }
 
   private void drawPlayers(GraphicsContext g) {
@@ -155,13 +182,13 @@ public class GameBoard extends Pane {
           (int)
               ((i * (cellWidth + SPACING))
                   + getWidthOffsetForGameField()
-                  + cellWidth / 2
+                  + cellWidth / 2.0
                   - new Text(letter).getLayoutBounds().getWidth() / 2);
       int y =
           (int)
               ((i * (cellHeight + SPACING))
                   + getHeightOffsetForGameField()
-                  + cellHeight / 2
+                  + cellHeight / 2.0
                   + letterFont.getSize() / 4);
       g.strokeText(letter, x, getHeightOffsetForGameField() - PADDING_FOR_LETTERS);
       g.strokeText(row, getWidthOffsetForGameField() - 2 * PADDING_FOR_LETTERS, y);
@@ -189,17 +216,19 @@ public class GameBoard extends Pane {
    * @param g The <code>GraphicsContext</code> object used for drawing
    */
   private void indicatePossibleMove(Cell cell, GraphicsContext g) {
-    g.setFill(new Color(20, 220, 20, 100));
+    g.setFill(new Color(20.0 / 255, 220.0 / 255, 20.0 / 255, 1));
     int startX =
-        (int) (cell.getColumn() * (cellWidth + SPACING))
-            + getWidthOffsetForGameField()
-            + cellWidth / 4;
+        (int)
+            (cell.getColumn() * (cellWidth + SPACING)
+                + getWidthOffsetForGameField()
+                + cellWidth / 4.0);
     int startY =
-        (int) (((GameFieldImpl.SIZE - 1) - cell.getRow()) * (cellHeight + SPACING))
-            + getHeightOffsetForGameField()
-            + cellHeight / 4;
+        (int)
+            (((GameFieldImpl.SIZE - 1) - cell.getRow()) * (cellHeight + SPACING)
+                + getHeightOffsetForGameField()
+                + cellHeight / 4.0);
 
-    g.fillOval(startX, startY, cellWidth / 2, cellHeight / 2);
+    g.fillOval(startX, startY, cellWidth / 2.0, cellHeight / 2.0);
   }
 
   /**
@@ -261,22 +290,47 @@ public class GameBoard extends Pane {
     return (int) (GameFieldImpl.SIZE * (cellHeight + SPACING) + SPACING);
   }
 
+  /**
+   * Returns the current cell width in pixels.
+   *
+   * @return the cells' with in pixels.
+   */
   int getCellWidth() {
     return cellWidth;
   }
 
+  /**
+   * Sets the cell width to the given value.
+   *
+   * @param cellWidth the new cell width in pixels
+   */
   void setCellWidth(int cellWidth) {
     this.cellWidth = cellWidth;
   }
 
+  /**
+   * Returns the current cell height.
+   *
+   * @return the cell's height
+   */
   int getCellHeight() {
     return cellHeight;
   }
 
+  /**
+   * Sets the cell height to the given value.
+   *
+   * @param cellHeight the new cell height in pixels
+   */
   void setCellHeight(int cellHeight) {
     this.cellHeight = cellHeight;
   }
 
+  /**
+   * Returns the spacing between cells in pixels.
+   *
+   * @return the spacing between cells in pixels
+   */
   float getSpacing() {
     return SPACING;
   }

@@ -23,7 +23,8 @@
 #text-field{
 	-fx-border-color: transparent transparent #ffffff transparent;
 	-fx-background-color: transparent;
-	-fx-text-fill: #494949;
+	-fx-text-fill: #ffffff;
+	-fx-font-size: 16;
 	-fx-prompt-text-fill: #494949;
 	-fx-border-style: none solid solid none;
 	-fx-focus-color: #faff00;
@@ -32,7 +33,7 @@
 
 
 #button{
-	-fx-background-color: #576385;
+	-fx-background-color: #46729c;
 	-fx-text-fill: #ffffff;
 }
 
@@ -44,4 +45,9 @@
 	-fx-border-radius: 50;
 	-fx-background-radius: 50;
 	-fx-padding: 50;
+}
+
+#normal-text{
+	-fx-font-size: 18;
+	-fx-text-fill: #d4d4d4;
 }

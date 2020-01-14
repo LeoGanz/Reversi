@@ -2,17 +2,21 @@ package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.CellImpl;
-import de.lmu.ifi.sosylab.fddlj.model.Disk;
 import de.lmu.ifi.sosylab.fddlj.model.GameFieldImpl;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.Phase;
-import de.lmu.ifi.sosylab.fddlj.model.Player;
-import java.util.Optional;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 
+/**
+ * This class provides methods for handling mouse events fired in the {@link GameBoard}. The
+ * handling of the mouse events was outsourced into an extra class in order to provide better code
+ * readability.
+ *
+ * @author Josef Feger
+ */
 public class GameBoardMouseListener {
 
   private GameMode gameMode;
@@ -20,6 +24,14 @@ public class GameBoardMouseListener {
   private GameBoard gameBoard;
   private Controller controller;
 
+  /**
+   * Constructor of this class initialises the variables the class needs.
+   *
+   * @param gameMode the current game's game mode
+   * @param model a reference to a model instance
+   * @param gameBoard a reference to a game board instance
+   * @param controller a reference to a controller instance
+   */
   public GameBoardMouseListener(
       GameMode gameMode, Model model, GameBoard gameBoard, Controller controller) {
     this.gameMode = gameMode;
@@ -28,6 +40,11 @@ public class GameBoardMouseListener {
     this.controller = controller;
   }
 
+  /**
+   * Takes action when the mouse is moved.
+   *
+   * @param e the mouse event fired when the mouse moved
+   */
   void handleMouseMoved(MouseEvent e) {
 
     if (gameMode == GameMode.SINGLEPLAYER
@@ -56,6 +73,11 @@ public class GameBoardMouseListener {
     }
   }
 
+  /**
+   * Takes action when a mouse button is clicked.
+   *
+   * @param e the mouse event that was fired when the button was clicked
+   */
   void handleMouseClicked(MouseEvent e) {
     if (isMouseInGameField(e)) {
       // Check whether user used left or right mouse button
@@ -75,7 +97,15 @@ public class GameBoardMouseListener {
     }
   }
 
-  void handleScrollEvent(ScrollEvent e) {}
+  /**
+   * Takes action when the mouse wheel was scrolled.
+   *
+   * @param e the scroll event that was fired when the mouse wheel was moved
+   */
+  void handleScrollEvent(ScrollEvent e) {
+    // TODO implement course of action
+    return;
+  }
 
   private boolean isMouseInGameField(MouseEvent e) {
     return e.getX() > gameBoard.getWidthOffsetForGameField()
@@ -100,14 +130,5 @@ public class GameBoardMouseListener {
     row = (int) (row / (gameBoard.getCellHeight() + gameBoard.getSpacing()));
 
     return new CellImpl(column, (GameFieldImpl.SIZE - 1) - row);
-  }
-
-  Player getPlayerOnCell(Cell cell) {
-    Optional<Disk> opt = model.getState().getField().get(cell);
-    if (opt.isPresent()) {
-      return opt.get().getPlayer();
-    } else {
-      return null;
-    }
   }
 }

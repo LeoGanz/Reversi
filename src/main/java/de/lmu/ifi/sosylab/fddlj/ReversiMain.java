@@ -16,8 +16,8 @@ public class ReversiMain {
    * @param args The command line arguments.
    */
   public static void main(String[] args) {
-    ControllerImpl.launch(args);
-    ReversiMain.showGame(args);
+    ControllerImpl.main(args);
+    // ReversiMain.showGame(args);
   }
 
   /**

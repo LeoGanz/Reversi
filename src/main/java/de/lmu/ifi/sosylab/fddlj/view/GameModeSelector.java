@@ -18,12 +18,25 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+/**
+ * This class offers the start window in which the user can select the game mode he wants to play.
+ *
+ * @author Josef Feger
+ */
 public class GameModeSelector extends Stage {
 
   private Controller controller;
   private Scene scene;
   private Stage primaryStage;
 
+  private BorderPane borderPane;
+
+  /**
+   * Constructor of this class initialises variables and builds the stage.
+   *
+   * @param controller a reference to a controller instance
+   * @param stage the stage created by the application thread
+   */
   public GameModeSelector(Controller controller, Stage stage) {
     super();
 
@@ -31,9 +44,10 @@ public class GameModeSelector extends Stage {
     this.primaryStage = stage;
   }
 
+  /** Displays a stage that allows the user to select which game mode he/she wants to play. */
   public void showGameModeSelection() {
 
-    BorderPane borderPane = new BorderPane();
+    borderPane = new BorderPane();
     borderPane.getStylesheets().add("cssFiles/gameModeSelector.css");
     borderPane.setId("main-pane");
 
@@ -62,16 +76,15 @@ public class GameModeSelector extends Stage {
     closeTop.setAlignment(Pos.CENTER_RIGHT);
 
     Label close = new Label("X");
-    close.setFont(Font.font(35));
     close.setCursor(Cursor.HAND);
-    close.setStyle("fx-text-fill: white;");
+    close.setStyle("-fx-text-fill: white; -fx-font-size: 35;");
     close.setOnMouseEntered(
         new EventHandler<MouseEvent>() {
 
           @Override
           public void handle(MouseEvent event) {
 
-            close.setStyle("-fx-text-fill: red;");
+            close.setStyle("-fx-text-fill: red; -fx-font-size: 35;");
           }
         });
     close.setOnMouseExited(
@@ -80,7 +93,7 @@ public class GameModeSelector extends Stage {
           @Override
           public void handle(MouseEvent event) {
 
-            close.setStyle("fx-text-fill: white;");
+            close.setStyle("fx-text-fill: white; -fx-font-size: 35;");
           }
         });
     close.setOnMouseClicked(
@@ -99,7 +112,9 @@ public class GameModeSelector extends Stage {
 
     Label title = new Label("Reversi");
     title.setFont(Font.font(25));
+    title.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 40;");
     bp.setCenter(title);
+    BorderPane.setMargin(title, new Insets(15, 0, 0, 0));
 
     return bp;
   }
@@ -122,7 +137,8 @@ public class GameModeSelector extends Stage {
         e -> {
           PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
           playerCreation.getSinglePlayerInformation(controller, this, false);
-          scene.setRoot(playerCreation);
+          borderPane.setCenter(playerCreation);
+          borderPane.setRight(null);
         });
 
     Button hotseat = getButton("Hotseat");
@@ -130,7 +146,8 @@ public class GameModeSelector extends Stage {
         e -> {
           PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
           playerCreation.getMultiplePlayersInformation(this);
-          scene.setRoot(playerCreation);
+          borderPane.setCenter(playerCreation);
+          borderPane.setRight(null);
         });
 
     Button multiPlayer = getButton("Multiplayer");
@@ -138,14 +155,22 @@ public class GameModeSelector extends Stage {
         e -> {
           PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
           playerCreation.getSinglePlayerInformation(controller, this, true);
-          scene.setRoot(playerCreation);
+          borderPane.setCenter(playerCreation);
+          borderPane.setRight(null);
         });
+
+    vbox.getChildren().addAll(singlePlayer, hotseat, multiPlayer);
 
     Region bottom = new Region();
     VBox.setVgrow(bottom, Priority.ALWAYS);
     vbox.getChildren().add(bottom);
 
     return vbox;
+  }
+
+  void returnToMainScreen() {
+    borderPane.setRight(buildSelectionPane());
+    borderPane.setCenter(null);
   }
 
   private Button getButton(String text) {
