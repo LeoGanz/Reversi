@@ -1,6 +1,7 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
-import de.lmu.ifi.sosylab.fddlj.model.GameState;
+import com.google.gson.JsonSyntaxException;
+import de.lmu.ifi.sosylab.fddlj.network.RejectedPlacement.Reason;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -78,19 +79,79 @@ public class ClientConnection implements Runnable {
   }
 
   private void processReceivedData(String receivedData) {
-    // TODO deserialize JSON and call specific handler for received data type
-    // forward game data to lobby
-    // enqueue for lobby building if requested and not yet in lobby
+    try {
+      Message<?> receivedMessage = Message.fromJson(receivedData);
+      Object data = receivedMessage.getData();
+      if (data instanceof DiskPlacement) {
+        handleDiskPlacement((DiskPlacement) data);
+      } else if (data instanceof JoinRequest) {
+        handleJoinRequest((JoinRequest) data);
+      } else if (data instanceof ClientNotification) {
+        handleClientNotification((ClientNotification) data);
+      } else {
+        System.out.println("Received unknown message type: " + data.getClass().getName());
+        sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
+      }
+    } catch (@SuppressWarnings("unused") JsonSyntaxException e) {
+      sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
+    }
+  }
+
+  private void handleDiskPlacement(DiskPlacement requestedPlacement) {
+    if (lobby == null) {
+      sendMessageWith(new RejectedPlacement(requestedPlacement.getUuid(), Reason.NO_LOBBY_JOINED));
+      return;
+    }
+    if (!lobby.isGameRunning()) {
+      sendMessageWith(new RejectedPlacement(requestedPlacement.getUuid(), Reason.GAME_NOT_RUNNING));
+      return;
+    }
+    RejectedPlacement response = lobby.tryDiskPlacement(requestedPlacement);
+    if (response != null) {
+      sendMessageWith(response);
+    }
+  }
+
+  private void handleJoinRequest(JoinRequest joinRequest) {
+    if (lobby != null) {
+      lobby.leave(connectionID);
+    }
+    server.joinLobby(joinRequest, connectionID);
+  }
+
+  private void handleClientNotification(ClientNotification notification) {
+    switch (notification) {
+      case REQUEST_RESTART:
+        if (lobby == null) {
+          sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
+        } else {
+          lobby.requestRestart(connectionID);
+        }
+        break;
+      case ACCEPT_RESTART_REQUEST:
+        if (lobby == null) {
+          sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
+        } else {
+          lobby.acceptRestart(connectionID);
+        }
+        break;
+
+      default:
+        sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
+        break;
+    }
   }
 
   /**
-   * Shutdown the connection to a client. This will close all open data streams
-   * and sockets and unregister this connection from the server.
+   * Shutdown the connection to a client. This will close all open data streams and sockets and
+   * unregister this connection from the server.
    */
-  void terminate() {
+  public void terminate() {
     connectionRunning = false;
-    lobby.leave(connectionID);
-    lobby = null;
+    if (lobby != null) {
+      lobby.leave(connectionID);
+      lobby = null;
+    }
     try {
       if (in != null) {
         in.close();
@@ -101,28 +162,19 @@ public class ClientConnection implements Runnable {
 
       clientSocket.close();
     } catch (@SuppressWarnings("unused") IOException e) {
-      // do nothing, as connection is already trying to shut down
+      // do nothing, as connection is already doing its best to shut down
     }
 
     server.connectionTerminated(connectionID);
   }
 
   /**
-   * Send a game state to the client.
+   * Send data to the client. The data will be packaged as a {@link Message}.
    *
-   * @param state the state to send
+   * @param data data to be sent to the client in a message
    */
-  public void sendState(GameState state) {
-    // TODO generate Json and send
-  }
-
-  /**
-   * Send a server notification to the client.
-   *
-   * @param notification the notification to send
-   */
-  public void sendNotification(ServerNotification notification) {
-    // TODO generate Json and send
+  public void sendMessageWith(Object data) {
+    out.println(new Message<>(data).toJson());
   }
 
   /**
