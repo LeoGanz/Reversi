@@ -11,6 +11,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
+/**
+ * This class implements a SwitchButton which has the two states off and on.
+ *
+ * @author Josef Feger
+ */
 public class SwitchButton extends StackPane {
 
   static final String HINTS_STATE_CHANGED = "state_changed";
@@ -52,6 +57,12 @@ public class SwitchButton extends StackPane {
     state = true;
   }
 
+  /**
+   * Constructor of the class initialises the button and adds the necessary functionality.
+   *
+   * @param width the button's preferred width
+   * @param height the button's preferred height
+   */
   public SwitchButton(double width, double height) {
 
     setPrefSize(width, height);
@@ -83,10 +94,20 @@ public class SwitchButton extends StackPane {
     button.setOnMouseClicked(click);
   }
 
+  /**
+   * Adds a listener that fires when the button's state changes.
+   *
+   * @param listener the listener to add
+   */
   void addListener(PropertyChangeListener listener) {
     support.addPropertyChangeListener(listener);
   }
 
+  /**
+   * Removes a listener.
+   *
+   * @param listener the listener to remove
+   */
   void removeListener(PropertyChangeListener listener) {
     support.removePropertyChangeListener(listener);
   }

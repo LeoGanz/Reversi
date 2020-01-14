@@ -32,7 +32,7 @@ public class ControllerImpl extends Application implements Controller {
     this.gameMode = gameMode;
 
     model = new ModelImpl(gameMode, playerOne, playerTwo);
-    view = new ReversiView(stage, model, this);
+    view = new ViewImpl(stage, model, this);
     model.addListener(view);
     view.showGame(gameMode);
   }

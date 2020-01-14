@@ -19,7 +19,7 @@ import javafx.scene.text.FontWeight;
  */
 public class DiskIndicator extends BorderPane implements PropertyChangeListener {
 
-  private static final int DISK_RADIUS = 80;
+  private static final int DISK_RADIUS = 50;
   private static final int PADDING = 10;
 
   private Label titel;
@@ -34,13 +34,14 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
    *
    * @param model a reference to a model instance
    * @param labelText the text to be displayed
+   * @param view a reference to a view instance
    */
-  public DiskIndicator(Model model, String labelText) {
+  public DiskIndicator(Model model, String labelText, View view) {
 
     this.model = model;
-    model.addListener(this);
+    view.addListener(this);
 
-    setMinHeight(200);
+    setMinHeight(130);
 
     initLabel(labelText);
     initCanvas();

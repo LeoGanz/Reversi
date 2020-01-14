@@ -260,8 +260,8 @@ public class ModelImpl implements Model {
     return false;
   }
 
-  /**
-   * Notifies all Listeners of a changed {@link GameState}.
+  /** 
+   * Notifies all Listeners of a changed {@link GameState}. 
    */
   private void notifyListenersOfChangedState() {
     support.firePropertyChange(Model.STATE_CHANGED, null, state);
@@ -311,22 +311,22 @@ public class ModelImpl implements Model {
       manager.setWinner(Optional.of(manager.getPlayerTwo()));
     }
   }
-  
+
   /**
-   * Returns the number of disks player one still has left
-   * 
+   * Returns the number of disks player one still has left.
+   *
    * @return the remaining number of disks of player one
    */
   public int getNumberOfDisksPlayerOne() {
-      return numberOfPlayerOneDisks;
+    return numberOfPlayerOneDisks;
   }
-  
+
   /**
-   * Returns the number of disks player two still has left
-   * 
+   * Returns the number of disks player two still has left.
+   *
    * @return the remaining number of disks of player two
    */
   public int getNumberOfDisksPlayerTwo() {
-      return numberOfPlayerTwoDisks;
+    return numberOfPlayerTwoDisks;
   }
 }

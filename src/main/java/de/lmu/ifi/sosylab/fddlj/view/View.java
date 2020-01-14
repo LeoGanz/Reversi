@@ -11,4 +11,18 @@ public interface View extends PropertyChangeListener {
 
   /** Show the current game. */
   void showGame(GameMode gameMode);
+
+  /**
+   * Adds a listener.
+   *
+   * @param listener the listener to add
+   */
+  void addListener(PropertyChangeListener listener);
+
+  /**
+   * Removes the listener.
+   *
+   * @param listener the listener to remove
+   */
+  void removeListener(PropertyChangeListener listener);
 }
