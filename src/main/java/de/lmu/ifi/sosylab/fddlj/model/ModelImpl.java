@@ -164,6 +164,18 @@ public class ModelImpl implements Model {
     }
   }
 
+  @Override
+  public void substitutePlayerOneWith(Player newPlayerOne) {
+    state.getPlayerManagement().setPlayerOne(newPlayerOne);
+    notifyListenersOfChangedState();
+  }
+
+  @Override
+  public void substitutePlayerTwoWith(Player newPlayerTwo) {
+    state.getPlayerManagement().setPlayerOne(newPlayerTwo);
+    notifyListenersOfChangedState();
+  }
+
   /**
    * Turns all Disks belonging to the opponent lying between the placed Disk and another Disk of the
    * same Player.
