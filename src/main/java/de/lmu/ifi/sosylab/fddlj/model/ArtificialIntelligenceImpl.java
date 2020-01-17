@@ -98,8 +98,8 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
       }
     }
     return numberOfDisks(state, aiPlayer)
-        + DisksInCorner(state, aiPlayer)
-        - DisksInCorner(state, state.getPlayerManagement().getOpponentPlayer(aiPlayer));
+        + disksInCorner(state, aiPlayer)
+        - disksInCorner(state, state.getPlayerManagement().getOpponentPlayer(aiPlayer));
   }
 
   /**
@@ -120,7 +120,7 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
    * @param player for which the disks should be counted
    * @return the number of disks for the player that are in the corner
    */
-  private double DisksInCorner(GameState state, Player player) {
+  private double disksInCorner(GameState state, Player player) {
     Set<Cell> disksOfPlayer = state.getField().getAllCellsForPlayer(player);
     double temp = 0;
     for (int column = 0; column < 8; column = column + 7) {
