@@ -19,7 +19,7 @@ public class ModelImpl implements Model {
 
   private ModifiableGameState state;
   private GameMode mode;
-  // private AI ai;
+  private ArtificialIntelligence ai;
   private static final int NUMBER_OF_MOVES_IN_BEGINNING_PHASE = 4;
   private static final int DISKS_PER_PLAYER = 32;
   private int numberOfPlayerOneDisks = DISKS_PER_PLAYER;
@@ -41,7 +41,7 @@ public class ModelImpl implements Model {
     ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     state.setPlayerManagement(manager);
     if (mode.equals(GameMode.SINGLEPLAYER)) {
-      // TODO Initiate AI
+      ai = new ArtificialIntelligenceImpl(3);
     }
   }
 
@@ -97,9 +97,11 @@ public class ModelImpl implements Model {
 
       notifyListenersOfChangedState();
 
-      if (mode.equals(GameMode.SINGLEPLAYER) /* && currentPlayer is the AI */) {
-        // TODO let AI move
-        // TODO notify Listeners
+      if (mode.equals(GameMode.SINGLEPLAYER)
+          && (state.getPlayerManagement().getCurrentPlayer() instanceof AiPlayer)
+          && state.getCurrentPhase().equals(Phase.RUNNING)) {
+        Cell bestMove = ai.calculateBestMove(state);
+        placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), bestMove);
       }
       return true;
 
@@ -260,9 +262,7 @@ public class ModelImpl implements Model {
     return false;
   }
 
-  /**
-   * Notifies all Listeners of a changed {@link GameState}.
-   */
+  /** Notifies all Listeners of a changed {@link GameState}. */
   private void notifyListenersOfChangedState() {
     support.firePropertyChange(Model.STATE_CHANGED, null, state);
   }
