@@ -24,13 +24,13 @@ public class GameLobby {
 
   private int lobbyID;
   private ServerImpl server;
+  private Model masterGame;
   private ClientConnection connOne;
   private ClientConnection connTwo;
-  private Set<ClientConnection> spectatorsConnections;
-  private Map<Integer, Player> spectatorsPlayers;
-  private Model masterGame;
   private Player playerOne;
   private Player playerTwo;
+  private Set<ClientConnection> spectatorsConnections;
+  private Map<Integer, Player> spectatorsPlayers;
   private boolean freshStart;
   private UUID lastPlacementID;
   private boolean restartRequestOne;
@@ -47,15 +47,6 @@ public class GameLobby {
     spectatorsConnections = new HashSet<>();
     spectatorsPlayers = new HashMap<>();
     freshStart = true;
-  }
-
-  /**
-   * Get the id of the game lobby.
-   *
-   * @return an integer id
-   */
-  public int getLobbyID() {
-    return lobbyID;
   }
 
   /**
@@ -84,12 +75,6 @@ public class GameLobby {
     } else {
       return new RejectedPlacement(uuid, Reason.INVALID_PLACEMENT);
     }
-  }
-
-  private void broadcast(Object objectToBrodcast) {
-    Stream.concat(Stream.of(connOne, connTwo), spectatorsConnections.stream())
-        .filter(Objects::nonNull)
-        .forEach(conn -> conn.sendMessageWith(objectToBrodcast));
   }
 
   /**
@@ -131,6 +116,7 @@ public class GameLobby {
   }
 
   private void handleResume() {
+    lastPlacementID = null;
     masterGame.substitutePlayersWith(playerOne, playerTwo);
     masterGame.unsetWaiting();
     broadcast(playerTwo);
@@ -151,10 +137,6 @@ public class GameLobby {
     conn.sendMessageWith(masterGame.getState());
   }
 
-  private Object getSpectators() {
-    return new Spectators(lobbyID, spectatorsPlayers.values());
-  }
-
   /**
    * Called to signal that a client has left the lobby. If both participating players have left, the
    * lobby will be closed. Else another player can join. If leaving player was spectating the game
@@ -170,39 +152,26 @@ public class GameLobby {
       leavingConn.setLobby(null);
     }
 
-    ClientConnection partner;
     if (connOne.getConnectionID() == connectionID) {
       connOne = null;
-      partner = connTwo;
-      masterGame.setWaiting();
+      broadcast(ServerNotification.PLAYER_ONE_LEFT);
     } else if (connTwo.getConnectionID() == connectionID) {
       connTwo = null;
-      partner = connOne;
-      masterGame.setWaiting();
+      broadcast(ServerNotification.PLAYER_TWO_LEFT);
     } else {
-      partner = null;
       spectatorsConnections.remove(server.getConnection(connectionID));
       spectatorsPlayers.remove(connectionID);
       broadcast(getSpectators());
+      return;
     }
 
-    if (partner != null) {
-      partner.sendMessageWith(ServerNotification.PARTNER_LEFT);
-      resetRestartRequests();
-    }
+    // only reached if leaving connection was conn 1 or conn 2
+    masterGame.setWaiting();
+    resetRestartRequests();
 
     if ((connOne == null) && (connTwo == null)) {
       closeLobby();
     }
-  }
-
-  /**
-   * Is the game of this lobby running.
-   *
-   * @return whether the game is in phase running
-   */
-  public boolean isGameRunning() {
-    return masterGame.getState().getCurrentPhase() == Phase.RUNNING;
   }
 
   /**
@@ -212,11 +181,6 @@ public class GameLobby {
    */
   public synchronized boolean needsPlayers() {
     return (connOne == null) || (connTwo == null);
-  }
-
-  private void closeLobby() {
-    broadcast(ServerNotification.LOBBY_CLOSED);
-    server.lobbyClosed(lobbyID);
   }
 
   /**
@@ -255,11 +219,45 @@ public class GameLobby {
   private void restartGame() {
     freshStart = true;
     resetRestartRequests();
+    broadcast(ServerNotification.RESTARTING);
     handleStart();
   }
 
   private void resetRestartRequests() {
     restartRequestOne = false;
     restartRequestTwo = false;
+  }
+
+  /**
+   * Get the id of the game lobby.
+   *
+   * @return an integer id
+   */
+  public int getLobbyID() {
+    return lobbyID;
+  }
+
+  /**
+   * Is the game of this lobby running.
+   *
+   * @return whether the game is in phase running
+   */
+  public boolean isGameRunning() {
+    return masterGame.getState().getCurrentPhase() == Phase.RUNNING;
+  }
+
+  private void broadcast(Object objectToBrodcast) {
+    Stream.concat(Stream.of(connOne, connTwo), spectatorsConnections.stream())
+        .filter(Objects::nonNull)
+        .forEach(conn -> conn.sendMessageWith(objectToBrodcast));
+  }
+
+  private Object getSpectators() {
+    return new Spectators(lobbyID, spectatorsPlayers.values());
+  }
+
+  private void closeLobby() {
+    broadcast(ServerNotification.LOBBY_CLOSED);
+    server.lobbyClosed(lobbyID);
   }
 }

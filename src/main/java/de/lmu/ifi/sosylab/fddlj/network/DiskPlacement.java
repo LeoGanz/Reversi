@@ -21,14 +21,16 @@ public class DiskPlacement {
   /**
    * Create a new {@link DiskPlacement}. A {@link UUID} will be generated automatically.
    *
-   * @param previous UUID of the disk placement's predecessor
+   * @param previous UUID of the disk placement's predecessor. Can be <code>null</code> to indicate
+   *     that there was no previous placement
    * @param disk {@link Disk} to be placed
    * @param location {@link Cell} on which the disk shall be placed
+   * @throws NullPointerException if disk or location are <code>null</code>
    */
   public DiskPlacement(UUID previous, Disk disk, Cell location) {
     this.previous = previous;
-    this.disk = disk;
-    this.location = location;
+    this.disk = Objects.requireNonNull(disk);
+    this.location = Objects.requireNonNull(location);
     uuid = UUID.randomUUID();
   }
 
