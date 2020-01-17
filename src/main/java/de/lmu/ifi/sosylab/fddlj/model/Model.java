@@ -81,16 +81,11 @@ public interface Model {
   boolean setWaiting();
 
   /**
-   * Substitute player one with a new player without stopping the game.
+   * Substitute both players with new players without stopping the game.
    *
-   * @param newPlayerOne new player to substitute with
+   * @param newPlayerOne new player to substitute the old player one with
+   * @param newPlayerTwo new player to substitute the old player two with
+   * @author Leonard Ganz
    */
-  void substitutePlayerOneWith(Player newPlayerOne);
-
-  /**
-   * Substitute player two with a new player without stopping the game.
-   *
-   * @param newPlayerTwo new player to substitute with
-   */
-  void substitutePlayerTwoWith(Player newPlayerTwo);
+  void substitutePlayersWith(Player newPlayerOne, Player newPlayerTwo);
 }

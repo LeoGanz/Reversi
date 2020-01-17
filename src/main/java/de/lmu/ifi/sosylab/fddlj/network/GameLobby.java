@@ -131,8 +131,7 @@ public class GameLobby {
   }
 
   private void handleResume() {
-    masterGame.substitutePlayerOneWith(playerOne);
-    masterGame.substitutePlayerTwoWith(playerTwo);
+    masterGame.substitutePlayersWith(playerOne, playerTwo);
     masterGame.unsetWaiting();
     broadcast(playerTwo);
     broadcast(playerOne);

@@ -165,14 +165,18 @@ public class ModelImpl implements Model {
   }
 
   @Override
-  public void substitutePlayerOneWith(Player newPlayerOne) {
-    state.getPlayerManagement().setPlayerOne(newPlayerOne);
-    notifyListenersOfChangedState();
-  }
+  public void substitutePlayersWith(Player newPlayerOne, Player newPlayerTwo) {
+    Set<Cell> cellsPlayerOne = state
+        .getField()
+        .getAllCellsForPlayer(state.getPlayerManagement().getPlayerOne());
+    Set<Cell> cellsPlayerTwo =
+        state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerTwo());
 
-  @Override
-  public void substitutePlayerTwoWith(Player newPlayerTwo) {
-    state.getPlayerManagement().setPlayerOne(newPlayerTwo);
+    cellsPlayerOne.stream().forEach(c -> state.getField().set(c, new DiskImpl(newPlayerOne)));
+    cellsPlayerTwo.stream().forEach(c -> state.getField().set(c, new DiskImpl(newPlayerTwo)));
+
+    state.getPlayerManagement().setPlayerOne(newPlayerOne);
+    state.getPlayerManagement().setPlayerTwo(newPlayerTwo);
     notifyListenersOfChangedState();
   }
 
