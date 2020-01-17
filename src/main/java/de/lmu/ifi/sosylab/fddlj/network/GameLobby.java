@@ -6,7 +6,9 @@ import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Phase;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.network.RejectedPlacement.Reason;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -24,7 +26,8 @@ public class GameLobby {
   private ServerImpl server;
   private ClientConnection connOne;
   private ClientConnection connTwo;
-  private Set<ClientConnection> spectators;
+  private Set<ClientConnection> spectatorsConnections;
+  private Map<Integer, Player> spectatorsPlayers;
   private Model masterGame;
   private Player playerOne;
   private Player playerTwo;
@@ -41,7 +44,8 @@ public class GameLobby {
   public GameLobby(int lobbyID, ServerImpl server) {
     this.lobbyID = lobbyID;
     this.server = server;
-    spectators = new HashSet<>();
+    spectatorsConnections = new HashSet<>();
+    spectatorsPlayers = new HashMap<>();
     freshStart = true;
   }
 
@@ -74,13 +78,18 @@ public class GameLobby {
             requestedDiskPlacement.getDisk(), requestedDiskPlacement.getLocation());
     if (valid) {
       lastPlacementID = uuid;
-      connOne.sendMessageWith(requestedDiskPlacement);
-      connTwo.sendMessageWith(requestedDiskPlacement);
+      broadcast(requestedDiskPlacement);
       resetRestartRequests();
       return null;
     } else {
       return new RejectedPlacement(uuid, Reason.INVALID_PLACEMENT);
     }
+  }
+
+  private void broadcast(Object objectToBrodcast) {
+    Stream.concat(Stream.of(connOne, connTwo), spectatorsConnections.stream())
+        .filter(Objects::nonNull)
+        .forEach(conn -> conn.sendMessageWith(objectToBrodcast));
   }
 
   /**
@@ -116,8 +125,8 @@ public class GameLobby {
     lastPlacementID = null;
     masterGame = new ModelImpl(GameMode.HOTSEAT, playerOne, playerTwo);
     freshStart = false;
-    connOne.sendMessageWith(playerTwo);
-    connTwo.sendMessageWith(playerOne);
+    broadcast(playerTwo);
+    broadcast(playerOne);
     connOne.sendMessageWith(ServerNotification.START);
   }
 
@@ -125,10 +134,9 @@ public class GameLobby {
     masterGame.substitutePlayerOneWith(playerOne);
     masterGame.substitutePlayerTwoWith(playerTwo);
     masterGame.unsetWaiting();
-    connOne.sendMessageWith(playerTwo);
-    connTwo.sendMessageWith(playerOne);
-    connOne.sendMessageWith(masterGame.getState());
-    connTwo.sendMessageWith(masterGame.getState());
+    broadcast(playerTwo);
+    broadcast(playerOne);
+    broadcast(masterGame.getState());
   }
 
   /**
@@ -136,9 +144,16 @@ public class GameLobby {
    *
    * @param conn the connection trying to join
    */
-  public synchronized void joinAsSpectator(ClientConnection conn) {
-    spectators.add(conn);
-    // TODO send updated spectator set to clients
+  public synchronized void joinAsSpectator(ClientConnection conn, Player player) {
+    spectatorsConnections.add(conn);
+    spectatorsPlayers.put(conn.getConnectionID(), player);
+    broadcast(getSpectators());
+    conn.setLobby(this);
+    conn.sendMessageWith(masterGame.getState());
+  }
+
+  private Object getSpectators() {
+    return new Spectators(lobbyID, spectatorsPlayers.values());
   }
 
   /**
@@ -149,6 +164,13 @@ public class GameLobby {
    * @param connectionID integer id used to reference the leaving client connection
    */
   public synchronized void leave(int connectionID) {
+    ClientConnection leavingConn = server.getConnection(connectionID);
+    if (leavingConn == null) {
+      return;
+    } else {
+      leavingConn.setLobby(null);
+    }
+
     ClientConnection partner;
     if (connOne.getConnectionID() == connectionID) {
       connOne = null;
@@ -160,8 +182,9 @@ public class GameLobby {
       masterGame.setWaiting();
     } else {
       partner = null;
-      spectators.remove(server.getConnection(connectionID));
-      // TODO send updated spectator set to clients
+      spectatorsConnections.remove(server.getConnection(connectionID));
+      spectatorsPlayers.remove(connectionID);
+      broadcast(getSpectators());
     }
 
     if (partner != null) {
@@ -193,9 +216,7 @@ public class GameLobby {
   }
 
   private void closeLobby() {
-    Stream.concat(Stream.of(connOne, connTwo), spectators.stream())
-        .filter(Objects::nonNull)
-        .forEach(conn -> conn.sendMessageWith(ServerNotification.LOBBY_CLOSED));
+    broadcast(ServerNotification.LOBBY_CLOSED);
     server.lobbyClosed(lobbyID);
   }
 

@@ -111,7 +111,7 @@ public class ServerImpl implements Server {
           conn.sendMessageWith(JoinRequest.Response.LOBBY_NOT_FOUND);
         } else {
           if (joinRequest.isAsSpectator()) {
-            lobby.joinAsSpectator(conn);
+            lobby.joinAsSpectator(conn, player);
             conn.sendMessageWith(JoinRequest.Response.JOIN_SUCCESSFUL);
           } else {
             handleLobbyJoinAsPlayer(lobby, conn, player);
@@ -190,7 +190,7 @@ public class ServerImpl implements Server {
    * @param connectionID integer to reference the connection
    * @return the client connection
    */
-  public Object getConnection(int connectionID) {
+  public ClientConnection getConnection(int connectionID) {
     return connections.get(connectionID);
   }
 }
