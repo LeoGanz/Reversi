@@ -9,7 +9,6 @@ public enum ServerNotification {
   SERVER_SHUTTING_DOWN,
   PLAYER_ONE_LEFT,
   PLAYER_TWO_LEFT,
-  START, // request that the client shall start the game by sending the first disk placement
   RESTARTING,
   LOBBY_CLOSED,
   RECEIVED_INVALID_DATA,
