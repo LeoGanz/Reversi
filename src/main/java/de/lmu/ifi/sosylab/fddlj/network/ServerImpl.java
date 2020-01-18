@@ -1,6 +1,8 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
 import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;

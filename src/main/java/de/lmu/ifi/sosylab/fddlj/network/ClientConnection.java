@@ -1,7 +1,13 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
 import com.google.gson.JsonSyntaxException;
-import de.lmu.ifi.sosylab.fddlj.network.RejectedPlacement.Reason;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ClientNotification;
+import de.lmu.ifi.sosylab.fddlj.network.communication.DiskPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Message;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement.Reason;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
