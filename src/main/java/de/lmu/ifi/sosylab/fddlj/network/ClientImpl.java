@@ -108,7 +108,7 @@ public class ClientImpl implements Client {
     this.out.println(new Message<>(messageObject).toJson());
   }
 
-  private void requestGameStateWithLastPlacementUUID() {
+  private void requestGameStateWithLastPlacementUuid() {
     this.sendMessage(ClientNotification.REQUEST_CURRENT_GAMESTATE_WITH_LAST_PLACEMENT_UUID);
   }
 
@@ -167,7 +167,7 @@ public class ClientImpl implements Client {
   private void processRejectedPlacement(RejectedPlacement rejectedPlacement) {
     if (rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PLACEMENT ||
             rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PREVIOUS_UUID) {
-      this.requestGameStateWithLastPlacementUUID();
+      this.requestGameStateWithLastPlacementUuid();
     }
 
     this.compatibleGui.receivedRejectedPlacementReason(rejectedPlacement.getReason());
@@ -186,7 +186,7 @@ public class ClientImpl implements Client {
 
   private void processDiskPlacement(DiskPlacement diskPlacement) {
     if(this.lastDiskPlacement != diskPlacement.getPrevious()) {
-      this.requestGameStateWithLastPlacementUUID();
+      this.requestGameStateWithLastPlacementUuid();
       return;
     }
 
@@ -195,7 +195,7 @@ public class ClientImpl implements Client {
 
       this.notifyClientAboutUpdatedModel();
     } else { // DiskPlacement from Server is not valid with current game state
-      this.requestGameStateWithLastPlacementUUID();
+      this.requestGameStateWithLastPlacementUuid();
     }
   }
 
