@@ -25,6 +25,11 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+/**
+ * The client enables a communication with a {@link Server}. It can connect to
+ * a given address on the port 43200. The client make callbacks on a
+ * {@link ClientCompatibleGui} with the data received from the server.
+ */
 public class ClientImpl implements Client {
 
   public static final int PORT = 43200;
@@ -46,18 +51,21 @@ public class ClientImpl implements Client {
     this.clientPlayer = player;
   }
 
+  @Override
   public void startClient() {
     this.running = true;
 
     Thread connectorThread = new Thread(this::communicateWithServer);
   }
 
+  @Override
   public void joinAnyRandomPublicLobby() {
     JoinRequest joinRequest = JoinRequest.generateJoinAnyPublicLobbyRequest(this.clientPlayer);
 
     this.sendMessage(joinRequest);
   }
 
+  @Override
   public void joinSpecificLobby(boolean asSpectator, int lobbyId) {
     JoinRequest joinRequest = JoinRequest.generateJoinSpecificLobbyRequest(
             this.clientPlayer, asSpectator, lobbyId);
@@ -65,12 +73,14 @@ public class ClientImpl implements Client {
     this.sendMessage(joinRequest);
   }
 
+  @Override
   public void createNewPrivateLobby() {
     JoinRequest joinRequest = JoinRequest.generateJoinNewPrivateLobbyRequest(this.clientPlayer);
 
     this.sendMessage(joinRequest);
   }
 
+  @Override
   public DiskPlacement placeDisk(Disk disk, Cell cell) {
     DiskPlacement diskPlacement = new DiskPlacement(this.lastDiskPlacement, disk, cell);
 
@@ -78,10 +88,12 @@ public class ClientImpl implements Client {
     return diskPlacement;
   }
 
+  @Override
   public void requestGameRestart() {
     this.sendMessage(ClientNotification.REQUEST_RESTART);
   }
 
+  @Override
   public void acceptGameRestart() {
     this.sendMessage(ClientNotification.ACCEPT_RESTART_REQUEST);
   }
@@ -202,9 +214,7 @@ public class ClientImpl implements Client {
     this.lastDiskPlacement = gameStateWithLastPlacementUuid.getLastPlacementUuid();
   }
 
-  /**
-   * Terminate the client by closing with the connection to the server.
-   */
+  @Override
   public void terminate() {
     this.running = false;
     this.connectionEstablished = false;
