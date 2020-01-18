@@ -1,9 +1,25 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
-import de.lmu.ifi.sosylab.fddlj.model.*;
-import de.lmu.ifi.sosylab.fddlj.network.communication.*;
+import de.lmu.ifi.sosylab.fddlj.model.Disk;
+import de.lmu.ifi.sosylab.fddlj.model.Cell;
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.GameState;
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ClientNotification;
+import de.lmu.ifi.sosylab.fddlj.network.communication.DiskPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.GameStateWithLastPlacementUuid;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Message;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
