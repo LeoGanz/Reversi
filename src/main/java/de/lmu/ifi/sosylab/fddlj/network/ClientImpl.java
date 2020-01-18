@@ -166,7 +166,8 @@ public class ClientImpl implements Client {
     } else if (message.getData() instanceof GameState) {
       this.processGamestate((GameState) message.getData());
     } else if (message.getData() instanceof GameStateWithLastPlacementUuid) {
-      this.processGameStateWithLastPlacementUuid((GameStateWithLastPlacementUuid) message.getData());
+      this.processGameStateWithLastPlacementUuid(
+              (GameStateWithLastPlacementUuid) message.getData());
     }
   }
 
