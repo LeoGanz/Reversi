@@ -220,7 +220,8 @@ public class ClientImpl implements Client {
     this.notifyClientAboutUpdatedModel();
   }
 
-  private void processGameStateWithLastPlacementUuid(GameStateWithLastPlacementUuid gameStateWithLastPlacementUuid) {
+  private void processGameStateWithLastPlacementUuid(
+          GameStateWithLastPlacementUuid gameStateWithLastPlacementUuid) {
     this.processGamestate(gameStateWithLastPlacementUuid.getGameState());
     this.lastDiskPlacement = gameStateWithLastPlacementUuid.getLastPlacementUuid();
   }
