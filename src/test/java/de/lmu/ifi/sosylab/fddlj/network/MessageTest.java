@@ -3,6 +3,7 @@ package de.lmu.ifi.sosylab.fddlj.network;
 import com.google.gson.Gson;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Message;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
