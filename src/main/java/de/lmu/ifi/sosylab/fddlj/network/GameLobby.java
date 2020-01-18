@@ -114,17 +114,13 @@ public class GameLobby {
     lastPlacementID = null;
     masterGame = new ModelImpl(GameMode.HOTSEAT, playerOne, playerTwo);
     freshStart = false;
-    broadcast(playerTwo);
-    broadcast(playerOne);
-    connOne.sendMessageWith(ServerNotification.START);
+    broadcast(masterGame.getState());
   }
 
   private void handleResume() {
     lastPlacementID = null;
     masterGame.substitutePlayersWith(playerOne, playerTwo);
     masterGame.unsetWaiting();
-    broadcast(playerTwo);
-    broadcast(playerOne);
     broadcast(masterGame.getState());
   }
 
