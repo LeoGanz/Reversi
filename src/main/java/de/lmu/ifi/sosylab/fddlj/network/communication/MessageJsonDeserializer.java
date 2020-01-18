@@ -1,4 +1,4 @@
-package de.lmu.ifi.sosylab.fddlj.network;
+package de.lmu.ifi.sosylab.fddlj.network.communication;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;

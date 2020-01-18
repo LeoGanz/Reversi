@@ -1,4 +1,4 @@
-package de.lmu.ifi.sosylab.fddlj.network;
+package de.lmu.ifi.sosylab.fddlj.network.communication;
 
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import java.util.Collection;

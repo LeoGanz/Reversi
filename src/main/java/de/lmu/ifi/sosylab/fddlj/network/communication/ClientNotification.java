@@ -1,4 +1,4 @@
-package de.lmu.ifi.sosylab.fddlj.network;
+package de.lmu.ifi.sosylab.fddlj.network.communication;
 
 /**
  * Predefined notifications a client can send to communicate with the server.
