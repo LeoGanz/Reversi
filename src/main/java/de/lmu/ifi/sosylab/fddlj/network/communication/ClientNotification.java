@@ -7,5 +7,6 @@ package de.lmu.ifi.sosylab.fddlj.network.communication;
  */
 public enum ClientNotification {
   REQUEST_RESTART,
-  ACCEPT_RESTART_REQUEST
+  ACCEPT_RESTART_REQUEST,
+  REQUEST_CURRENT_GAMESTATE_WITH_LAST_PLACEMENT_UUID
 }
