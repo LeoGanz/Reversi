@@ -144,19 +144,19 @@ public class ClientImpl implements Client {
   private void processReceivedLine(String receivedLine) {
     Message message = Message.fromJson(receivedLine);
 
-    if(message.getData() instanceof JoinRequest.Response) {
+    if (message.getData() instanceof JoinRequest.Response) {
       this.processJoinRequestResponse((JoinRequest.Response) message.getData());
     } else if (message.getData() instanceof RejectedPlacement) {
       this.processRejectedPlacement((RejectedPlacement) message.getData());
-    } else if(message.getData() instanceof ServerNotification) {
+    } else if (message.getData() instanceof ServerNotification) {
       this.processServerNotification((ServerNotification) message.getData());
-    } else if(message.getData() instanceof DiskPlacement) {
+    } else if (message.getData() instanceof DiskPlacement) {
       this.processDiskPlacement((DiskPlacement) message.getData());
-    } else if(message.getData() instanceof Spectators) {
+    } else if (message.getData() instanceof Spectators) {
       this.processSpectators((Spectators) message.getData());
-    } else if(message.getData() instanceof GameState) {
+    } else if (message.getData() instanceof GameState) {
       this.processGamestate((GameState) message.getData());
-    } else if(message.getData() instanceof GameStateWithLastPlacementUuid) {
+    } else if (message.getData() instanceof GameStateWithLastPlacementUuid) {
       this.processGameStateWithLastPlacementUuid((GameStateWithLastPlacementUuid) message.getData());
     }
   }
@@ -175,9 +175,9 @@ public class ClientImpl implements Client {
   }
 
   private void processServerNotification(ServerNotification serverNotification) {
-    if(serverNotification == ServerNotification.SERVER_SHUTTING_DOWN) {
+    if (serverNotification == ServerNotification.SERVER_SHUTTING_DOWN) {
       this.terminate();
-    } else if(serverNotification == ServerNotification.PLAYER_ONE_LEFT ||
+    } else if (serverNotification == ServerNotification.PLAYER_ONE_LEFT ||
             serverNotification == ServerNotification.PLAYER_TWO_LEFT) {
       this.model.setWaiting();
     }
@@ -186,12 +186,12 @@ public class ClientImpl implements Client {
   }
 
   private void processDiskPlacement(DiskPlacement diskPlacement) {
-    if(this.lastDiskPlacement != diskPlacement.getPrevious()) {
+    if (this.lastDiskPlacement != diskPlacement.getPrevious()) {
       this.requestGameStateWithLastPlacementUuid();
       return;
     }
 
-    if(this.model.placeDisk(diskPlacement.getDisk(), diskPlacement.getLocation())) {
+    if (this.model.placeDisk(diskPlacement.getDisk(), diskPlacement.getLocation())) {
       this.lastDiskPlacement = diskPlacement.getUuid();
 
       this.notifyClientAboutUpdatedModel();
