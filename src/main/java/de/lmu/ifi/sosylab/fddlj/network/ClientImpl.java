@@ -176,8 +176,8 @@ public class ClientImpl implements Client {
   }
 
   private void processRejectedPlacement(RejectedPlacement rejectedPlacement) {
-    if (rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PLACEMENT ||
-            rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PREVIOUS_UUID) {
+    if (rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PLACEMENT
+            || rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PREVIOUS_UUID) {
       this.requestGameStateWithLastPlacementUuid();
     }
 
@@ -187,8 +187,8 @@ public class ClientImpl implements Client {
   private void processServerNotification(ServerNotification serverNotification) {
     if (serverNotification == ServerNotification.SERVER_SHUTTING_DOWN) {
       this.terminate();
-    } else if (serverNotification == ServerNotification.PLAYER_ONE_LEFT ||
-            serverNotification == ServerNotification.PLAYER_TWO_LEFT) {
+    } else if (serverNotification == ServerNotification.PLAYER_ONE_LEFT
+            || serverNotification == ServerNotification.PLAYER_TWO_LEFT) {
       this.model.setWaiting();
     }
 
