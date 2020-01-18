@@ -122,7 +122,8 @@ public class ClientImpl implements Client {
       this.out = new PrintWriter(connection.getOutputStream(), true, StandardCharsets.UTF_8);
       this.out.flush();
       this.in = new BufferedReader(
-                      new InputStreamReader(this.connection.getInputStream(), StandardCharsets.UTF_8));
+                      new InputStreamReader(this.connection.getInputStream(),
+                              StandardCharsets.UTF_8));
 
       this.connectionEstablished = true;
     } catch (@SuppressWarnings("unused") IOException e) {
