@@ -3,6 +3,7 @@ package de.lmu.ifi.sosylab.fddlj.network;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.Disk;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.network.communication.DiskPlacement;
 
 /**
  * Represents a connected user to a server. The client is able to connect
@@ -42,10 +43,11 @@ public interface Client {
   /**
    * Send a request to the connected server to place a disk.
    *
-   * @param disk
-   * @param cell
+   * @param disk The disk to be placed
+   * @param cell The cell, where the disk should be placed
+   * @return the DiskPlacement, which were sent to the server
    */
-  void placeDisk(Disk disk, Cell cell);
+  DiskPlacement placeDisk(Disk disk, Cell cell);
 
   /**
    * Request a restart of the game. The Server will ask the opponent player, whether he will
