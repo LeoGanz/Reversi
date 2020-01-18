@@ -1,7 +1,7 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
-import de.lmu.ifi.sosylab.fddlj.model.Disk;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
+import de.lmu.ifi.sosylab.fddlj.model.Disk;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.GameState;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
