@@ -2,13 +2,23 @@ package de.lmu.ifi.sosylab.fddlj.model;
 
 import java.util.Optional;
 
+/**
+ * Testing utility for printing game states.
+ *
+ * @author Leonard Ganz
+ */
 public class Shell {
 
   private static final char SYMBOL_ONE = '1';
   private static final char SYMBOL_TWO = '2';
   private static final char SYMBOL_EMPTY = '|';
 
-  private static void print(GameState state) {
+  /**
+   * Utility for printing a {@link GameState} to the console.
+   *
+   * @param state GameState to print
+   */
+  public static void print(GameState state) {
     GameField gameField = state.getField();
     StringBuilder print = new StringBuilder();
 
