@@ -65,6 +65,7 @@ public class ClientImpl implements Client {
     this.running = true;
 
     Thread connectorThread = new Thread(this::communicateWithServer);
+    connectorThread.start();
   }
 
   @Override
@@ -114,7 +115,9 @@ public class ClientImpl implements Client {
    * @return Whether the message can be delivered successfully
    */
   private void sendMessage(Object messageObject) {
-    this.out.println(new Message<>(messageObject).toJson());
+    if (this.connectionEstablished) {
+      this.out.println(new Message<>(messageObject).toJson());
+    }
   }
 
   private void requestGameStateWithLastPlacementUuid() {
