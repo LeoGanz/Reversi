@@ -44,7 +44,16 @@ public class ClientImpl implements Client {
   private boolean connectionEstablished;
   private boolean running;
 
-
+  /**
+   * Creates a new Client. The client will connect to a server, after it's started.
+   * To identify within in matches a {@link Player} is required. For callbacks for
+   * notifications, which are sent by the server a {@link ClientCompatibleGui} must
+   * be provided.
+   *
+   * @param compatibleGui compatibleGui to make callbacks
+   * @param inetAddress Address of server to connect
+   * @param player Player to identify in matches
+   */
   public ClientImpl(ClientCompatibleGui compatibleGui, InetAddress inetAddress, Player player) {
     this.compatibleGui = compatibleGui;
     this.serverAddress = inetAddress;
