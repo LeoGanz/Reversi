@@ -28,7 +28,7 @@ import java.util.UUID;
 public class ClientImpl implements Client {
 
   public static final int PORT = 43200;
-  private ClientCompatibleGui compatibleGUI;
+  private ClientCompatibleGui compatibleGui;
   private InetAddress serverAddress;
   private Model model;
   private Player clientPlayer;
@@ -40,8 +40,8 @@ public class ClientImpl implements Client {
   private boolean running;
 
 
-  public ClientImpl(ClientCompatibleGui compatibleGUI, InetAddress inetAddress, Player player) {
-    this.compatibleGUI = compatibleGUI;
+  public ClientImpl(ClientCompatibleGui compatibleGui, InetAddress inetAddress, Player player) {
+    this.compatibleGui = compatibleGui;
     this.serverAddress = inetAddress;
     this.clientPlayer = player;
   }
@@ -101,7 +101,7 @@ public class ClientImpl implements Client {
   }
 
   private void notifyClientAboutUpdatedModel() {
-    this.compatibleGUI.modelUpdated(this.model);
+    this.compatibleGui.modelUpdated(this.model);
   }
 
   private void communicateWithServer() {
@@ -149,7 +149,7 @@ public class ClientImpl implements Client {
   }
 
   private void processJoinRequestResponse(JoinRequest.Response response) {
-    this.compatibleGUI.receivedJoinRequestResponse(response);
+    this.compatibleGui.receivedJoinRequestResponse(response);
   }
 
   private void processRejectedPlacement(RejectedPlacement rejectedPlacement) {
@@ -158,7 +158,7 @@ public class ClientImpl implements Client {
       this.requestGameStateWithLastPlacementUUID();
     }
 
-    this.compatibleGUI.receivedRejectedPlacementReason(rejectedPlacement.getReason());
+    this.compatibleGui.receivedRejectedPlacementReason(rejectedPlacement.getReason());
   }
 
   private void processServerNotification(ServerNotification serverNotification) {
@@ -169,7 +169,7 @@ public class ClientImpl implements Client {
       this.model.setWaiting();
     }
 
-    this.compatibleGUI.receivedServerNotification(serverNotification);
+    this.compatibleGui.receivedServerNotification(serverNotification);
   }
 
   private void processDiskPlacement(DiskPlacement diskPlacement) {
@@ -188,7 +188,7 @@ public class ClientImpl implements Client {
   }
 
   private void processSpectators(Spectators spectators) {
-    this.compatibleGUI.receivedSpectator(spectators);
+    this.compatibleGui.receivedSpectator(spectators);
   }
 
   private void processGamestate(GameState gameState) {
