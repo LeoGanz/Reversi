@@ -6,6 +6,7 @@ import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Phase;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.network.communication.DiskPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.GameStateWithLastPlacementUuid;
 import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement;
 import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement.Reason;
 import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
@@ -114,14 +115,14 @@ public class GameLobby {
     lastPlacementID = null;
     masterGame = new ModelImpl(GameMode.HOTSEAT, playerOne, playerTwo);
     freshStart = false;
-    broadcast(masterGame.getState());
+    broadcast(getGameStateWithLastPlacementUuid());
   }
 
   private void handleResume() {
     lastPlacementID = null;
     masterGame.substitutePlayersWith(playerOne, playerTwo);
     masterGame.unsetWaiting();
-    broadcast(masterGame.getState());
+    broadcast(getGameStateWithLastPlacementUuid());
   }
 
   /**
@@ -134,7 +135,7 @@ public class GameLobby {
     spectatorsPlayers.put(conn.getConnectionID(), player);
     broadcast(getSpectators());
     conn.setLobby(this);
-    conn.sendMessageWith(masterGame.getState());
+    broadcast(getGameStateWithLastPlacementUuid());
   }
 
   /**
@@ -214,6 +215,15 @@ public class GameLobby {
       connOne.sendMessageWith(ServerNotification.PARTNER_ACCEPTED_RESTART);
       restartGame();
     }
+  }
+
+  /**
+   * Get a {@link GameStateWithLastPlacementUuid}.
+   *
+   * @return the GameStateWithLastPlacementUuid with current game data
+   */
+  public synchronized GameStateWithLastPlacementUuid getGameStateWithLastPlacementUuid() {
+    return new GameStateWithLastPlacementUuid(masterGame.getState(), lastPlacementID);
   }
 
   private void restartGame() {

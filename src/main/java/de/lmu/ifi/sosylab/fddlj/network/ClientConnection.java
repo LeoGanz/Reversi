@@ -141,6 +141,13 @@ public class ClientConnection implements Runnable {
           lobby.acceptRestart(connectionID);
         }
         break;
+      case REQUEST_CURRENT_GAMESTATE_WITH_LAST_PLACEMENT_UUID:
+        if (lobby == null) {
+          sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
+        } else {
+          sendMessageWith(lobby.getGameStateWithLastPlacementUuid());
+        }
+        break;
 
       default:
         sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
