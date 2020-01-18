@@ -9,8 +9,7 @@ import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
 /**
  * This Interface define callback methods for a GUI, which have been used.
  */
-interface ClientCompatibleGui
-{
+interface ClientCompatibleGui {
 
   /**
    * The client received a {@link JoinRequest.Response} from the server.
