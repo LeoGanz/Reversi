@@ -18,9 +18,9 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
    *
    * @param calculationDepth is the number of successive moves evaluated in the minmax.
    */
-  public ArtificialIntelligenceImpl(int calculationDepth) {
+  public ArtificialIntelligenceImpl(int calculationDepth, Heuristic heuristic) {
     this.calculationDepth = calculationDepth;
-    heuristic = new HeuristicImpl();
+    this.heuristic = heuristic;
   }
 
   @Override
