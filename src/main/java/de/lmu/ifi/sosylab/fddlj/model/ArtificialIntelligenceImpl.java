@@ -11,8 +11,7 @@ import java.util.TreeSet;
 public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
 
   private final int calculationDepth;
-  private static final int WEIGHT_GAME_FINISHED = 500;
-  private static final int WEIGHT_CORNER_DISKS = 7;
+  private final Heuristic heuristic;
 
   /**
    * Creates an AI with a given calculation depth.
@@ -21,6 +20,7 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
    */
   public ArtificialIntelligenceImpl(int calculationDepth) {
     this.calculationDepth = calculationDepth;
+    heuristic = new HeuristicImpl();
   }
 
   @Override
@@ -52,12 +52,12 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
    */
   private double evaluateRecursively(GameState state, Cell toPlace, Player aiPlayer, int depth) {
     if (depth >= calculationDepth) {
-      return evaluateSituationWithHeuristic(state, aiPlayer);
+      return evaluateSituationWithHeuristic(state, aiPlayer, depth);
     }
     Model game = new ModelImpl(state.makeCopy(), GameMode.HOTSEAT);
     game.placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), toPlace);
     if (game.getState().getCurrentPhase().equals(Phase.FINISHED)) {
-      return evaluateSituationWithHeuristic(game.getState(), aiPlayer);
+      return evaluateSituationWithHeuristic(game.getState(), aiPlayer, depth);
     }
 
     Player currentPlayer = game.getState().getPlayerManagement().getCurrentPlayer();
@@ -90,49 +90,7 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
    * @param aiPlayer from whose perspective it shall be evaluated
    * @return {@code double} value of the given state
    */
-  private double evaluateSituationWithHeuristic(GameState state, Player aiPlayer) {
-    if (state.getCurrentPhase().equals(Phase.FINISHED)
-        && state.getPlayerManagement().getWinner().isPresent()) {
-      if (state.getPlayerManagement().getWinner().get().equals(aiPlayer)) {
-        return WEIGHT_GAME_FINISHED;
-      } else {
-        return -WEIGHT_GAME_FINISHED;
-      }
-    }
-    return numberOfDisks(state, aiPlayer)
-        + disksInCorner(state, aiPlayer) * WEIGHT_CORNER_DISKS
-        - disksInCorner(state, state.getPlayerManagement().getOpponentPlayer(aiPlayer))
-            * WEIGHT_CORNER_DISKS;
-  }
-
-  /**
-   * Counts the number of disks of a player.
-   *
-   * @param state which will be evaluated
-   * @param player for which the disks should be counted
-   * @return the number of disks for the player
-   */
-  private double numberOfDisks(GameState state, Player player) {
-    return state.getField().getAllCellsForPlayer(player).size();
-  }
-
-  /**
-   * Counts the disks of a player that are in the corner.
-   *
-   * @param state which will be evaluated
-   * @param player for which the disks should be counted
-   * @return the number of disks for the player that are in the corner
-   */
-  private double disksInCorner(GameState state, Player player) {
-    Set<Cell> disksOfPlayer = state.getField().getAllCellsForPlayer(player);
-    double temp = 0;
-    for (int column = 0; column < GameFieldImpl.SIZE; column = column + (GameFieldImpl.SIZE - 1)) {
-      for (int row = 0; row < GameFieldImpl.SIZE; row = row + (GameFieldImpl.SIZE - 1)) {
-        if (disksOfPlayer.contains(new CellImpl(column, row))) {
-          temp++;
-        }
-      }
-    }
-    return temp;
+  private double evaluateSituationWithHeuristic(GameState state, Player aiPlayer, int depth) {
+    return heuristic.evaluateSituationWithHeuristic(state, aiPlayer, depth);
   }
 }
