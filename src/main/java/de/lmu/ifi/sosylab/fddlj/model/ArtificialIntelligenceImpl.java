@@ -11,6 +11,8 @@ import java.util.TreeSet;
 public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
 
   private final int calculationDepth;
+  private static final int WEIGHT_GAME_FINISHED = 500;
+  private static final int WEIGHT_CORNER_DISKS = 7;
 
   /**
    * Creates an AI with a given calculation depth.
@@ -92,14 +94,15 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
     if (state.getCurrentPhase().equals(Phase.FINISHED)
         && state.getPlayerManagement().getWinner().isPresent()) {
       if (state.getPlayerManagement().getWinner().get().equals(aiPlayer)) {
-        return 500;
+        return WEIGHT_GAME_FINISHED;
       } else {
-        return -500;
+        return -WEIGHT_GAME_FINISHED;
       }
     }
     return numberOfDisks(state, aiPlayer)
-        + disksInCorner(state, aiPlayer)
-        - disksInCorner(state, state.getPlayerManagement().getOpponentPlayer(aiPlayer));
+        + disksInCorner(state, aiPlayer) * WEIGHT_CORNER_DISKS
+        - disksInCorner(state, state.getPlayerManagement().getOpponentPlayer(aiPlayer))
+            * WEIGHT_CORNER_DISKS;
   }
 
   /**
@@ -123,13 +126,13 @@ public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
   private double disksInCorner(GameState state, Player player) {
     Set<Cell> disksOfPlayer = state.getField().getAllCellsForPlayer(player);
     double temp = 0;
-    for (int column = 0; column < 8; column = column + 7) {
-      for (int row = 0; row < 8; row = row + 7) {
+    for (int column = 0; column < GameFieldImpl.SIZE; column = column + (GameFieldImpl.SIZE - 1)) {
+      for (int row = 0; row < GameFieldImpl.SIZE; row = row + (GameFieldImpl.SIZE - 1)) {
         if (disksOfPlayer.contains(new CellImpl(column, row))) {
           temp++;
         }
       }
     }
-    return temp * 7;
+    return temp;
   }
 }
