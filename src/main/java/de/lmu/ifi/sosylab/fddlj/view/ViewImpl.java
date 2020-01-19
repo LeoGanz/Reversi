@@ -155,7 +155,9 @@ public class ViewImpl implements View {
 
     if (event.getPropertyName().equals(Model.LISTENERS_CHANGED)) {
       if (event.getNewValue() instanceof Model) {
-        this.model = (Model) event.getNewValue();
+	if (!model.equals((Model) event.getNewValue())) {
+	    this.model = (Model) event.getNewValue();
+	}
         support.firePropertyChange(event);
       }
     }

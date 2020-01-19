@@ -121,7 +121,7 @@ public class GameModeSelector extends Stage {
 
   private VBox buildSelectionPane() {
 
-    VBox vbox = new VBox(15);
+    VBox vbox = new VBox(40);
     vbox.setId("selection-pane");
     vbox.setAlignment(Pos.CENTER);
     vbox.setPrefWidth(1.3 * (Screen.getPrimary().getVisualBounds().getWidth() / 5) + 200);
@@ -177,8 +177,8 @@ public class GameModeSelector extends Stage {
     Button button = new Button(text);
     button.setId("button");
     button.setMinHeight(50);
-    button.setMaxWidth(500);
-    button.setMinWidth(200);
+    button.setMaxWidth(350);
+    button.setMinWidth(150);
     button.setCursor(Cursor.HAND);
     button.setFont(Font.font(18));
 

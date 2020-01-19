@@ -95,11 +95,12 @@ public class GameFinishedScreen extends Stage {
     Button restart = getButton("Restart");
     restart.setOnAction(
         e -> {
+          close();
           controller.resetGame(
               controller.getCurrentGameMode(),
               model.getState().getPlayerManagement().getPlayerOne(),
               model.getState().getPlayerManagement().getPlayerTwo());
-          close();
+          
         });
 
     Button mainScreen = getButton("Main screen");
