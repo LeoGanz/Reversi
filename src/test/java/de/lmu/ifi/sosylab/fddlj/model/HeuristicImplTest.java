@@ -17,12 +17,12 @@ public class HeuristicImplTest {
 
   private ModifiableGameState earlyGame_PlayerTwosTurn() {
     ModifiableGameField field = new GameFieldImpl();
-    field.set(new CellImpl(3, 3), new DiskImpl(manager.getPlayerOne()));
-    field.set(new CellImpl(3, 4), new DiskImpl(manager.getPlayerOne()));
-    field.set(new CellImpl(3, 5), new DiskImpl(manager.getPlayerOne()));
-    field.set(new CellImpl(4, 3), new DiskImpl(manager.getPlayerTwo()));
-    field.set(new CellImpl(4, 4), new DiskImpl(manager.getPlayerTwo()));
-    field.set(new CellImpl(4, 5), new DiskImpl(manager.getPlayerTwo()));
+    field.set(new CellImpl(3, 3), diskOne);
+    field.set(new CellImpl(3, 4), diskOne);
+    field.set(new CellImpl(3, 5), diskOne);
+    field.set(new CellImpl(4, 3), diskTwo);
+    field.set(new CellImpl(4, 4), diskTwo);
+    field.set(new CellImpl(4, 5), diskTwo);
 
     manager.switchCurrentPlayer();
 
@@ -38,8 +38,6 @@ public class HeuristicImplTest {
     manager.switchCurrentPlayer();
 
     ModifiableGameField field = new GameFieldImpl();
-    Disk diskOne = new DiskImpl(playerOne);
-    Disk diskTwo = new DiskImpl(playerTwo);
 
     field.set(new CellImpl(3, 1), diskTwo);
     field.set(new CellImpl(2, 2), diskTwo);
@@ -103,38 +101,38 @@ public class HeuristicImplTest {
 
     manager.switchCurrentPlayer();
     ModifiableGameField field = new GameFieldImpl();
-    field.set(new CellImpl(0, 7), new DiskImpl(playerOne));
-    field.set(new CellImpl(0, 6), new DiskImpl(playerOne));
-    field.set(new CellImpl(0, 5), new DiskImpl(playerOne));
-    field.set(new CellImpl(1, 7), new DiskImpl(playerOne));
-    field.set(new CellImpl(1, 6), new DiskImpl(playerOne));
-    field.set(new CellImpl(1, 5), new DiskImpl(playerOne));
-    field.set(new CellImpl(1, 4), new DiskImpl(playerOne));
-    field.set(new CellImpl(1, 3), new DiskImpl(playerOne));
-    field.set(new CellImpl(2, 4), new DiskImpl(playerOne));
-    field.set(new CellImpl(3, 3), new DiskImpl(playerOne));
-    field.set(new CellImpl(4, 4), new DiskImpl(playerOne));
-    field.set(new CellImpl(4, 3), new DiskImpl(playerOne));
-    field.set(new CellImpl(4, 2), new DiskImpl(playerOne));
-    field.set(new CellImpl(0, 1), new DiskImpl(playerTwo));
-    field.set(new CellImpl(1, 2), new DiskImpl(playerTwo));
-    field.set(new CellImpl(2, 2), new DiskImpl(playerTwo));
-    field.set(new CellImpl(2, 3), new DiskImpl(playerTwo));
-    field.set(new CellImpl(3, 1), new DiskImpl(playerTwo));
-    field.set(new CellImpl(3, 2), new DiskImpl(playerTwo));
-    field.set(new CellImpl(2, 5), new DiskImpl(playerTwo));
-    field.set(new CellImpl(2, 6), new DiskImpl(playerTwo));
-    field.set(new CellImpl(3, 4), new DiskImpl(playerTwo));
-    field.set(new CellImpl(3, 5), new DiskImpl(playerTwo));
-    field.set(new CellImpl(3, 6), new DiskImpl(playerTwo));
-    field.set(new CellImpl(4, 5), new DiskImpl(playerTwo));
-    field.set(new CellImpl(4, 6), new DiskImpl(playerTwo));
-    field.set(new CellImpl(5, 3), new DiskImpl(playerTwo));
-    field.set(new CellImpl(5, 4), new DiskImpl(playerTwo));
-    field.set(new CellImpl(5, 5), new DiskImpl(playerTwo));
-    field.set(new CellImpl(6, 4), new DiskImpl(playerTwo));
-    field.set(new CellImpl(6, 5), new DiskImpl(playerTwo));
-    field.set(new CellImpl(7, 4), new DiskImpl(playerTwo));
+    field.set(new CellImpl(0, 7), diskOne);
+    field.set(new CellImpl(0, 6), diskOne);
+    field.set(new CellImpl(0, 5), diskOne);
+    field.set(new CellImpl(1, 7), diskOne);
+    field.set(new CellImpl(1, 6), diskOne);
+    field.set(new CellImpl(1, 5), diskOne);
+    field.set(new CellImpl(1, 4), diskOne);
+    field.set(new CellImpl(1, 3), diskOne);
+    field.set(new CellImpl(2, 4), diskOne);
+    field.set(new CellImpl(3, 3), diskOne);
+    field.set(new CellImpl(4, 4), diskOne);
+    field.set(new CellImpl(4, 3), diskOne);
+    field.set(new CellImpl(4, 2), diskOne);
+    field.set(new CellImpl(0, 1), diskTwo);
+    field.set(new CellImpl(1, 2), diskTwo);
+    field.set(new CellImpl(2, 2), diskTwo);
+    field.set(new CellImpl(2, 3), diskTwo);
+    field.set(new CellImpl(3, 1), diskTwo);
+    field.set(new CellImpl(3, 2), diskTwo);
+    field.set(new CellImpl(2, 5), diskTwo);
+    field.set(new CellImpl(2, 6), diskTwo);
+    field.set(new CellImpl(3, 4), diskTwo);
+    field.set(new CellImpl(3, 5), diskTwo);
+    field.set(new CellImpl(3, 6), diskTwo);
+    field.set(new CellImpl(4, 5), diskTwo);
+    field.set(new CellImpl(4, 6), diskTwo);
+    field.set(new CellImpl(5, 3), diskTwo);
+    field.set(new CellImpl(5, 4), diskTwo);
+    field.set(new CellImpl(5, 5), diskTwo);
+    field.set(new CellImpl(6, 4), diskTwo);
+    field.set(new CellImpl(6, 5), diskTwo);
+    field.set(new CellImpl(7, 4), diskTwo);
 
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
@@ -148,57 +146,57 @@ public class HeuristicImplTest {
     ModifiableGameField field = new GameFieldImpl();
 
     for (int row = 0; row < 5; row++) {
-      field.set(new CellImpl(0, row), new DiskImpl(playerOne));
+      field.set(new CellImpl(0, row), diskOne);
     }
 
     for (int column = 1; column < 3; column++) {
       for (int row = 6; row < 8; row++) {
-        field.set(new CellImpl(column, row), new DiskImpl(playerOne));
+        field.set(new CellImpl(column, row), diskOne);
       }
     }
     for (int column = 2; column < 8; column++) {
-      field.set(new CellImpl(column, 0), new DiskImpl(playerOne));
+      field.set(new CellImpl(column, 0), diskOne);
     }
     for (int row = 1; row < 7; row++) {
-      field.set(new CellImpl(7, row), new DiskImpl(playerOne));
+      field.set(new CellImpl(7, row), diskOne);
     }
-    field.set(new CellImpl(3, 1), new DiskImpl(playerOne));
-    field.set(new CellImpl(4, 1), new DiskImpl(playerOne));
-    field.set(new CellImpl(6, 1), new DiskImpl(playerOne));
-    field.set(new CellImpl(2, 2), new DiskImpl(playerOne));
-    field.set(new CellImpl(5, 2), new DiskImpl(playerOne));
-    field.set(new CellImpl(5, 3), new DiskImpl(playerOne));
-    field.set(new CellImpl(3, 4), new DiskImpl(playerOne));
-    field.set(new CellImpl(4, 4), new DiskImpl(playerOne));
-    field.set(new CellImpl(5, 5), new DiskImpl(playerOne));
-    field.set(new CellImpl(6, 6), new DiskImpl(playerOne));
-    field.set(new CellImpl(6, 7), new DiskImpl(playerOne));
-    field.set(new CellImpl(0, 7), new DiskImpl(playerOne));
+    field.set(new CellImpl(3, 1), diskOne);
+    field.set(new CellImpl(4, 1), diskOne);
+    field.set(new CellImpl(6, 1), diskOne);
+    field.set(new CellImpl(2, 2), diskOne);
+    field.set(new CellImpl(5, 2), diskOne);
+    field.set(new CellImpl(5, 3), diskOne);
+    field.set(new CellImpl(3, 4), diskOne);
+    field.set(new CellImpl(4, 4), diskOne);
+    field.set(new CellImpl(5, 5), diskOne);
+    field.set(new CellImpl(6, 6), diskOne);
+    field.set(new CellImpl(6, 7), diskOne);
+    field.set(new CellImpl(0, 7), diskOne);
 
     for (int row = 0; row < 5; row++) {
-      field.set(new CellImpl(1, row), new DiskImpl(playerTwo));
+      field.set(new CellImpl(1, row), diskTwo);
     }
     for (int column = 0; column < 5; column++) {
-      field.set(new CellImpl(column, 5), new DiskImpl(playerTwo));
+      field.set(new CellImpl(column, 5), diskTwo);
     }
     for (int column = 3; column < 6; column++) {
       for (int row = 6; row < 8; row++) {
-        field.set(new CellImpl(column, row), new DiskImpl(playerTwo));
+        field.set(new CellImpl(column, row), diskTwo);
       }
     }
     for (int row = 2; row < 6; row++) {
-      field.set(new CellImpl(6, row), new DiskImpl(playerTwo));
+      field.set(new CellImpl(6, row), diskTwo);
     }
-    field.set(new CellImpl(2, 1), new DiskImpl(playerTwo));
-    field.set(new CellImpl(2, 3), new DiskImpl(playerTwo));
-    field.set(new CellImpl(2, 4), new DiskImpl(playerTwo));
-    field.set(new CellImpl(3, 2), new DiskImpl(playerTwo));
-    field.set(new CellImpl(3, 3), new DiskImpl(playerTwo));
-    field.set(new CellImpl(4, 2), new DiskImpl(playerTwo));
-    field.set(new CellImpl(4, 3), new DiskImpl(playerTwo));
-    field.set(new CellImpl(5, 1), new DiskImpl(playerTwo));
-    field.set(new CellImpl(5, 4), new DiskImpl(playerTwo));
-    field.set(new CellImpl(7, 7), new DiskImpl(playerTwo));
+    field.set(new CellImpl(2, 1), diskTwo);
+    field.set(new CellImpl(2, 3), diskTwo);
+    field.set(new CellImpl(2, 4), diskTwo);
+    field.set(new CellImpl(3, 2), diskTwo);
+    field.set(new CellImpl(3, 3), diskTwo);
+    field.set(new CellImpl(4, 2), diskTwo);
+    field.set(new CellImpl(4, 3), diskTwo);
+    field.set(new CellImpl(5, 1), diskTwo);
+    field.set(new CellImpl(5, 4), diskTwo);
+    field.set(new CellImpl(7, 7), diskTwo);
 
     ModifiableGameState state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
@@ -212,11 +210,11 @@ public class HeuristicImplTest {
     ModifiableGameField field = new GameFieldImpl();
     for (int column = 0; column < 7; column++) {
       for (int row = 0; row < 8; row++) {
-        field.set(new CellImpl(column, row), new DiskImpl(playerTwo));
+        field.set(new CellImpl(column, row), diskTwo);
       }
     }
     for (int row = 0; row < 8; row++) {
-      field.set(new CellImpl(7, row), new DiskImpl(playerOne));
+      field.set(new CellImpl(7, row), diskOne);
     }
 
     ModifiableGameState state = new GameStateImpl();
