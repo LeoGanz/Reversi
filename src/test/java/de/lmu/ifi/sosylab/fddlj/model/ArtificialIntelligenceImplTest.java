@@ -12,13 +12,26 @@ public class ArtificialIntelligenceImplTest {
   private final Disk diskOne = new DiskImpl(one);
   private final Disk diskTwo = new DiskImpl(two);
 
+  private class DummyHeuristic implements Heuristic {
+
+    @Override
+    public double evaluateSituationWithHeuristic(GameState state, Player aiPlayer, int depth) {
+      return state.getField().getAllCellsForPlayer(aiPlayer).size();
+    }
+
+    @SuppressWarnings("unused")
+    public Player appeaseSpotbugs() {
+      return one;
+    }
+  }
+
   @Test
   public void aiTest1() {
 
     Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
     Assertions.assertTrue(game.placeDisk(new DiskImpl(one), new CellImpl(3, 3)));
 
-    ArtificialIntelligence ai = new ArtificialIntelligenceImpl(1);
+    ArtificialIntelligence ai = new ArtificialIntelligenceImpl(1, new DummyHeuristic());
     Assertions.assertEquals(new CellImpl(3, 4), ai.calculateBestMove(game.getState()));
     Assertions.assertTrue(game.placeDisk(new DiskImpl(two), new CellImpl(3, 4)));
     Assertions.assertTrue(game.placeDisk(new DiskImpl(one), new CellImpl(4, 4)));
@@ -45,7 +58,7 @@ public class ArtificialIntelligenceImplTest {
   @Test
   public void aiTest2() {
     Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
-    ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(2);
+    ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(2, new DummyHeuristic());
     Assertions.assertTrue(game.placeDisk(diskOne, new CellImpl(3, 3)));
     Assertions.assertEquals(new CellImpl(3, 4), ai.calculateBestMove(game.getState()));
     Assertions.assertTrue(game.placeDisk(diskTwo, new CellImpl(3, 4)));
