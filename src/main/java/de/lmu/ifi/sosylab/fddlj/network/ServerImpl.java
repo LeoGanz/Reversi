@@ -114,7 +114,8 @@ public class ServerImpl implements Server {
         } else {
           if (joinRequest.isAsSpectator()) {
             lobby.joinAsSpectator(conn, player);
-            conn.sendMessageWith(JoinRequest.Response.JOIN_SUCCESSFUL);
+            conn.sendMessageWith(
+                JoinRequest.Response.JOIN_SUCCESSFUL.setLobbyID(lobby.getLobbyID()));
           } else {
             handleLobbyJoinAsPlayer(lobby, conn, player);
           }
@@ -122,7 +123,7 @@ public class ServerImpl implements Server {
         break;
       case NEW_PRIVATE_LOBBY:
         GameLobby privateLobby = new GameLobby(nextLobbyID++, this);
-        privateLobby.joinAsPlayer(conn, player);
+        handleLobbyJoinAsPlayer(privateLobby, conn, player);
         lobbies.put(privateLobby.getLobbyID(), privateLobby);
         break;
       default:
@@ -133,7 +134,7 @@ public class ServerImpl implements Server {
   private void handleLobbyJoinAsPlayer(GameLobby lobby, ClientConnection conn, Player player) {
     boolean joinSuccessful = lobby.joinAsPlayer(conn, player);
     if (joinSuccessful) {
-      conn.sendMessageWith(JoinRequest.Response.JOIN_SUCCESSFUL);
+      conn.sendMessageWith(JoinRequest.Response.JOIN_SUCCESSFUL.setLobbyID(lobby.getLobbyID()));
     } else {
       conn.sendMessageWith(JoinRequest.Response.NO_PLAYERS_NEEDED);
     }

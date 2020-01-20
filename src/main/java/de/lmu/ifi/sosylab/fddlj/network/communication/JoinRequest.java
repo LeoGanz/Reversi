@@ -118,6 +118,29 @@ public class JoinRequest {
   public enum Response {
     JOIN_SUCCESSFUL,
     LOBBY_NOT_FOUND,
-    NO_PLAYERS_NEEDED
+    NO_PLAYERS_NEEDED;
+
+    private int lobbyID = -1;
+
+    /**
+     * For successful lobby joining a lobbyID should have been set that can be retrieved with this
+     * method.
+     *
+     * @return the lobby id of the lobby that was joined
+     */
+    public int getLobbyID() {
+      return lobbyID;
+    }
+
+    /**
+     * Set the id of the lobby the player joined into. Should only be used for successful joining.
+     *
+     * @param lobbyID id of the lobby the player joined into
+     * @return the enum constant with the Id set
+     */
+    public Response setLobbyID(int lobbyID) {
+      this.lobbyID = lobbyID;
+      return this;
+    }
   }
 }
