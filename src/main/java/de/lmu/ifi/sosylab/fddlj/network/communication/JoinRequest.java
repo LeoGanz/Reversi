@@ -27,10 +27,11 @@ public class JoinRequest {
    * is thereby asking to be included in automatic matchmaking.
    *
    * @param player the player that wants to join
+   * @param asSpectator whether the player wants to join as a spectator or as a participating player
    * @return the request that can be sent to the {@link Server}
    */
-  public static JoinRequest generateJoinAnyPublicLobbyRequest(Player player) {
-    return new JoinRequest(player, JoinType.ANY_PUBLIC_LOBBY, false, -1);
+  public static JoinRequest generateJoinAnyPublicLobbyRequest(Player player, boolean asSpectator) {
+    return new JoinRequest(player, JoinType.ANY_PUBLIC_LOBBY, asSpectator, -1);
   }
 
   /**
@@ -115,32 +116,55 @@ public class JoinRequest {
    *
    * @author Leonard Ganz
    */
-  public enum Response {
-    JOIN_SUCCESSFUL,
-    LOBBY_NOT_FOUND,
-    NO_PLAYERS_NEEDED;
+  public static class Response {
 
-    private int lobbyID = -1;
+    /**
+     * Type of the response.
+     *
+     * @author Leonard Ganz
+     */
+    public enum ResponseType {
+      JOIN_SUCCESSFUL,
+      LOBBY_NOT_FOUND,
+      NO_PLAYERS_NEEDED;
+    }
+
+    private ResponseType type;
+    private int lobbyID;
+
+    /**
+     * Create a new response to a join request.
+     *
+     * @param type the kind of response, i.e. the actual response
+     * @param lobbyID if join was successful, provide the ID of the lobby the player joined into
+     */
+    public Response(ResponseType type, int lobbyID) {
+      this.type = type;
+      this.lobbyID = lobbyID;
+    }
+
+    /**
+     * Create a new response to a join request without lobbyID information.
+     *
+     * @param type the kind of response, i.e. the actual response
+     */
+    public Response(ResponseType type) {
+      this(type, -1);
+    }
+
+    public ResponseType getType() {
+      return type;
+    }
 
     /**
      * For successful lobby joining a lobbyID should have been set that can be retrieved with this
      * method.
      *
-     * @return the lobby id of the lobby that was joined
+     * @return the lobby id of the lobby that was joined, <code>-1</code> indicates that no
+     *     information has been set
      */
     public int getLobbyID() {
       return lobbyID;
-    }
-
-    /**
-     * Set the id of the lobby the player joined into. Should only be used for successful joining.
-     *
-     * @param lobbyID id of the lobby the player joined into
-     * @return the enum constant with the Id set
-     */
-    public Response setLobbyID(int lobbyID) {
-      this.lobbyID = lobbyID;
-      return this;
     }
   }
 }
