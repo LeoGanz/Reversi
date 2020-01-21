@@ -65,6 +65,7 @@ public class ClientImpl implements Client {
     this.running = true;
 
     Thread connectorThread = new Thread(this::communicateWithServer);
+    connectorThread.setDaemon(true);
     connectorThread.start();
   }
 
