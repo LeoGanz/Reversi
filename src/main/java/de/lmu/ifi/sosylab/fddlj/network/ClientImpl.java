@@ -124,10 +124,6 @@ public class ClientImpl implements Client {
     this.sendMessage(ClientNotification.REQUEST_CURRENT_GAMESTATE_WITH_LAST_PLACEMENT_UUID);
   }
 
-  private void notifyClientAboutUpdatedModel() {
-    this.compatibleGui.modelUpdated(this.model);
-  }
-
   private void communicateWithServer() {
     try {
       this.connection = new Socket(this.serverAddress, PORT);
@@ -206,8 +202,6 @@ public class ClientImpl implements Client {
 
     if (this.model.placeDisk(diskPlacement.getDisk(), diskPlacement.getLocation())) {
       this.lastDiskPlacement = diskPlacement.getUuid();
-
-      this.notifyClientAboutUpdatedModel();
     } else { // DiskPlacement from Server is not valid with current game state
       this.requestGameStateWithLastPlacementUuid();
     }
@@ -220,7 +214,7 @@ public class ClientImpl implements Client {
   private void processGamestate(GameState gameState) {
     this.model = new ModelImpl(gameState, GameMode.MULTIPLAYER);
 
-    this.notifyClientAboutUpdatedModel();
+    this.compatibleGui.modelExchanged(this.model);
   }
 
   private void processGameStateWithLastPlacementUuid(

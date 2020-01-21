@@ -39,14 +39,13 @@ public interface ClientCompatibleGui {
   void receivedServerNotification(ServerNotification serverNotification);
 
   /**
-   * The {@link Model} has been updated. This means a moved has been made or
-   * the whole model got exchanged by a new one. Last one can happen, when
-   * the client joins a new lobby or the current gamestate gets invalid and
-   * need to be refreshed from the server.
+   * The {@link Model} has been exchanged. This happens, when the client
+   * joins a new lobby or the current gamestate gets invalid and needs
+   * to be refreshed from the server.
    *
    * @param model updated model
    */
-  void modelUpdated(Model model);
+  void modelExchanged(Model model);
 
   /**
    * The list of spectators, which are currently watching the game.
