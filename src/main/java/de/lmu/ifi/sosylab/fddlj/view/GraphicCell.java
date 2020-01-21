@@ -1,5 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
+import de.lmu.ifi.sosylab.fddlj.model.AiPlayer;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.CellImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Disk;
@@ -27,6 +28,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
   private GraphicDisk diskOnCell;
 
   private Model model;
+  private GameBoardGrid gameBoardGrid;
   private Controller controller;
   private Cell current;
 
@@ -35,11 +37,10 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
 
   static final float SPACING = 100;
 
-  private final String cssNormal =
-      "-fx-background-color: transparent; -fx-border-color: #d6d6d6;" + " -fx-border-width: 1.2;";
-  private final String cssHighlighted =
-      "-fx-background-color: transparent; -fx-border-color: rgba(0,255,0,255);"
-          + " -fx-border-width: 2.2;";
+  private String color;
+
+  private String cssNormal;
+  private String cssHighlighted;
   private final String cssStart =
       "-fx-background-color: #4a4a4a; -fx-border-color: #d6d6d6;" + " -fx-border-width: 1.2;";
 
@@ -57,10 +58,12 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
 
     this.model = model;
     this.controller = controller;
+    this.gameBoardGrid = gameBoardGrid;
 
     current = new CellImpl(column, row);
     indicateMoves = true;
 
+    initialiseCellColor();
     setStyle(cssNormal);
     double initValue =
         (Screen.getPrimary().getVisualBounds().getHeight() - SPACING)
@@ -77,6 +80,29 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
             .getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer())
             .contains(current);
     indicatePossibleMove();
+  }
+
+  private void initialiseCellColor() {
+
+    if ((current.getRow() % 2 == 0 && current.getColumn() % 2 == 0)) {
+      color = "#636363";
+    } else if ((current.getRow() % 2 != 0 && current.getColumn() % 2 == 0)) {
+      color = "#cecece";
+    } else if (current.getRow() % 2 == 0 && current.getColumn() % 2 != 0) {
+      color = "#cecece";
+    } else if (current.getRow() % 2 != 0 && current.getColumn() % 2 != 0) {
+      color = "#636363";
+    } else {
+      color = "transparent";
+    }
+
+    cssNormal =
+        "-fx-background-color: " + color + "; -fx-border-color: black;" + " -fx-border-width: 2;";
+    cssHighlighted =
+        "-fx-background-color: "
+            + color
+            + "; -fx-border-color: rgba(0,255,0,255);"
+            + " -fx-border-width: 2.2;";
   }
 
   /**
@@ -141,6 +167,10 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
 
   private void handleMouseMoved(MouseEvent e) {
 
+    if (controller.getCurrentGameMode() == GameMode.SPECTATOR) {
+      return;
+    }
+
     if (model.getState().getCurrentPhase() != Phase.RUNNING) {
       setCursor(Cursor.DEFAULT);
       return;
@@ -181,6 +211,10 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
   }
 
   private void handleMouseClicked(MouseEvent e) {
+    if (controller.getCurrentGameMode() == GameMode.SPECTATOR) {
+      return;
+    }
+
     if (getCursor().equals(Cursor.HAND)) {
       if (model
           .getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer())
@@ -224,9 +258,32 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
         indicatePossibleMove();
       }
     }
+
+    if (evt.getPropertyName().equals(ViewImpl.STAGE_RESIZED)) {
+      double prefWidth = (gameBoardGrid.getHeight() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
+      setPrefWidth(prefWidth);
+      setPrefHeight(prefWidth);
+
+      if (diskOnCell != null) {
+        diskOnCell.resizeDisk(
+            getWidth() - GraphicDisk.PADDING,
+            getHeight() - GraphicDisk.PADDING,
+            (getHeight() - GraphicDisk.PADDING) / 2);
+      }
+
+      if (indicateMoves && isMovePossibleOnCell) {
+        indicatePossibleMove();
+      }
+    }
   }
 
   private void handleStateChanged(PropertyChangeEvent evt) {
+    if (model.getState().getCurrentPhase() == Phase.FINISHED) {
+      isMovePossibleOnCell = false;
+      indicateMoves = false;
+      indicatePossibleMove();
+    }
+
     if (model
         .getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer())
         .contains(current)) {
@@ -237,21 +294,48 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
     indicatePossibleMove();
 
     if (model.getState().getField().get(current).isPresent() && diskOnCell == null) {
+
       diskOnCell =
           new GraphicDisk(
-              getWidth() - 10,
-              getHeight() - 10,
-              (getHeight() - 10) / 2,
-              model.getState().getField().get(current).get().getPlayer().getColor());
+              getWidth() - 10, getHeight() - 10, (getHeight() - 10) / 2, getDiskColor());
       setCenter(diskOnCell);
       setStyle(cssNormal);
     } else if (model.getState().getField().get(current).isPresent() && diskOnCell != null) {
-      diskOnCell.changeColor(model.getState().getField().get(current).get().getPlayer().getColor());
+      diskOnCell.changeColor(getDiskColor());
     }
+  }
+
+  private Color getDiskColor() {
+    Color color = model.getState().getField().get(current).get().getPlayer().getColor();
+
+    if (controller instanceof MultiplayerController) {
+      if (!model
+          .getState()
+          .getField()
+          .get(current)
+          .get()
+          .getPlayer()
+          .equals(((MultiplayerController) controller).getOwnPlayer())) {
+        if (similarTo(color, ((MultiplayerController) controller).getOwnPlayer().getColor())) {
+          if (similarTo(color, Color.WHITE)) {
+            color = Color.SILVER;
+          } else {
+            color = color.deriveColor(15, 15, 10, 1);
+          }
+        }
+      }
+    }
+
+    return color;
   }
 
   private void indicatePossibleMove() {
     if (indicateMoves && isMovePossibleOnCell && diskOnCell == null) {
+
+      if (controller.getCurrentGameMode() == GameMode.SINGLEPLAYER
+          && model.getState().getPlayerManagement().getCurrentPlayer() instanceof AiPlayer) {
+        return;
+      }
       double prefRadius = (getHeight() - 30) / 2;
 
       Circle circle = new Circle(prefRadius);
@@ -266,6 +350,20 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
         setCenter(null);
         setStyle(cssNormal);
       }
+    }
+  }
+
+  private boolean similarTo(Color c, Color v) {
+    double distance =
+        Math.sqrt(
+            (c.getRed() - v.getRed()) * (c.getRed() - v.getRed())
+                + (c.getGreen() - v.getGreen()) * (c.getGreen() - v.getGreen())
+                + (c.getBlue() - v.getBlue()) * (c.getBlue() - v.getBlue()));
+
+    if (distance < 0.15) {
+      return true;
+    } else {
+      return false;
     }
   }
 

@@ -166,15 +166,6 @@ public class OnlineViewImpl implements OnlineView {
 
     vbox.getChildren().addAll(currentPlayer, ownDiskIndicator);
 
-    Button reset = getButton("Reset game");
-    reset.setOnAction(
-        e -> {
-          controller.resetGame(
-              gameMode,
-              model.getState().getPlayerManagement().getPlayerOne(),
-              model.getState().getPlayerManagement().getPlayerTwo());
-        });
-
     Region spacer = new Region();
     VBox.setVgrow(spacer, Priority.ALWAYS);
 
@@ -182,9 +173,18 @@ public class OnlineViewImpl implements OnlineView {
 
     Region bottomSpacer = new Region();
     VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
+    vbox.getChildren().addAll(bottomSpacer, new Separator(Orientation.HORIZONTAL), getHelpButton());
 
-    vbox.getChildren()
-        .addAll(bottomSpacer, new Separator(Orientation.HORIZONTAL), getHelpButton(), reset);
+    if (gameMode != GameMode.SPECTATOR) {
+      Button reset = getButton("Reset game");
+      reset.setOnAction(
+          e -> {
+            controller.resetGame(
+                gameMode,
+                model.getState().getPlayerManagement().getPlayerOne(),
+                model.getState().getPlayerManagement().getPlayerTwo());
+          });
+    }
 
     return vbox;
   }

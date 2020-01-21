@@ -153,10 +153,9 @@ public class PlayerCreation extends BorderPane {
    * Show a pane that allow a single player to enter his/her information, such as name and preferred
    * color for the disks.
    *
-   * @param controller the reference to a controller instance
    * @param gameModeSelector the reference to a gameModeSelector instance
    */
-  void getOnlinePlayerInformation(Controller controller, GameModeSelector gameModeSelector) {
+  void getOnlinePlayerInformation(GameModeSelector gameModeSelector) {
     HBox alignment = new HBox(50);
     alignment.setAlignment(Pos.CENTER);
 
@@ -232,6 +231,34 @@ public class PlayerCreation extends BorderPane {
     HBox bottom =
         buildBottomOnline(
             textField, colorPicker, textFieldServer, textFieldLobby, checkbox, gameModeSelector);
+    setBottom(bottom);
+    BorderPane.setAlignment(bottom, Pos.CENTER);
+    BorderPane.setMargin(bottom, new Insets(0, 0, 20, 0));
+  }
+
+  void getSpectatorInformation(GameModeSelector gameModeSelector) {
+    VBox vbox = new VBox(15);
+    vbox.setAlignment(Pos.CENTER);
+
+    TextField textField = new TextField();
+    vbox.getChildren().add(getInputField(textField, "Geben Sie ihren Usernamen ein:"));
+
+    TextField textFieldServerAdress = new TextField();
+    vbox.getChildren()
+        .add(getInputField(textFieldServerAdress, "Geben Sie die Server Adresse ein:"));
+
+    TextField textFieldLobbyID = new TextField();
+    vbox.getChildren()
+        .add(
+            getInputField(
+                textFieldLobbyID, "Optional: Geben Sie die ID einer bestimmten Lobby an:"));
+
+    setTop(vbox);
+    BorderPane.setAlignment(vbox, Pos.CENTER);
+    BorderPane.setMargin(vbox, new Insets(50));
+
+    HBox bottom =
+        buildBottomSpectate(textField, textFieldServerAdress, textFieldLobbyID, gameModeSelector);
     setBottom(bottom);
     BorderPane.setAlignment(bottom, Pos.CENTER);
     BorderPane.setMargin(bottom, new Insets(0, 0, 20, 0));
@@ -359,6 +386,43 @@ public class PlayerCreation extends BorderPane {
     return hbox;
   }
 
+  private HBox buildBottomSpectate(
+      TextField playername, TextField serverAddress, TextField lobbyID, GameModeSelector selector) {
+    HBox hbox = new HBox(30);
+    hbox.setAlignment(Pos.CENTER);
+
+    Button start = getButton("Start");
+    start.setOnAction(
+        e -> {
+          if (!isTextFieldInputValid(playername.getText())) {
+            playername.setStyle(
+                "-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
+            return;
+          }
+
+          if (!isTextFieldInputValid(serverAddress.getText())) {
+            serverAddress.setStyle(
+                "-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
+            return;
+          }
+
+          if (!lobbyID.getText().trim().matches("(?<=\\s|^)\\d+(?=\\s|$)")) {
+            lobbyID.setStyle("-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
+            return;
+          }
+
+          startSpectateMode(
+              playername.getText(), serverAddress.getText(), Integer.parseInt(lobbyID.getText()));
+        });
+
+    Button back = getButton("Back");
+    back.setOnAction(e -> selector.returnToMainScreen());
+
+    hbox.getChildren().addAll(start, back);
+
+    return hbox;
+  }
+
   private VBox getInputField(TextField textField, String labelText) {
     VBox vbox = new VBox(5);
     vbox.setPadding(new Insets(20));
@@ -456,6 +520,14 @@ public class PlayerCreation extends BorderPane {
 
   private void startHotseat(
       String playerOneName, Color playerOneColor, String playerTwoName, Color playerTwoColor) {
+
+    if (similarTo(playerOneColor, playerTwoColor)) {
+      if (similarTo(playerTwoColor, Color.WHITE)) {
+        playerTwoColor = Color.SILVER;
+      } else {
+        playerTwoColor = playerTwoColor.deriveColor(15, 15, 10, 1);
+      }
+    }
     Player playerOne = new PlayerImpl(playerOneName, playerOneColor);
     Player playerTwo = new PlayerImpl(playerTwoName, playerTwoColor);
 
@@ -470,7 +542,28 @@ public class PlayerCreation extends BorderPane {
     controller.startOnlineGame(player, serverAddress, lobbyID, checkbox);
   }
 
+  private void startSpectateMode(String playerName, String serverAddress, int lobbyID) {
+    Player spectator = new PlayerImpl(playerName, getRandomColor());
+
+    MultiplayerControllerImpl controller = new MultiplayerControllerImpl(primaryStage);
+    controller.startSpectateGame(spectator, serverAddress, lobbyID);
+  }
+
   private Color getRandomColor() {
     return new Color(Math.random(), Math.random(), Math.random(), 1.0);
+  }
+
+  private boolean similarTo(Color c, Color v) {
+    double distance =
+        Math.sqrt(
+            (c.getRed() - v.getRed()) * (c.getRed() - v.getRed())
+                + (c.getGreen() - v.getGreen()) * (c.getGreen() - v.getGreen())
+                + (c.getBlue() - v.getBlue()) * (c.getBlue() - v.getBlue()));
+
+    if (distance < 0.25) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

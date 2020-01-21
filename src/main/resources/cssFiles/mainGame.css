@@ -7,20 +7,12 @@
 	-fx-text-fill: #ffffff;
 }
 
-#graphic-cell:normal {
-	-fx-background-color: #f6f6f6; 
-	-fx-border-color: #d6d6d6;
-    -fx-border-width: 1.2;              
-}
-
-#graphic-cell:highlighted {
-	-fx-background-color: transparent; 
-	-fx-border-color: rgba(0,255,0,255);
-    -fx-border-width: 2.2;
-}
-
 .separator .line {
     -fx-border-color: white;
     -fx-border-width: 1;
     -fx-border-radius: 15;  
+}
+
+#borderpane-spacer {
+	-fx-background-color: #576385;
 }

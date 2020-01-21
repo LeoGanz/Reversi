@@ -5,15 +5,14 @@ import de.lmu.ifi.sosylab.fddlj.model.Model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javafx.application.Platform;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Screen;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -27,11 +26,6 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
   private Controller controller;
 
   private SwitchButton switchButton;
-
-  private final String letterCss =
-      "-fx-font-size: xx-large; -fx-font-weight: bold; -fx-text-fill: white";
-
-  private final char startLetter = 'A';
 
   /**
    * Constructor of this class initialises variables and is responsible for building GUI elements.
@@ -56,40 +50,26 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
 
   private void initGameBoard(Stage stage, View view) {
 
-    GridPane grid = new GridPane();
+    VBox centerGrid = new VBox();
+    centerGrid.setAlignment(Pos.CENTER);
+    centerGrid.setEffect(new DropShadow(10, 6, 6, Color.BLACK));
+    for (int row = 1; row < GameFieldImpl.SIZE + 1; row++) {
 
-    grid.setGridLinesVisible(false);
-    grid.setAlignment(Pos.CENTER);
+      HBox hboxRow = new HBox();
+      hboxRow.setAlignment(Pos.CENTER);
 
-    for (int column = 1; column < GameFieldImpl.SIZE + 1; column++) {
-      for (int row = 1; row < GameFieldImpl.SIZE + 1; row++) {
+      for (int column = 1; column < GameFieldImpl.SIZE + 1; column++) {
 
         GraphicCell cell = new GraphicCell(column - 1, row - 1, this, model, controller);
-        grid.add(cell, column, row);
+        hboxRow.getChildren().add(cell);
         switchButton.addListener(cell);
         view.addListener(cell);
       }
+
+      centerGrid.getChildren().add(hboxRow);
     }
 
-    for (int i = 1; i < GameFieldImpl.SIZE + 1; i++) {
-      Label letter = new Label(String.valueOf((char) (startLetter + i - 1)));
-      letter.setStyle(letterCss);
-
-      Label rowNumber = new Label(String.valueOf(i));
-      rowNumber.setStyle(letterCss);
-      grid.add(letter, i, 0);
-      grid.add(rowNumber, 0, i);
-
-      GridPane.setHalignment(letter, HPos.CENTER);
-      GridPane.setValignment(rowNumber, VPos.CENTER);
-      GridPane.setMargin(letter, new Insets(5, 0, 20, 0));
-      GridPane.setMargin(rowNumber, new Insets(0, 20, 0, 5));
-    }
-
-    double initValue = (Screen.getPrimary().getVisualBounds().getHeight() - GraphicCell.SPACING);
-    grid.setMaxSize(initValue, initValue);
-
-    setCenter(grid);
+    setCenter(centerGrid);
   }
 
   private void initToggleSwitch() {

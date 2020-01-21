@@ -148,12 +148,21 @@ public class GameModeSelector extends Stage {
     multiPlayer.setOnAction(
         e -> {
           PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
-          playerCreation.getOnlinePlayerInformation(controller, this);
+          playerCreation.getOnlinePlayerInformation(this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
         });
 
-    vbox.getChildren().addAll(singlePlayer, hotseat, multiPlayer);
+    Button spectate = getButton("Spectate");
+    spectate.setOnAction(
+        e -> {
+          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
+          playerCreation.getSpectatorInformation(this);
+          borderPane.setCenter(playerCreation);
+          borderPane.setRight(null);
+        });
+
+    vbox.getChildren().addAll(singlePlayer, hotseat, multiPlayer, spectate);
 
     Region bottom = new Region();
     VBox.setVgrow(bottom, Priority.ALWAYS);

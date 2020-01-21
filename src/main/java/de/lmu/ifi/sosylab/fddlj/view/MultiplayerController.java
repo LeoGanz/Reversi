@@ -23,6 +23,16 @@ public interface MultiplayerController extends Controller {
   void startOnlineGame(
       Player ownPlayer, String serverAddress, int lobbyID, boolean createPrivateLobby);
 
+  /**
+   * Initialises a game in which the player watches an online match between to other players as a
+   * spectator.
+   *
+   * @param ownPlayer the reference to the player instance representing the player on this machine
+   * @param serverAddress the address of the server you want to connect to
+   * @param lobbyID the lobbie's ID you want to join
+   */
+  void startSpectateGame(Player ownPlayer, String serverAddress, int lobbyID);
+
   /** Sends a request to the opponent player to reset the current game. */
   void requestGameReset();
 

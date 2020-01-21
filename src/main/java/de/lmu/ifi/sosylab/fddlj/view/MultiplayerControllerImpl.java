@@ -18,6 +18,8 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   private Stage mainStage;
   private Player ownPlayer;
 
+  private GameMode gameMode;
+
   /**
    * Public constructor of this class takes the stage created by the JavaFX thread that is used to
    * display the game.
@@ -45,7 +47,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
   @Override
   public GameMode getCurrentGameMode() {
-    return GameMode.MULTIPLAYER;
+    return gameMode;
   }
 
   @Override
@@ -55,6 +57,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     // create view
     // connect to server
 
+    gameMode = GameMode.MULTIPLAYER;
   }
 
   @Override
@@ -65,5 +68,10 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   @Override
   public Player getOwnPlayer() {
     return ownPlayer;
+  }
+
+  @Override
+  public void startSpectateGame(Player ownPlayer, String serverAddress, int lobbyID) {
+    gameMode = GameMode.SPECTATOR;
   }
 }

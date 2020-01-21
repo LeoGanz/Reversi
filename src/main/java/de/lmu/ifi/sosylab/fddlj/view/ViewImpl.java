@@ -38,6 +38,8 @@ import javafx.stage.Stage;
  */
 public class ViewImpl implements View {
 
+  static final String STAGE_RESIZED = "Stage resized";
+
   private Model model;
   private Controller controller;
 
@@ -70,6 +72,21 @@ public class ViewImpl implements View {
     this.stage.setMaximized(true);
     this.stage.setMinWidth(2 * Screen.getPrimary().getVisualBounds().getWidth() / 5.0);
     this.stage.setMinHeight(2 * Screen.getPrimary().getVisualBounds().getHeight() / 3);
+    this.stage
+        .widthProperty()
+        .addListener(
+            (obs, oldVal, newVal) -> {
+              support.firePropertyChange(
+                  new PropertyChangeEvent(this, STAGE_RESIZED, null, support));
+            });
+
+    this.stage
+        .heightProperty()
+        .addListener(
+            (obs, oldVal, newVal) -> {
+              support.firePropertyChange(
+                  new PropertyChangeEvent(this, STAGE_RESIZED, null, support));
+            });
   }
 
   @Override
@@ -77,6 +94,18 @@ public class ViewImpl implements View {
     root = new BorderPane();
     root.getStylesheets().add("cssFiles/mainGame.css");
     root.setId("main-background");
+
+    HBox spacerTop = new HBox();
+    spacerTop.setMinHeight(40);
+    spacerTop.setMaxHeight(80);
+    spacerTop.setId("borderpane-spacer");
+    root.setTop(spacerTop);
+
+    HBox spacerBottom = new HBox();
+    spacerBottom.setMinHeight(40);
+    spacerBottom.setMaxHeight(80);
+    spacerBottom.setId("borderpane-spacer");
+    root.setBottom(spacerBottom);
 
     VBox left = getDiskIndicators(gameMode);
     root.setLeft(left);
@@ -218,18 +247,18 @@ public class ViewImpl implements View {
     if (event.getPropertyName().equals(Model.STATE_CHANGED)) {
       support.firePropertyChange(event.getPropertyName(), event.getOldValue(), event.getNewValue());
 
-      if (model.getState().getCurrentPhase() == Phase.FINISHED) {
-
-        root.setDisable(true);
-        new GameFinishedScreen(controller, model, stage);
-      }
-
       if (model instanceof ModelImpl) {
         ModelImpl mod = (ModelImpl) model;
 
         numberPlayerOneDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerOne()));
 
         numberPlayerTwoDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
+      }
+
+      if (model.getState().getCurrentPhase() == Phase.FINISHED) {
+
+        root.setDisable(true);
+        new GameFinishedScreen(controller, model, stage);
       }
     }
 
