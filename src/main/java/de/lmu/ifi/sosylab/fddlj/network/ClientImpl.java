@@ -150,7 +150,7 @@ public class ClientImpl implements Client {
   }
 
   private void processReceivedLine(String receivedLine) {
-    Message message = Message.fromJson(receivedLine);
+    Message<?> message = Message.fromJson(receivedLine);
 
     if (message.getData() instanceof JoinRequest.Response) {
       this.processJoinRequestResponse((JoinRequest.Response) message.getData());
