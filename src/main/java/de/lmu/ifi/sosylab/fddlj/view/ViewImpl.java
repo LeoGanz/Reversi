@@ -2,6 +2,7 @@ package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Phase;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -11,14 +12,20 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
-import javafx.scene.image.WritableImage;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -36,6 +43,9 @@ public class ViewImpl implements View {
   private Scene scene;
   private BorderPane root;
   private GameBoardGrid gameBoard;
+
+  private Label numberPlayerOneDisks;
+  private Label numberPlayerTwoDisks;
 
   private PropertyChangeSupport support;
 
@@ -56,7 +66,7 @@ public class ViewImpl implements View {
 
     this.stage.setTitle("Reversi");
     this.stage.setMaximized(true);
-    this.stage.setMinWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3.0);
+    this.stage.setMinWidth(2 * Screen.getPrimary().getVisualBounds().getWidth() / 5.0);
     this.stage.setMinHeight(Screen.getPrimary().getVisualBounds().getHeight() / 2.0);
   }
 
@@ -84,12 +94,8 @@ public class ViewImpl implements View {
   private VBox getDiskIndicators(GameMode gameMode) {
 
     VBox vbox = new VBox(50);
-    vbox.setAlignment(Pos.CENTER);
+    vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setPadding(new Insets(20));
-
-    Region spacerTop = new Region();
-    VBox.setVgrow(spacerTop, Priority.ALWAYS);
-    vbox.getChildren().add(spacerTop);
 
     DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:", this);
 
@@ -102,23 +108,88 @@ public class ViewImpl implements View {
       vbox.getChildren().addAll(currentPlayer, ownDiskIndicator);
     }
 
-    if (gameMode != GameMode.MULTIPLAYER) {
-      Button reset = getButton("Reset game");
-      reset.setOnAction(
-          e -> {
-            controller.resetGame(
-                gameMode,
-                model.getState().getPlayerManagement().getPlayerOne(),
-                model.getState().getPlayerManagement().getPlayerTwo());
-          });
+    Button reset = getButton("Reset game");
+    reset.setOnAction(
+        e -> {
+          controller.resetGame(
+              gameMode,
+              model.getState().getPlayerManagement().getPlayerOne(),
+              model.getState().getPlayerManagement().getPlayerTwo());
+        });
 
-      Region spacer = new Region();
-      VBox.setVgrow(spacer, Priority.ALWAYS);
+    Region spacer = new Region();
+    VBox.setVgrow(spacer, Priority.ALWAYS);
 
-      vbox.getChildren().addAll(spacer, reset);
+    vbox.getChildren().addAll(spacer, getDiskCounter());
+
+    Region bottomSpacer = new Region();
+    VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
+
+    vbox.getChildren().addAll(bottomSpacer, getHelpButton(), reset);
+
+    return vbox;
+  }
+
+  private VBox getDiskCounter() {
+    VBox vbox = new VBox(30);
+    vbox.setAlignment(Pos.TOP_CENTER);
+    vbox.setStyle("-fx-background-color: #6e7175;");
+    vbox.setFillWidth(true);
+    vbox.setMaxWidth(Double.POSITIVE_INFINITY);
+
+    if (model instanceof ModelImpl) {
+
+      HBox playerOneInfo = new HBox(10);
+      playerOneInfo.setAlignment(Pos.CENTER);
+      playerOneInfo.setStyle("-fx-background-color: #6e7175;");
+      playerOneInfo.setMaxWidth(Double.POSITIVE_INFINITY);
+
+      ModelImpl mod = (ModelImpl) model;
+
+      playerOneInfo
+          .getChildren()
+          .add(buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor()));
+      numberPlayerOneDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerOne()));
+      numberPlayerOneDisks.setFont(Font.font("Boulder", FontWeight.BOLD, 25));
+      numberPlayerOneDisks.setStyle("-fx-text-fill: white;");
+      playerOneInfo.getChildren().add(numberPlayerOneDisks);
+      vbox.getChildren().add(playerOneInfo);
+
+      HBox playerTwoInfo = new HBox(10);
+      playerTwoInfo.setAlignment(Pos.CENTER);
+      playerTwoInfo.setStyle("-fx-background-color: #6e7175;");
+
+      playerTwoInfo
+          .getChildren()
+          .add(buildDiskTriangle(model.getState().getPlayerManagement().getPlayerTwo().getColor()));
+      numberPlayerTwoDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
+      numberPlayerTwoDisks.setFont(Font.font("Boulder", FontWeight.BOLD, 25));
+      numberPlayerTwoDisks.setStyle("-fx-text-fill: white;");
+      playerTwoInfo.getChildren().add(numberPlayerTwoDisks);
+
+      vbox.getChildren().add(playerTwoInfo);
     }
 
     return vbox;
+  }
+
+  private Button getHelpButton() {
+    Image help = new Image(getClass().getClassLoader().getResourceAsStream("images/help.png"));
+
+    ImageView imageView = new ImageView(help);
+    imageView.setPreserveRatio(true);
+    imageView.setFitHeight(50);
+    Button button = new Button("", imageView);
+    button.setCursor(Cursor.HAND);
+    button.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+    button.setOnAction(e -> new AboutWindow());
+    Tooltip helper = new Tooltip();
+    helper.setText(
+        "Display a window with additional information about this reversi game,"
+            + " such as the rules and licenses.");
+    button.setTooltip(helper);
+
+    return button;
   }
 
   @Override
@@ -146,15 +217,26 @@ public class ViewImpl implements View {
 
       if (model.getState().getCurrentPhase() == Phase.FINISHED) {
 
-        WritableImage snapshot = gameBoard.snapshot(new SnapshotParameters(), null);
-
         root.setDisable(true);
-        new GameFinishedScreen(controller, model, stage, snapshot);
+        new GameFinishedScreen(controller, model, stage);
+      }
+
+      if (model instanceof ModelImpl) {
+        ModelImpl mod = (ModelImpl) model;
+
+        numberPlayerOneDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerOne()));
+
+        numberPlayerTwoDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
       }
     }
 
     if (event.getPropertyName().equals(Model.LISTENERS_CHANGED)) {
+
       if (event.getNewValue() instanceof Model) {
+        if (root.isDisabled()) {
+          root.setDisable(false);
+        }
+
         this.model = (Model) event.getNewValue();
         support.firePropertyChange(event);
       }
@@ -181,5 +263,25 @@ public class ViewImpl implements View {
   @Override
   public void removeListener(PropertyChangeListener listener) {
     support.removePropertyChangeListener(listener);
+  }
+
+  private GridPane buildDiskTriangle(Color color) {
+    GridPane grid = new GridPane();
+
+    grid.setStyle("-fx-background-color: transparent;");
+    grid.setGridLinesVisible(false);
+    grid.setAlignment(Pos.CENTER);
+
+    GraphicDisk diskOne = new GraphicDisk(30, 30, 15, color);
+    GraphicDisk diskTwo = new GraphicDisk(30, 30, 15, color);
+    GraphicDisk diskThree = new GraphicDisk(30, 30, 15, color);
+    GraphicDisk diskFour = new GraphicDisk(30, 30, 15, color);
+
+    grid.add(diskOne, 1, 0);
+    grid.add(diskTwo, 0, 1);
+    grid.add(diskThree, 1, 1);
+    grid.add(diskFour, 2, 1);
+
+    return grid;
   }
 }

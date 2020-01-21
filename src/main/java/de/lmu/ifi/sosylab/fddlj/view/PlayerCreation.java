@@ -11,10 +11,12 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -54,11 +56,8 @@ public class PlayerCreation extends BorderPane {
    *
    * @param controller the reference to a controller instance
    * @param gameModeSelector the reference to a gameModeSelector instance
-   * @param multiplayer {@code true} if the selected game mode is multi player, {@code
-   *     false}otherwise
    */
-  void getSinglePlayerInformation(
-      Controller controller, GameModeSelector gameModeSelector, boolean multiplayer) {
+  void getSinglePlayerInformation(Controller controller, GameModeSelector gameModeSelector) {
     VBox vbox = new VBox(50);
     vbox.setAlignment(Pos.CENTER);
 
@@ -69,7 +68,7 @@ public class PlayerCreation extends BorderPane {
     vbox.getChildren().add(getColorPickerPane(colorPicker));
     setCenter(vbox);
 
-    HBox bottom = buildBottomSingle(textField, colorPicker, gameModeSelector, multiplayer);
+    HBox bottom = buildBottomSingle(textField, colorPicker, gameModeSelector);
     setBottom(bottom);
     BorderPane.setAlignment(bottom, Pos.CENTER);
     BorderPane.setMargin(bottom, new Insets(0, 0, 20, 0));
@@ -95,10 +94,7 @@ public class PlayerCreation extends BorderPane {
     vboxPlayerOne.getChildren().add(getColorPickerPane(colorPickerOne));
     alignment.getChildren().add(vboxPlayerOne);
 
-    Separator sep = new Separator(Orientation.VERTICAL);
-    sep.setStyle("-fx-background-color: #d4d4d4; -fx-background-radius: 0.2;");
-    sep.setMaxHeight(450);
-    alignment.getChildren().add(sep);
+    alignment.getChildren().add(getSeparator());
 
     VBox vboxPlayerTwo = new VBox(50);
     vboxPlayerTwo.setAlignment(Pos.CENTER);
@@ -110,7 +106,7 @@ public class PlayerCreation extends BorderPane {
     vboxPlayerTwo.getChildren().add(getColorPickerPane(colorPickerTwo));
     alignment.getChildren().add(vboxPlayerTwo);
 
-    setCenter(alignment);
+    setTop(alignment);
     BorderPane.setAlignment(alignment, Pos.CENTER);
     BorderPane.setMargin(alignment, new Insets(50));
 
@@ -122,11 +118,114 @@ public class PlayerCreation extends BorderPane {
     BorderPane.setMargin(bottom, new Insets(0, 0, 20, 0));
   }
 
+  /**
+   * Show a pane that allow a single player to enter his/her information, such as name and preferred
+   * color for the disks.
+   *
+   * @param controller the reference to a controller instance
+   * @param gameModeSelector the reference to a gameModeSelector instance
+   */
+  void getOnlinePlayerInformation(Controller controller, GameModeSelector gameModeSelector) {
+    HBox alignment = new HBox(50);
+    alignment.setAlignment(Pos.CENTER);
+
+    VBox vboxPlayer = new VBox(50);
+    vboxPlayer.setAlignment(Pos.TOP_CENTER);
+    TextField textField = new TextField();
+    vboxPlayer
+        .getChildren()
+        .add(getUsernameInputField(textField, "Geben Sie ihren Usernamen ein:"));
+    ColorPicker colorPicker = new ColorPicker(getRandomColor());
+    vboxPlayer.getChildren().add(getColorPickerPane(colorPicker));
+    alignment.getChildren().add(vboxPlayer);
+
+    alignment.getChildren().add(getSeparator());
+
+    VBox vboxConnection = new VBox(50);
+    vboxConnection.setAlignment(Pos.TOP_CENTER);
+    TextField textFieldServer = new TextField();
+    vboxConnection
+        .getChildren()
+        .add(getUsernameInputField(textFieldServer, "Geben Sie IP-Adresse des Servers ein:"));
+    TextField textFieldLobby = new TextField();
+    textFieldLobby.setPromptText("Hover for info");
+    Tooltip tooltip = new Tooltip();
+    tooltip.setText(
+        "If you want to join an already existing lobby enter the lobbie's ID here. \n"
+            + " By default - meaning when this field stays empty "
+            + "- \nyou will join a lobby based on automatic matchmaking.");
+    textFieldLobby.setTooltip(tooltip);
+    VBox container = getUsernameInputField(textFieldLobby, "Lobby ID");
+    vboxConnection.getChildren().add(container);
+
+    Label alternateText = new Label();
+    alternateText.setText(
+        "When creating a private lobby you can't enter a lobby ID "
+            + "since the server will assign you one."
+            + " For sharing purposes - you can view your lobby ID"
+            + " as soon as you've hit the start button.");
+    alternateText.setMaxWidth(300);
+    alternateText.setWrapText(true);
+    alternateText.setFont(Font.font(15));
+    alternateText.setStyle("-fx-text-fill: white");
+
+    alignment.getChildren().add(vboxConnection);
+
+    setTop(alignment);
+    BorderPane.setAlignment(alignment, Pos.CENTER);
+    BorderPane.setMargin(alignment, new Insets(50));
+
+    CheckBox checkbox = new CheckBox("Select if you want to join in a private lobby.");
+    checkbox.setText("Create a private lobby");
+    checkbox.setFont(Font.font(15));
+    checkbox.setSelected(false);
+    checkbox.setMinHeight(25);
+    checkbox
+        .selectedProperty()
+        .addListener(
+            new ChangeListener<Boolean>() {
+              @Override
+              public void changed(
+                  ObservableValue<? extends Boolean> observable,
+                  Boolean oldValue,
+                  Boolean newValue) {
+                // switchLobbyIDField(!newValue, vboxConnection, textFieldLobby, alternateText);
+                if (!newValue) {
+                  container.getChildren().remove(alternateText);
+                  container.getChildren().add(textFieldLobby);
+                } else {
+                  container.getChildren().remove(textFieldLobby);
+                  container.getChildren().add(alternateText);
+                }
+              }
+            });
+    Tooltip tooltipCheckbox = new Tooltip();
+    tooltipCheckbox.setText(
+        "You can create a private lobby in order to not join a public join and instead host a game,"
+            + " which you can play with a friend by sharing the lobbie's ID.");
+    checkbox.setTooltip(tooltipCheckbox);
+    setCenter(checkbox);
+    BorderPane.setAlignment(checkbox, Pos.TOP_CENTER);
+    BorderPane.setMargin(checkbox, new Insets(20));
+
+    HBox bottom =
+        buildBottomOnline(
+            textField, colorPicker, textFieldServer, textFieldLobby, checkbox, gameModeSelector);
+    setBottom(bottom);
+    BorderPane.setAlignment(bottom, Pos.CENTER);
+    BorderPane.setMargin(bottom, new Insets(0, 0, 20, 0));
+  }
+
+  private Separator getSeparator() {
+    Separator sep = new Separator(Orientation.VERTICAL);
+    sep.setStyle("-fx-background-color: #d4d4d4; -fx-background-radius: 0.2;");
+    sep.setMaxHeight(450);
+
+    return sep;
+  }
+
   private HBox buildBottomSingle(
-      TextField textField,
-      ColorPicker colorPicker,
-      GameModeSelector gameModeSelector,
-      boolean multiplayer) {
+      TextField textField, ColorPicker colorPicker, GameModeSelector gameModeSelector) {
 
     HBox hbox = new HBox(30);
     hbox.setAlignment(Pos.CENTER);
@@ -138,12 +237,7 @@ public class PlayerCreation extends BorderPane {
             textField.setStyle("-fx-border-color: red;");
             return;
           }
-
-          if (multiplayer) {
-            startMultiplayer(textField.getText(), colorPicker.getValue());
-          } else {
-            startSinglePlayer(textField.getText(), colorPicker.getValue());
-          }
+          startSinglePlayer(textField.getText(), colorPicker.getValue());
           gameModeSelector.close();
         });
 
@@ -195,6 +289,55 @@ public class PlayerCreation extends BorderPane {
     return hbox;
   }
 
+  private HBox buildBottomOnline(
+      TextField playerName,
+      ColorPicker playerColor,
+      TextField serverAddress,
+      TextField lobbyNumber,
+      CheckBox checkbox,
+      GameModeSelector selector) {
+
+    HBox hbox = new HBox(30);
+    hbox.setAlignment(Pos.CENTER);
+
+    Button start = getButton("Start");
+    start.setOnAction(
+        e -> {
+          if (!isTextFieldInputValid(playerName.getText())) {
+            playerName.setStyle(
+                "-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
+            return;
+          }
+
+          if (!isTextFieldInputValid(serverAddress.getText())) {
+            serverAddress.setStyle(
+                "-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
+            return;
+          }
+
+          if (!lobbyNumber.getText().trim().matches("(?<=\\s|^)\\d+(?=\\s|$)")) {
+            lobbyNumber.setStyle(
+                "-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
+            return;
+          }
+
+          startMultiplayer(
+              playerName.getText(),
+              playerColor.getValue(),
+              serverAddress.getText(),
+              Integer.parseInt(lobbyNumber.getText().trim()),
+              checkbox.isSelected());
+          selector.close();
+        });
+
+    Button back = getButton("Back");
+    back.setOnAction(e -> selector.returnToMainScreen());
+
+    hbox.getChildren().addAll(start, back);
+
+    return hbox;
+  }
+
   private VBox getUsernameInputField(TextField textField, String labelText) {
     VBox vbox = new VBox(5);
     vbox.setPadding(new Insets(20));
@@ -229,6 +372,8 @@ public class PlayerCreation extends BorderPane {
 
     Label lbl = new Label(labelText);
     lbl.setId("normal-text");
+    lbl.setWrapText(true);
+    lbl.setMaxWidth(300);
     vbox.getChildren().addAll(lbl, textField);
     return vbox;
   }
@@ -296,10 +441,12 @@ public class PlayerCreation extends BorderPane {
     controller.startMainView(GameMode.HOTSEAT, primaryStage, playerOne, playerTwo);
   }
 
-  private void startMultiplayer(String playerName, Color playerColor) {
+  private void startMultiplayer(
+      String playerName, Color playerColor, String serverAddress, int lobbyID, boolean checkbox) {
     Player player = new PlayerImpl(playerName, playerColor);
 
-    controller.startMainView(GameMode.MULTIPLAYER, primaryStage, player, null);
+    MultiplayerControllerImpl controller = new MultiplayerControllerImpl(primaryStage);
+    controller.startOnlineGame(player, serverAddress, lobbyID, checkbox);
   }
 
   private Color getRandomColor() {

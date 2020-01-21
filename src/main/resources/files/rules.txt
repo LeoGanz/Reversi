@@ -1,0 +1,18 @@
+Auf einem 8×8-Brett legen die Spieler abwechselnd Spielsteine, deren Seiten unterschiedlich (schwarz und weiß) gefärbt sind. Ein Spieler („Weiß“) legt seinen Stein immer mit der weißen Seite nach oben, der andere („Schwarz“) entsprechend mit der schwarzen. Ein Spieler muss seinen Stein auf ein leeres Feld legen, das horizontal, vertikal oder diagonal an ein bereits belegtes Feld angrenzt. Wird ein Stein gelegt, werden alle gegnerischen Steine, die sich zwischen dem neuen Spielstein und einem bereits gelegten Stein der eigenen Farbe befinden, umgedreht. Spielzüge, die zu keinem Umdrehen von gegnerischen Steinen führen, sind nicht erlaubt. Das Ziel des Spiels ist es, am Ende eine möglichst große Anzahl von Steinen der eigenen Farbe auf dem Brett zu haben. 
+
+Die genauen Regeln: 
+    - Es wird auf einem Brett mit 8×8 Feldern gespielt.
+    
+    - Jeder Spieler hat am Anfang einen Vorrat von 32 Steinen.
+    
+    - In den ersten zwei Zügen setzen beide Spieler jeweils einen ihrer Steine auf die vier Mittelfelder. Es können deshalb zwei „Startaufstellungen“ entstehen, wobei der zweite Spieler sich diese de facto aussuchen darf.
+    
+    - Die Spieler ziehen abwechselnd. Man setzt entweder einen Stein mit der eigenen Farbe nach oben auf ein leeres Feld, oder man passt. Passen ist aber nur erlaubt, wenn man keine regelkonforme Möglichkeit hat, einen Stein zu setzen.
+    
+    - Man darf nur so setzen, dass ausgehend von dem gesetzten Stein in beliebiger Richtung (senkrecht, waagerecht oder diagonal) ein oder mehrere gegnerische Steine anschließen und danach wieder ein eigener Stein liegt. Es muss also mindestens ein gegnerischer Stein von dem gesetzten Stein und einem anderen eigenen Stein in gerader Linie eingeschlossen werden. Dabei müssen alle Felder zwischen den beiden eigenen Steinen von gegnerischen Steinen besetzt sein.
+    
+    - Alle gegnerischen Steine, die so eingeschlossen werden, wechseln die Farbe, indem sie umgedreht werden. Dies geschieht als Teil desselben Zuges, bevor der Gegner zum Zug kommt. Ein Zug kann mehrere Reihen gegnerischer Steine gleichzeitig einschließen, die dann alle umgedreht werden. Wenn aber ein gerade umgedrehter Stein weitere gegnerische Steine einschließt, werden diese nicht umgedreht.
+    
+    - Sobald ein Spieler passen muss, wenn er also keinen Stein mehr setzen kann, ist das Spiel beendet.
+    
+    - Der Spieler, der am Ende die meisten Steine seiner Farbe auf dem Brett hat, gewinnt. Haben beide die gleiche Zahl, ist das Spiel unentschieden.

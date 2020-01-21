@@ -7,12 +7,14 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -30,6 +32,7 @@ public class GameModeSelector extends Stage {
   private Stage primaryStage;
 
   private BorderPane borderPane;
+  private StartScreenDiskGrid startScreenDisks;
 
   /**
    * Constructor of this class initialises variables and builds the stage.
@@ -53,6 +56,8 @@ public class GameModeSelector extends Stage {
 
     borderPane.setTop(buildTopPart());
     borderPane.setRight(buildSelectionPane());
+    startScreenDisks = new StartScreenDiskGrid();
+    borderPane.setCenter(startScreenDisks);
 
     scene = new Scene(borderPane);
 
@@ -71,9 +76,6 @@ public class GameModeSelector extends Stage {
 
     BorderPane bp = new BorderPane();
     bp.setStyle("-fx-background-color: transparent;");
-
-    HBox closeTop = new HBox();
-    closeTop.setAlignment(Pos.CENTER_RIGHT);
 
     Label close = new Label("X");
     close.setCursor(Cursor.HAND);
@@ -105,28 +107,46 @@ public class GameModeSelector extends Stage {
             close();
           }
         });
-    closeTop.getChildren().add(close);
-    bp.setRight(closeTop);
-    BorderPane.setAlignment(closeTop, Pos.CENTER_RIGHT);
-    BorderPane.setMargin(closeTop, new Insets(15, 30, 0, 0));
+    bp.setRight(close);
+    BorderPane.setAlignment(close, Pos.TOP_RIGHT);
+    BorderPane.setMargin(close, new Insets(15, 30, 0, 0));
 
-    Label title = new Label("Reversi");
-    title.setFont(Font.font(25));
-    title.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 40;");
+    HBox title = getTitleWithDisks();
     bp.setCenter(title);
     BorderPane.setMargin(title, new Insets(15, 0, 0, 0));
 
     return bp;
   }
 
+  private HBox getTitleWithDisks() {
+    HBox hbox = new HBox(10);
+    hbox.setAlignment(Pos.CENTER);
+
+    for (int i = 1; i < 4; i++) {
+      hbox.getChildren().add(getDisk(i * 10 + 15, i * 10 + 15, (i * 10 + 15) / 2, Color.WHITE));
+    }
+
+    Label title = new Label("Reversi");
+    title.setFont(Font.font(25));
+    title.setStyle("-fx-text-fill: white;  -fx-font-size: 50; -fx-font-family: 'Comic Sans MS';");
+    hbox.getChildren().add(title);
+
+    for (int i = 3; i > 0; i--) {
+      hbox.getChildren().add(getDisk(i * 10 + 15, i * 10 + 15, (i * 10 + 15) / 2, Color.BLACK));
+    }
+
+    return hbox;
+  }
+
   private VBox buildSelectionPane() {
 
-    VBox vbox = new VBox(15);
+    VBox vbox = new VBox(35);
     vbox.setId("selection-pane");
     vbox.setAlignment(Pos.CENTER);
     vbox.setPrefWidth(1.3 * (Screen.getPrimary().getVisualBounds().getWidth() / 5) + 200);
     vbox.setMaxWidth(vbox.getPrefWidth());
     vbox.setFillWidth(true);
+    vbox.setPadding(new Insets(0, 0, 20, 0));
 
     Region top = new Region();
     VBox.setVgrow(top, Priority.ALWAYS);
@@ -136,7 +156,7 @@ public class GameModeSelector extends Stage {
     singlePlayer.setOnAction(
         e -> {
           PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
-          playerCreation.getSinglePlayerInformation(controller, this, false);
+          playerCreation.getSinglePlayerInformation(controller, this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
         });
@@ -154,7 +174,7 @@ public class GameModeSelector extends Stage {
     multiPlayer.setOnAction(
         e -> {
           PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
-          playerCreation.getSinglePlayerInformation(controller, this, true);
+          playerCreation.getOnlinePlayerInformation(controller, this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
         });
@@ -165,12 +185,16 @@ public class GameModeSelector extends Stage {
     VBox.setVgrow(bottom, Priority.ALWAYS);
     vbox.getChildren().add(bottom);
 
+    Button server = getButton("Start Server");
+    server.setOnAction(e -> {});
+    vbox.getChildren().add(server);
+
     return vbox;
   }
 
   void returnToMainScreen() {
     borderPane.setRight(buildSelectionPane());
-    borderPane.setCenter(null);
+    borderPane.setCenter(startScreenDisks);
   }
 
   private Button getButton(String text) {
@@ -181,7 +205,12 @@ public class GameModeSelector extends Stage {
     button.setMinWidth(200);
     button.setCursor(Cursor.HAND);
     button.setFont(Font.font(18));
+    button.setEffect(new DropShadow(4, Color.DARKGRAY));
 
     return button;
+  }
+
+  private GraphicDisk getDisk(double width, double height, double radius, Color color) {
+    return new GraphicDisk(width, height, radius, color);
   }
 }

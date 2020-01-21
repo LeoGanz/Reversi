@@ -10,11 +10,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -38,17 +35,16 @@ public class GameFinishedScreen extends Stage {
    * @param model a reference to a model instance
    * @param mainStage a reference to the game's main stage
    */
-  public GameFinishedScreen(
-      Controller controller, Model model, Stage mainStage, WritableImage snapshot) {
+  public GameFinishedScreen(Controller controller, Model model, Stage mainStage) {
     super();
 
     this.controller = controller;
     this.model = model;
 
-    initScreen(mainStage, snapshot);
+    initScreen(mainStage);
   }
 
-  private void initScreen(Stage mainStage, WritableImage snapshot) {
+  private void initScreen(Stage mainStage) {
     BorderPane root = new BorderPane();
     root.getStylesheets().add("cssFiles/gameModeSelector.css");
     root.setId("main-pane");
@@ -59,14 +55,14 @@ public class GameFinishedScreen extends Stage {
     root.setTop(title);
     BorderPane.setAlignment(title, Pos.CENTER);
 
-    VBox center = new VBox(30);
-    center.setAlignment(Pos.CENTER);
+    BorderPane center = new BorderPane();
 
-    ImageView imageView = new ImageView(snapshot);
-    imageView.setPreserveRatio(true);
-    imageView.setFitHeight(2 * (Screen.getPrimary().getVisualBounds().getHeight() / 3) / 2);
-    center.getChildren().add(imageView);
-    center.getChildren().add(getWinnerLabel());
+    Fireworks fireworks = new Fireworks();
+    fireworks.setMaxWidth(Double.POSITIVE_INFINITY);
+    center.setCenter(fireworks);
+    Label winner = getWinnerLabel();
+    center.setBottom(winner);
+    BorderPane.setAlignment(winner, Pos.CENTER);
     root.setCenter(center);
 
     root.setBottom(getOptions(mainStage));
@@ -82,6 +78,8 @@ public class GameFinishedScreen extends Stage {
     setHeight(getMinHeight());
     centerOnScreen();
     show();
+
+    fireworks.start();
   }
 
   private HBox getOptions(Stage mainStage) {
@@ -106,6 +104,7 @@ public class GameFinishedScreen extends Stage {
     mainScreen.setOnAction(
         e -> {
           mainStage.close();
+          close();
           if (controller instanceof ControllerImpl) {
             ((ControllerImpl) controller).showGameModeSelector(new Stage());
           } else {
@@ -140,7 +139,9 @@ public class GameFinishedScreen extends Stage {
 
     if (model.getState().getPlayerManagement().getWinner().isPresent()) {
       text =
-          model.getState().getPlayerManagement().getWinner().get().getName() + " has won the game!";
+          "Congratulations! "
+              + model.getState().getPlayerManagement().getWinner().get().getName()
+              + " has won the game!";
     } else {
       text = "The game resulted in a draw!";
     }

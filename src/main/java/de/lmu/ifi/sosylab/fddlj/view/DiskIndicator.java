@@ -3,7 +3,6 @@ package de.lmu.ifi.sosylab.fddlj.view;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -96,7 +95,7 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
 
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
-    Platform.runLater(() -> handlePropertyChangeEvent(evt));
+    handlePropertyChangeEvent(evt);
   }
 
   private void handlePropertyChangeEvent(PropertyChangeEvent event) {

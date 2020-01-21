@@ -1,6 +1,7 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Disk;
+import javafx.animation.Animation;
 import javafx.animation.FillTransition;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
@@ -92,5 +93,35 @@ public class GraphicDisk extends Circle {
       ft.play();
       setFill(fill);
     }
+  }
+
+  /**
+   * Changes the disk's color from the current fill to the new fill infinitely with a {@link
+   * FillTransistion}.
+   *
+   * @param fill the new color for the fill transition.
+   * @param duration time in milliseconds how long the transition should play
+   */
+  void changeColorInfinitely(Color fill, long duration) {
+    if (!fill.equals(getFill())) {
+
+      FillTransition ft =
+          new FillTransition(Duration.millis(duration), this, (Color) getFill(), fill);
+      ft.setCycleCount(Animation.INDEFINITE);
+      ft.setAutoReverse(true);
+
+      ft.play();
+    }
+  }
+
+  /**
+   * Resizes the disk to the new coordinates.
+   *
+   * @param width the parent's new width
+   * @param height the parent's new height
+   * @param radius the disk's new radius
+   */
+  void resizeDisk(double width, double height, double radius) {
+    initDisk(width, height, radius, (Color) getFill());
   }
 }

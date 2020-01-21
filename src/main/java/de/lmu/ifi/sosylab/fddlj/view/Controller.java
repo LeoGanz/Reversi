@@ -3,7 +3,6 @@ package de.lmu.ifi.sosylab.fddlj.view;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
-import java.beans.PropertyChangeListener;
 import javafx.stage.Stage;
 
 /**
@@ -11,7 +10,7 @@ import javafx.stage.Stage;
  * them accordingly. This is by either invoking the necessary model-methods, or by directly telling
  * the view to change its graphical user-interface.
  */
-public interface Controller extends PropertyChangeListener {
+public interface Controller {
 
   /**
    * Initializes and starts the user interface.
@@ -33,9 +32,8 @@ public interface Controller extends PropertyChangeListener {
    * Execute a disk placement on the board.
    *
    * @param on The {@link Cell target cell}.
-   * @return <code>true</code> if the move was executed successfully; <code>false</code> otherwise.
    */
-  boolean placeDisk(Cell on);
+  void placeDisk(Cell on);
 
   /**
    * Returns the game's current game mode.

@@ -7,7 +7,6 @@ import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
-import java.beans.PropertyChangeEvent;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -46,7 +45,7 @@ public class ControllerImpl extends Application implements Controller {
   }
 
   @Override
-  public boolean placeDisk(Cell on) {
+  public void placeDisk(Cell on) {
     Disk disk = new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer());
     boolean succesful = model.placeDisk(disk, on);
 
@@ -56,15 +55,6 @@ public class ControllerImpl extends Application implements Controller {
           "Error",
           "Error while placing disk",
           "The placement of your disk on this cell resulted in an error. Please try again!");
-    }
-    return succesful;
-  }
-
-  @Override
-  public void propertyChange(PropertyChangeEvent event) {
-    if (event.getPropertyName().equals(Model.STATE_CHANGED)) {
-      // TODO update where needed
-      return;
     }
   }
 
