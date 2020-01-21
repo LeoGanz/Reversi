@@ -108,6 +108,7 @@ public class GameLobby {
         handleResume();
       }
     }
+    publishLobbyUpdate();
     return true;
   }
 
@@ -168,6 +169,7 @@ public class GameLobby {
 
     // only reached if leaving connection was conn 1 or conn 2
     masterGame.setWaiting();
+    publishLobbyUpdate();
     resetRestartRequests();
 
     if ((connOne == null) && (connTwo == null)) {
@@ -256,6 +258,19 @@ public class GameLobby {
     return masterGame.getState().getCurrentPhase() == Phase.RUNNING;
   }
 
+  /**
+   * Get a {@link LobbyRepresentation} for the current state of this lobby.
+   *
+   * @return a representation of this lobby containing public information
+   */
+  public LobbyRepresentation getRepresentation() {
+    Phase phase = Phase.WAITING;
+    if (masterGame != null) {
+      phase = masterGame.getState().getCurrentPhase();
+    }
+    return new LobbyRepresentation(lobbyID, playerOne, playerTwo, phase);
+  }
+
   private void broadcast(Object objectToBrodcast) {
     Stream.concat(Stream.of(connOne, connTwo), spectatorsConnections.stream())
         .filter(Objects::nonNull)
@@ -269,5 +284,9 @@ public class GameLobby {
   private void closeLobby() {
     broadcast(ServerNotification.LOBBY_CLOSED);
     server.lobbyClosed(lobbyID);
+  }
+
+  private void publishLobbyUpdate() {
+    server.lobbyUpdated(lobbyID);
   }
 }

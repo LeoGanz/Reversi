@@ -9,9 +9,14 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
+import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener.Change;
+import javafx.collections.ObservableMap;
 
 /**
  * The server provides means of communication for clients. It will accept connections and pair them
@@ -29,9 +34,11 @@ public class ServerImpl implements Server {
   private int nextLobbyID = 0;
   private boolean serverRunning;
   private boolean serverHasBeenStarted;
+  private Set<ServerListener> serverListeners;
 
   private Map<Integer, ClientConnection> connections;
-  private Map<Integer, GameLobby> lobbies;
+  private ObservableMap<Integer, GameLobby> lobbies;
+  private Map<Integer, LobbyRepresentation> lobbyRepresentations;
   private Optional<Integer> freshPublicLobbyWaitingForPlayer;
 
   /**
@@ -43,8 +50,13 @@ public class ServerImpl implements Server {
    */
   public ServerImpl() throws IOException {
     serverSocket = new ServerSocket(PORT);
+    serverListeners = new HashSet<>();
     connections = new HashMap<>();
-    lobbies = new HashMap<>();
+    lobbies =
+        FXCollections.checkedObservableMap(
+            FXCollections.observableHashMap(), Integer.class, GameLobby.class);
+    lobbies.addListener(this::processUpdateOnLobbyMap);
+    lobbyRepresentations = new HashMap<>();
     freshPublicLobbyWaitingForPlayer = Optional.empty();
   }
 
@@ -183,6 +195,9 @@ public class ServerImpl implements Server {
   @Override
   public synchronized void initiateShutdown() {
     serverRunning = false;
+    serverListeners.forEach(listener -> listener.serverShuttingDown());
+    serverListeners = Set.of();
+
     terminateAllConnections();
     // Trigger accept(), so that the main while loop stops
     try (Socket connection = new Socket(InetAddress.getLocalHost(), PORT)) {
@@ -224,6 +239,18 @@ public class ServerImpl implements Server {
   }
 
   /**
+   * Called when a lobby updated.
+   *
+   * @param lobbyID integer id to reference the closed lobby
+   */
+  public void lobbyUpdated(int lobbyID) {
+    GameLobby gameLobby = lobbies.get(lobbyID);
+    if (gameLobby != null) {
+      lobbyRepresentations.put(lobbyID, gameLobby.getRepresentation());
+    }
+  }
+
+  /**
    * Get the connection with the specified ID if available.
    *
    * @param connectionID integer to reference the connection
@@ -231,5 +258,31 @@ public class ServerImpl implements Server {
    */
   public ClientConnection getConnection(int connectionID) {
     return connections.get(connectionID);
+  }
+
+  private void processUpdateOnLobbyMap(Change<? extends Integer, ? extends GameLobby> change) {
+    Integer key = change.getKey();
+    if (change.wasRemoved()) {
+      lobbyRepresentations.remove(key);
+      notifyListenersOfLobbyUpdate(key, null);
+    } else if (change.wasAdded()) {
+      lobbyRepresentations.put(key, change.getValueAdded().getRepresentation());
+      notifyListenersOfLobbyUpdate(key, lobbyRepresentations.get(key));
+    }
+  }
+
+  private void notifyListenersOfLobbyUpdate(int lobbyID, LobbyRepresentation lobbyRepresentation) {
+    serverListeners.forEach(listener -> listener.lobbyUpdated(lobbyID, lobbyRepresentation));
+  }
+
+  @Override
+  public void addListener(ServerListener listener) {
+    serverListeners.add(listener);
+    listener.allLobbies(lobbyRepresentations);
+  }
+
+  @Override
+  public void removeListener(ServerListener listener) {
+    serverListeners.remove(listener);
   }
 }
