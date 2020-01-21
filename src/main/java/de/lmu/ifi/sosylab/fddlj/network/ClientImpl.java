@@ -27,7 +27,7 @@ import java.util.UUID;
 
 /**
  * The client enables a communication with a {@link Server}. It can connect to
- * a given address on the port 43200. The client make callbacks on a
+ * a given address on the port 43200. The client makes callbacks on a
  * {@link ClientCompatibleGui} with the data received from the server.
  */
 public class ClientImpl implements Client {
@@ -46,7 +46,7 @@ public class ClientImpl implements Client {
 
   /**
    * Creates a new Client. The client will connect to a server, after it's started.
-   * To identify within in matches a {@link Player} is required. For callbacks for
+   * To identify within matches a {@link Player} is required. For callbacks for
    * notifications, which are sent by the server a {@link ClientCompatibleGui} must
    * be provided.
    *
