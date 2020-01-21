@@ -19,7 +19,7 @@ import javafx.scene.text.FontWeight;
 public class DiskIndicator extends BorderPane implements PropertyChangeListener {
 
   private static final int DISK_RADIUS = 50;
-  private static final int PADDING = 10;
+  private static final float PADDING =10; 
 
   private Label titel;
   private Label name;
@@ -72,15 +72,15 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
         .addListener(
             e -> {
               circle.setCenterX(getWidth() / 2);
-              circle.setLightX(circle.getCenterX() - DISK_RADIUS / 2 + 3 * PADDING);
-              circle.setLightZ(0.8 * getHeight());
+              circle.setLightX(circle.getCenterX() - DISK_RADIUS / 2 + PADDING);
+              circle.setLightZ(1.15 * getHeight());
             });
     heightProperty()
         .addListener(
             e -> {
               circle.setCenterY(getHeight() / 2);
-              circle.setLightY(circle.getCenterY() - DISK_RADIUS / 2 + 3 * PADDING);
-              circle.setLightZ(0.8 * getHeight());
+              circle.setLightY(circle.getCenterY() - DISK_RADIUS / 2 + PADDING);
+              circle.setLightZ(1.15 * getHeight());
             });
   }
 

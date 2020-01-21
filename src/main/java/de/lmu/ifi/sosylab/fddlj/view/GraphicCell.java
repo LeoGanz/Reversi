@@ -36,7 +36,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
   static final float SPACING = 100;
 
   private final String cssNormal =
-      "-fx-background-color: transparent; -fx-border-color: #d6d6d6;" + " -fx-border-width: 1.2;";
+      "-fx-background-color: #a3a3a3; -fx-border-color: #d6d6d6;" + " -fx-border-width: 1.2;";
   private final String cssHighlighted =
       "-fx-background-color: transparent; -fx-border-color: rgba(0,255,0,255);"
           + " -fx-border-width: 2.2;";
@@ -242,7 +242,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
       double prefRadius = (getHeight() - 30) / 2;
 
       Circle circle = new Circle(prefRadius);
-      circle.setFill(new Color(0, 1, 0, 0.2));
+      circle.setFill(new Color(0, 1, 0, 0.5));
       circle.setCenterX(getWidth() / 2);
       circle.setCenterY(getHeight() / 2);
 

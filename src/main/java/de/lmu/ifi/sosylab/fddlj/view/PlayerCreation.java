@@ -17,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -35,6 +36,8 @@ public class PlayerCreation extends BorderPane {
 
   private Controller controller;
   private Stage primaryStage;
+
+  private Button start;
 
   /**
    * Constructor of this class initialises variables and sets basic styling.
@@ -62,6 +65,12 @@ public class PlayerCreation extends BorderPane {
     vbox.setAlignment(Pos.CENTER);
 
     TextField textField = new TextField();
+    textField.setOnKeyTyped(
+        e -> {
+          if (e.getCode() == KeyCode.ENTER) {
+            start.fire();
+          }
+        });
     vbox.getChildren().add(getUsernameInputField(textField, "Geben Sie Ihren Usernamen ein:"));
 
     ColorPicker colorPicker = new ColorPicker(Color.WHITE);
@@ -87,6 +96,12 @@ public class PlayerCreation extends BorderPane {
     VBox vboxPlayerOne = new VBox(50);
     vboxPlayerOne.setAlignment(Pos.CENTER);
     TextField textFieldOne = new TextField();
+    textFieldOne.setOnKeyTyped(
+        e -> {
+          if (e.getCode() == KeyCode.ENTER) {
+            start.fire();
+          }
+        });
     vboxPlayerOne
         .getChildren()
         .add(getUsernameInputField(textFieldOne, "Geben Sie den Usernamen von Spieler 1 ein:"));
@@ -99,6 +114,12 @@ public class PlayerCreation extends BorderPane {
     VBox vboxPlayerTwo = new VBox(50);
     vboxPlayerTwo.setAlignment(Pos.CENTER);
     TextField textFieldTwo = new TextField();
+    textFieldTwo.setOnKeyReleased(
+        e -> {
+          if (e.getCode() == KeyCode.ENTER) {
+            start.fire();
+          }
+        });
     vboxPlayerTwo
         .getChildren()
         .add(getUsernameInputField(textFieldTwo, "Geben Sie den Usernamen von Spieler 2 ein:"));
@@ -230,7 +251,7 @@ public class PlayerCreation extends BorderPane {
     HBox hbox = new HBox(30);
     hbox.setAlignment(Pos.CENTER);
 
-    Button start = getButton("Start");
+    start = getButton("Start");
     start.setOnAction(
         e -> {
           if (!isTextFieldInputValid(textField.getText())) {

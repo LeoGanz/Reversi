@@ -15,8 +15,9 @@ import javafx.util.Duration;
  * @author Josef Feger
  */
 public class GraphicDisk extends Circle {
+    
+    private static final float PADDING =10; 
 
-  private static final float PADDING = 10;
 
   private Light.Spot light;
 
@@ -26,7 +27,7 @@ public class GraphicDisk extends Circle {
    * @param width the disk's parent's width in pixel
    * @param height the disk's parent's height in pixel
    * @param radius the disk's radius
-   * @param color the disk's inital color
+   * @param color the disk's initial color
    */
   public GraphicDisk(double width, double height, double radius, Color color) {
 
@@ -42,9 +43,10 @@ public class GraphicDisk extends Circle {
 
     light = new Light.Spot();
     light.setColor(Color.WHITE);
-    light.setX(getCenterX() - radius / 2 + 3 * PADDING);
-    light.setY(getCenterY() - radius / 2 + 3 * PADDING);
+    light.setX(getCenterX() - radius / 2 + PADDING );
+    light.setY(getCenterY() - radius / 2 + PADDING );
     light.setZ(1.15 * height);
+    light.setSpecularExponent(2.0);
 
     Lighting lighting = new Lighting();
     lighting.setLight(light);

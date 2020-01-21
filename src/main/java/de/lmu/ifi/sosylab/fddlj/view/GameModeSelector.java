@@ -201,8 +201,8 @@ public class GameModeSelector extends Stage {
     Button button = new Button(text);
     button.setId("button");
     button.setMinHeight(50);
-    button.setMaxWidth(500);
-    button.setMinWidth(200);
+    button.setMaxWidth(350);
+    button.setMinWidth(150);
     button.setCursor(Cursor.HAND);
     button.setFont(Font.font(18));
     button.setEffect(new DropShadow(4, Color.DARKGRAY));

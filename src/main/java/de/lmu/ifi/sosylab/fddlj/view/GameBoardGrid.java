@@ -1,10 +1,11 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import de.lmu.ifi.sosylab.fddlj.model.GameFieldImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -74,6 +75,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
         grid.add(cell, column, row);
         switchButton.addListener(cell);
         view.addListener(cell);
+        
       }
     }
 

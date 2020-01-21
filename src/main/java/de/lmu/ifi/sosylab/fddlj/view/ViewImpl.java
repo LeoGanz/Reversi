@@ -238,6 +238,7 @@ public class ViewImpl implements View {
         }
 
         this.model = (Model) event.getNewValue();
+
         support.firePropertyChange(event);
       }
     }
