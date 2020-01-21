@@ -113,7 +113,6 @@ public class ClientImpl implements Client {
    * Send a message to a server.
    *
    * @param messageObject message object do send to server
-   * @return Whether the message can be delivered successfully
    */
   private void sendMessage(Object messageObject) {
     if (this.connectionEstablished) {
