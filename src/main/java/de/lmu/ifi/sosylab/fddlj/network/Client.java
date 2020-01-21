@@ -23,7 +23,7 @@ public interface Client {
   void terminate();
 
   /**
-   * Joins any random, public available lobby.
+   * Joins any random, publicly available lobby.
    */
   void joinAnyRandomPublicLobby();
 
@@ -36,7 +36,7 @@ public interface Client {
   void joinSpecificLobby(boolean asSpectator, int lobbyId);
 
   /**
-   * Create a new private lobby, where other player can join by the lobby id.
+   * Create a new private lobby, where other players can join by the lobby id.
    */
   void createNewPrivateLobby();
 
@@ -45,7 +45,7 @@ public interface Client {
    *
    * @param disk The disk to be placed
    * @param cell The cell, where the disk should be placed
-   * @return the DiskPlacement, which were sent to the server
+   * @return the DiskPlacement, which was sent to the server
    */
   DiskPlacement placeDisk(Disk disk, Cell cell);
 
