@@ -1,5 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
+import com.google.gson.JsonSyntaxException;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.Disk;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
@@ -150,7 +151,14 @@ public class ClientImpl implements Client {
   }
 
   private void processReceivedLine(String receivedLine) {
-    Message<?> message = Message.fromJson(receivedLine);
+    Message<?> message;
+
+    try {
+      message = Message.fromJson(receivedLine);
+    } catch (JsonSyntaxException e) {
+      System.out.println("Can not decode server answer: "+receivedLine);
+      return;
+    }
 
     if (message.getData() instanceof JoinRequest.Response) {
       this.processJoinRequestResponse((JoinRequest.Response) message.getData());
