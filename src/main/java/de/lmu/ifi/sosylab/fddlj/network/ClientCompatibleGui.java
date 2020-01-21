@@ -7,7 +7,10 @@ import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
 import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
 
 /**
- * This Interface define callback methods for a GUI, which have been used.
+ * This interface defines callback methods for a GUI. The client
+ * uses those defined methods to notify the GUI about join requests,
+ * rejected placements by the server, general server notifications, list
+ * of spectators and when the model gets updated.
  */
 public interface ClientCompatibleGui {
 
