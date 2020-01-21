@@ -1,6 +1,5 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -8,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -80,36 +78,12 @@ public class GameModeSelector extends Stage {
     Label close = new Label("X");
     close.setCursor(Cursor.HAND);
     close.setStyle("-fx-text-fill: white; -fx-font-size: 35;");
-    close.setOnMouseEntered(
-        new EventHandler<MouseEvent>() {
-
-          @Override
-          public void handle(MouseEvent event) {
-
-            close.setStyle("-fx-text-fill: red; -fx-font-size: 35;");
-          }
-        });
-    close.setOnMouseExited(
-        new EventHandler<MouseEvent>() {
-
-          @Override
-          public void handle(MouseEvent event) {
-
-            close.setStyle("fx-text-fill: white; -fx-font-size: 35;");
-          }
-        });
-    close.setOnMouseClicked(
-        new EventHandler<MouseEvent>() {
-
-          @Override
-          public void handle(MouseEvent event) {
-
-            close();
-          }
-        });
+    close.setOnMouseEntered(e -> close.setStyle("-fx-text-fill: red; -fx-font-size: 35;"));
+    close.setOnMouseExited(e -> close.setStyle("fx-text-fill: white; -fx-font-size: 35;"));
+    close.setOnMouseClicked(e -> close());
     bp.setRight(close);
     BorderPane.setAlignment(close, Pos.TOP_RIGHT);
-    BorderPane.setMargin(close, new Insets(15, 30, 0, 0));
+    BorderPane.setMargin(close, new Insets(15, 15, 0, 0));
 
     HBox title = getTitleWithDisks();
     bp.setCenter(title);
@@ -128,7 +102,7 @@ public class GameModeSelector extends Stage {
 
     Label title = new Label("Reversi");
     title.setFont(Font.font(25));
-    title.setStyle("-fx-text-fill: white;  -fx-font-size: 50; -fx-font-family: 'Comic Sans MS';");
+    title.setId("title-label");
     hbox.getChildren().add(title);
 
     for (int i = 3; i > 0; i--) {

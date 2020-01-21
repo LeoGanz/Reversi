@@ -39,6 +39,16 @@ public class PlayerCreation extends BorderPane {
 
   private Button start;
 
+  private final String tooltipLobby =
+      "If you want to join an already existing lobby enter the lobbie's ID here. \n"
+          + " By default - meaning when this field stays empty "
+          + "- \nyou will join a lobby based on automatic matchmaking.";
+  private final String alternateLabelText =
+      "When creating a private lobby you can't enter a lobby ID "
+          + "since the server will assign you one."
+          + " For sharing purposes - you can view your lobby ID"
+          + " as soon as you've hit the start button.";
+
   /**
    * Constructor of this class initialises variables and sets basic styling.
    *
@@ -71,7 +81,7 @@ public class PlayerCreation extends BorderPane {
             start.fire();
           }
         });
-    vbox.getChildren().add(getUsernameInputField(textField, "Geben Sie Ihren Usernamen ein:"));
+    vbox.getChildren().add(getInputField(textField, "Geben Sie Ihren Usernamen ein:"));
 
     ColorPicker colorPicker = new ColorPicker(Color.WHITE);
     vbox.getChildren().add(getColorPickerPane(colorPicker));
@@ -104,7 +114,7 @@ public class PlayerCreation extends BorderPane {
         });
     vboxPlayerOne
         .getChildren()
-        .add(getUsernameInputField(textFieldOne, "Geben Sie den Usernamen von Spieler 1 ein:"));
+        .add(getInputField(textFieldOne, "Geben Sie den Usernamen von Spieler 1 ein:"));
     ColorPicker colorPickerOne = new ColorPicker(getRandomColor());
     vboxPlayerOne.getChildren().add(getColorPickerPane(colorPickerOne));
     alignment.getChildren().add(vboxPlayerOne);
@@ -122,7 +132,7 @@ public class PlayerCreation extends BorderPane {
         });
     vboxPlayerTwo
         .getChildren()
-        .add(getUsernameInputField(textFieldTwo, "Geben Sie den Usernamen von Spieler 2 ein:"));
+        .add(getInputField(textFieldTwo, "Geben Sie den Usernamen von Spieler 2 ein:"));
     ColorPicker colorPickerTwo = new ColorPicker(getRandomColor());
     vboxPlayerTwo.getChildren().add(getColorPickerPane(colorPickerTwo));
     alignment.getChildren().add(vboxPlayerTwo);
@@ -153,9 +163,7 @@ public class PlayerCreation extends BorderPane {
     VBox vboxPlayer = new VBox(50);
     vboxPlayer.setAlignment(Pos.TOP_CENTER);
     TextField textField = new TextField();
-    vboxPlayer
-        .getChildren()
-        .add(getUsernameInputField(textField, "Geben Sie ihren Usernamen ein:"));
+    vboxPlayer.getChildren().add(getInputField(textField, "Geben Sie ihren Usernamen ein:"));
     ColorPicker colorPicker = new ColorPicker(getRandomColor());
     vboxPlayer.getChildren().add(getColorPickerPane(colorPicker));
     alignment.getChildren().add(vboxPlayer);
@@ -167,24 +175,17 @@ public class PlayerCreation extends BorderPane {
     TextField textFieldServer = new TextField();
     vboxConnection
         .getChildren()
-        .add(getUsernameInputField(textFieldServer, "Geben Sie IP-Adresse des Servers ein:"));
+        .add(getInputField(textFieldServer, "Geben Sie IP-Adresse des Servers ein:"));
     TextField textFieldLobby = new TextField();
     textFieldLobby.setPromptText("Hover for info");
     Tooltip tooltip = new Tooltip();
-    tooltip.setText(
-        "If you want to join an already existing lobby enter the lobbie's ID here. \n"
-            + " By default - meaning when this field stays empty "
-            + "- \nyou will join a lobby based on automatic matchmaking.");
+    tooltip.setText(tooltipLobby);
     textFieldLobby.setTooltip(tooltip);
-    VBox container = getUsernameInputField(textFieldLobby, "Lobby ID");
+    VBox container = getInputField(textFieldLobby, "Lobby ID");
     vboxConnection.getChildren().add(container);
 
     Label alternateText = new Label();
-    alternateText.setText(
-        "When creating a private lobby you can't enter a lobby ID "
-            + "since the server will assign you one."
-            + " For sharing purposes - you can view your lobby ID"
-            + " as soon as you've hit the start button.");
+    alternateText.setText(alternateLabelText);
     alternateText.setMaxWidth(300);
     alternateText.setWrapText(true);
     alternateText.setFont(Font.font(15));
@@ -210,7 +211,6 @@ public class PlayerCreation extends BorderPane {
                   ObservableValue<? extends Boolean> observable,
                   Boolean oldValue,
                   Boolean newValue) {
-                // switchLobbyIDField(!newValue, vboxConnection, textFieldLobby, alternateText);
                 if (!newValue) {
                   container.getChildren().remove(alternateText);
                   container.getChildren().add(textFieldLobby);
@@ -359,7 +359,7 @@ public class PlayerCreation extends BorderPane {
     return hbox;
   }
 
-  private VBox getUsernameInputField(TextField textField, String labelText) {
+  private VBox getInputField(TextField textField, String labelText) {
     VBox vbox = new VBox(5);
     vbox.setPadding(new Insets(20));
     vbox.setAlignment(Pos.CENTER);

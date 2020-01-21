@@ -13,8 +13,15 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+/**
+ * This class displays a window in which the user can see additional, detailed information about
+ * this game, such as the licenses and the game's rules.
+ *
+ * @author Josef Feger
+ */
 public class AboutWindow extends Stage {
 
+  /** Public constructor of this class initialises stage and content. */
   public AboutWindow() {
     super();
 
@@ -45,7 +52,6 @@ public class AboutWindow extends Stage {
   }
 
   private Tab getLicenseTab() {
-    // final TextArea textArea = TextAreaBuilder.create().prefWidth(400).wrapText(true).build();
     TextArea textArea = new TextArea();
     textArea.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3);
     textArea.setWrapText(true);

@@ -9,11 +9,13 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -67,7 +69,7 @@ public class ViewImpl implements View {
     this.stage.setTitle("Reversi");
     this.stage.setMaximized(true);
     this.stage.setMinWidth(2 * Screen.getPrimary().getVisualBounds().getWidth() / 5.0);
-    this.stage.setMinHeight(Screen.getPrimary().getVisualBounds().getHeight() / 2.0);
+    this.stage.setMinHeight(2 * Screen.getPrimary().getVisualBounds().getHeight() / 3);
   }
 
   @Override
@@ -93,7 +95,7 @@ public class ViewImpl implements View {
 
   private VBox getDiskIndicators(GameMode gameMode) {
 
-    VBox vbox = new VBox(50);
+    VBox vbox = new VBox(30);
     vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setPadding(new Insets(20));
 
@@ -120,12 +122,13 @@ public class ViewImpl implements View {
     Region spacer = new Region();
     VBox.setVgrow(spacer, Priority.ALWAYS);
 
-    vbox.getChildren().addAll(spacer, getDiskCounter());
+    vbox.getChildren().addAll(new Separator(Orientation.HORIZONTAL), spacer, getDiskCounter());
 
     Region bottomSpacer = new Region();
     VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
 
-    vbox.getChildren().addAll(bottomSpacer, getHelpButton(), reset);
+    vbox.getChildren()
+        .addAll(bottomSpacer, new Separator(Orientation.HORIZONTAL), getHelpButton(), reset);
 
     return vbox;
   }

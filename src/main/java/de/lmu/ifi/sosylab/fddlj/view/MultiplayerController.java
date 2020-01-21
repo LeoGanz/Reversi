@@ -2,6 +2,13 @@ package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 
+/**
+ * The main interface used by the game for online games. It takes the actions from the user and
+ * handles them accordingly. This is by either invoking the necessary model-methods, or by directly
+ * telling the view to change its graphical user-interface.
+ *
+ * @author Josef Feger
+ */
 public interface MultiplayerController extends Controller {
 
   /**

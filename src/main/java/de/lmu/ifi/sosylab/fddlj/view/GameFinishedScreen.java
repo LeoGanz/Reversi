@@ -51,7 +51,7 @@ public class GameFinishedScreen extends Stage {
     root.setPadding(new Insets(30));
 
     Label title = new Label("Game over!");
-    title.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 40;");
+    title.setId("title-label");
     root.setTop(title);
     BorderPane.setAlignment(title, Pos.CENTER);
 
@@ -98,7 +98,6 @@ public class GameFinishedScreen extends Stage {
               controller.getCurrentGameMode(),
               model.getState().getPlayerManagement().getPlayerOne(),
               model.getState().getPlayerManagement().getPlayerTwo());
-          
         });
 
     Button mainScreen = getButton("Main screen");

@@ -7,8 +7,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 /**
  * This class offers a pane that can be used to indicate the current player's disk color and in case
@@ -18,8 +16,8 @@ import javafx.scene.text.FontWeight;
  */
 public class DiskIndicator extends BorderPane implements PropertyChangeListener {
 
-  private static final int DISK_RADIUS = 50;
-  private static final float PADDING =10; 
+  private static final int DISK_RADIUS = 65;
+  private static final float PADDING = 10;
 
   private Label titel;
   private Label name;
@@ -49,11 +47,10 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
 
   private void initLabel(String labelText) {
     titel = new Label(labelText);
-    titel.setFont(Font.font("Arial", FontWeight.MEDIUM, 25));
-    titel.setStyle("-fx-text-fill: #ffffff");
+    titel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: x-large; -fx-font-family: arial;");
     setTop(titel);
     BorderPane.setAlignment(titel, Pos.CENTER);
-    BorderPane.setMargin(titel, new Insets(0, 0, 20, 0));
+    BorderPane.setMargin(titel, new Insets(0, 0, 10, 0));
   }
 
   private void initCanvas() {
@@ -68,29 +65,29 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
     setCenter(circle);
     BorderPane.setAlignment(circle, Pos.CENTER);
 
-    widthProperty()
-        .addListener(
-            e -> {
-              circle.setCenterX(getWidth() / 2);
-              circle.setLightX(circle.getCenterX() - DISK_RADIUS / 2 + PADDING);
-              circle.setLightZ(1.15 * getHeight());
-            });
-    heightProperty()
-        .addListener(
-            e -> {
-              circle.setCenterY(getHeight() / 2);
-              circle.setLightY(circle.getCenterY() - DISK_RADIUS / 2 + PADDING);
-              circle.setLightZ(1.15 * getHeight());
-            });
+    widthProperty().addListener(e -> resizeDisk());
+    heightProperty().addListener(e -> resizeDisk());
+  }
+
+  private void resizeDisk() {
+    double radius =
+        ((getHeight() - titel.getHeight() - name.getHeight()) - GraphicDisk.PADDING) / 2;
+    if (radius > DISK_RADIUS) {
+      radius = DISK_RADIUS;
+    }
+
+    circle.setCenterY(getHeight() / 2);
+    circle.setLightY(circle.getCenterY() - DISK_RADIUS / 2 + PADDING);
+    circle.setLightZ(1.15 * getHeight());
+    circle.resizeDisk(getHeight(), getHeight(), radius);
   }
 
   private void initPlayerName() {
     name = new Label(model.getState().getPlayerManagement().getCurrentPlayer().getName());
-    name.setFont(Font.font("Arial", FontWeight.MEDIUM, 25));
-    name.setStyle("-fx-text-fill: #ffffff");
+    name.setStyle("-fx-text-fill: #ffffff; -fx-font-size: x-large; -fx-font-family: arial;");
     setBottom(name);
     BorderPane.setAlignment(name, Pos.CENTER);
-    BorderPane.setMargin(name, new Insets(20, 0, 0, 0));
+    BorderPane.setMargin(name, new Insets(10, 0, 0, 0));
   }
 
   @Override

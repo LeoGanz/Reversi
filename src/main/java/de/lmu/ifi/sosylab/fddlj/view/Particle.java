@@ -4,6 +4,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+/**
+ * This class represents a single Particle used for the fireworks animation in the {@link
+ * GameFinishedScreen}.
+ */
 public class Particle {
   private static final double GRAVITY = 0.06;
   // properties for animation
@@ -25,6 +29,22 @@ public class Particle {
   double lastPosX;
   double lastPosY;
 
+  /**
+   * Constructor of this class initilaises this particle.
+   *
+   * @param posX the particle's x position
+   * @param posY the particle's y position
+   * @param velX the particle's x velocity
+   * @param velY the particle's y velocity
+   * @param targetX the particle's target x position
+   * @param targetY the particle's target y position
+   * @param color the particle's color
+   * @param size the particle's size
+   * @param usePhysics indicates whether this particle should simulate physics
+   * @param shouldExplodeChildren indicates whether this particle should explode other particles it
+   *     comes into contact with
+   * @param hasTail indicated whether the particle has a tail
+   */
   public Particle(
       double posX,
       double posY,
@@ -53,6 +73,11 @@ public class Particle {
     this.fade = Math.random() * 0.1;
   }
 
+  /**
+   * Updates the particle.
+   *
+   * @return {@code true} if particle is still visible, otherwise {@code false}
+   */
   public boolean update() {
     lastPosX = posX;
     lastPosY = posY;
@@ -71,6 +96,11 @@ public class Particle {
     return alpha < 0.005;
   }
 
+  /**
+   * Draws this particle with the specified {@link GraphicsContext}.
+   *
+   * @param context the graphics context object used for drawing the particle
+   */
   public void draw(GraphicsContext context) {
     final double x = Math.round(posX);
     final double y = Math.round(posY);

@@ -51,3 +51,15 @@
 	-fx-font-size: 18;
 	-fx-text-fill: #d4d4d4;
 }
+
+#title-label{
+	-fx-text-fill: white; 
+	-fx-font-weight: bold; 
+	-fx-font-size: 40;
+}
+
+.separator .line {
+    -fx-border-color: white;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;  
+}

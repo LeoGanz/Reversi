@@ -8,12 +8,20 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+/**
+ * This class offers a grid of cells in which each cell holds a disk.
+ *
+ * @author Josef Feger
+ */
 public class StartScreenDiskGrid extends BorderPane {
 
   private Color colorOne = Color.WHITE;
   private Color colorTwo = Color.BLACK;
 
   private ArrayList<GraphicDisk> animationStarter;
+
+  private final int animationCycle = 800;
+  private final int gridSize = 3;
 
   /** Public constructor of this class build a 2x2 grid with one disk placed on each cell. */
   public StartScreenDiskGrid() {
@@ -27,30 +35,29 @@ public class StartScreenDiskGrid extends BorderPane {
     VBox container = new VBox();
     container.setAlignment(Pos.CENTER);
 
-    container.getChildren().addAll(buildRow(true), buildRow(false), buildRow(true));
+    for (int i = 0; i < gridSize; i++) {
+      container.getChildren().add(buildRow((i % 2) == 0));
+    }
 
     setCenter(container);
 
     Thread animationThread =
         new Thread(
-          new Runnable() {
-
-            @Override
-            public void run() {
+            () -> {
               for (GraphicDisk disk : animationStarter) {
                 if (((Color) disk.getFill()).equals(colorOne)) {
-                  disk.changeColorInfinitely(colorTwo, animationStarter.size() * 800);
+                  disk.changeColorInfinitely(colorTwo, animationStarter.size() * animationCycle);
                 } else {
-                  disk.changeColorInfinitely(colorOne, animationStarter.size() * 800);
+                  disk.changeColorInfinitely(colorOne, animationStarter.size() * animationCycle);
                 }
                 try {
-                  Thread.sleep(800);
-              } catch (InterruptedException e) {
+                  Thread.sleep(animationCycle);
+                } catch (InterruptedException e) {
                   continue;
                 }
               }
-            }
-          });
+            });
+
     animationThread.start();
   }
 
@@ -59,7 +66,7 @@ public class StartScreenDiskGrid extends BorderPane {
     HBox hbox = new HBox();
     hbox.setAlignment(Pos.CENTER);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < gridSize; i++) {
       GraphicCell cell = new GraphicCell();
       Color color;
       if (top) {

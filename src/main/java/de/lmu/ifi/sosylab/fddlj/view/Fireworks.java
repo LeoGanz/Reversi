@@ -15,6 +15,10 @@ import javafx.scene.paint.Paint;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 
+/**
+ * This class builds pane on which a fireworks can be displayed by spawning random {@link Particle
+ * particles}.
+ */
 public class Fireworks extends Pane {
   private final AnimationTimer timer;
   private final Canvas canvas;
@@ -22,6 +26,7 @@ public class Fireworks extends Pane {
   private final Paint[] colors;
   private int countDownTillNextFirework = 40;
 
+  /** Public constructor of this class initialises variables. */
   public Fireworks() {
     // create a color palette of 180 colors
     colors = new Paint[181];
@@ -82,10 +87,12 @@ public class Fireworks extends Pane {
         };
   }
 
+  /** Starts the animation. */
   public void start() {
     timer.start();
   }
 
+  /** Stops the animation. */
   public void stop() {
     timer.stop();
   }

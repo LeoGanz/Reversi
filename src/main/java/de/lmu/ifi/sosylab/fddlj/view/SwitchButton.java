@@ -5,6 +5,7 @@ import java.beans.PropertyChangeSupport;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -50,6 +51,7 @@ public class SwitchButton extends StackPane {
     setAlignment(button, Pos.CENTER_LEFT);
     button.setMaxSize(2 * height, 2 * height);
     button.setMinSize(2 * height, 2 * height);
+    button.setCursor(Cursor.HAND);
 
     button.setStyle(buttonStyleOn);
     back.setFill(Color.valueOf("#80C49E"));

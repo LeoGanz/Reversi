@@ -10,4 +10,7 @@ public interface OnlineView extends View {
 
   /** Shows a waiting screen while waiting for opponent to connect. */
   void showWaitingScreen();
+
+  /** Shows a frame in which the user can spectate a game. */
+  void showSpectatorView();
 }

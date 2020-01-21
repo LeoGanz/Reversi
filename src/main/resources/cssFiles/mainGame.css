@@ -18,3 +18,9 @@
 	-fx-border-color: rgba(0,255,0,255);
     -fx-border-width: 2.2;
 }
+
+.separator .line {
+    -fx-border-color: white;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;  
+}
