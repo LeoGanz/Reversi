@@ -33,4 +33,20 @@ public interface Server {
    * @return {@code true} if the server is running, otherwise {@code false}
    */
   public boolean isRunning();
+
+  /**
+   * Add a {@link ServerListener} to the server that will be notified about public changes occurring
+   * in the sevrver.
+   *
+   * @param listener the class that implements the server listener
+   */
+  void addListener(ServerListener listener);
+
+  /**
+   * Remove a {@link ServerListener} from the server, which will then no longer be notified about
+   * any events in the server.
+   *
+   * @param listener the class that will no longer receive updates
+   */
+  void removeListener(ServerListener listener);
 }
