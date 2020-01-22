@@ -156,7 +156,7 @@ public class ClientImpl implements Client {
     try {
       message = Message.fromJson(receivedLine);
     } catch (JsonSyntaxException e) {
-      System.out.println("Can not decode server answer: "+receivedLine);
+      System.out.println("Can not decode server answer: " + receivedLine);
       return;
     }
 
