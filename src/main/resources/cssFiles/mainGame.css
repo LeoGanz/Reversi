@@ -16,3 +16,57 @@
 #borderpane-spacer {
 	-fx-background-color: #576385;
 }
+
+.scroll-bar:horizontal ,
+.scroll-bar:vertical{
+    -fx-background-color:transparent;
+}
+ 
+
+.scroll-bar .increment-button ,.scroll-bar .decrement-button {
+    -fx-background-color:transparent;
+	-fx-border-color:derive(black,80%);
+}
+ 
+.scroll-bar:horizontal .track ,
+.scroll-bar:vertical .track{
+     -fx-background-color: transparent;
+	 -fx-border-color:derive(black,80%);
+	 -fx-background-radius: 0em;
+}
+ 
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color:derive(#3a3a3a,90%);
+	-fx-background-insets: 0, 0, 0;
+	-fx-background-radius: 0em;
+ 
+}
+ 
+ 
+ 
+.scroll-bar:horizontal:hover .track ,
+.scroll-bar:horizontal:pressed .track ,
+.scroll-bar:vertical:hover .track,
+.scroll-bar:vertical:pressed .track{
+     -fx-background-color: derive(#434343,20%);
+ 	 -fx-opacity: 0.2;
+	 -fx-background-radius: 0em;
+ 
+}
+ 
+.scroll-bar .thumb:hover,
+.scroll-bar .thumb:pressed{
+    -fx-background-color: derive(black,50%);
+}
+ 
+.scroll-bar .increment-button:hover ,.scroll-bar .decrement-button:hover {
+    -fx-background-color:derive(gray,100%);
+	-fx-border-color:derive(gray,80%);	
+	-fx-padding:10px;
+}
+
+#spectator-pane{
+	-fx-background-color: rgba(150,150,150,0.6);
+	-fx-padding: 10;
+}
