@@ -79,4 +79,13 @@ public interface Model {
    * @return {@code true} if the operation was successful and {@code false} otherwise.
    */
   boolean setWaiting();
+
+  /**
+   * Substitute both players with new players without stopping the game.
+   *
+   * @param newPlayerOne new player to substitute the old player one with
+   * @param newPlayerTwo new player to substitute the old player two with
+   * @author Leonard Ganz
+   */
+  void substitutePlayersWith(Player newPlayerOne, Player newPlayerTwo);
 }

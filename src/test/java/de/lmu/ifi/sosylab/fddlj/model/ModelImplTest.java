@@ -5,7 +5,6 @@ import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-
 import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -870,5 +869,53 @@ public class ModelImplTest {
         game.placeDisk(
             new DiskImpl(game.getState().getPlayerManagement().getCurrentPlayer()),
             new CellImpl(4, 4)));
+  }
+
+  @Test
+  public void testSubstitutePlayersWith() {
+    Model game = new ModelImpl(midGame_PlayerOnesTurn(), GameMode.HOTSEAT);
+    final GameState stateBefore = game.getState();
+    final GameField fieldBefore = stateBefore.getField().makeCopy();
+    final Player playerOneBefore = stateBefore.getPlayerManagement().getPlayerOne();
+    final Player playerTwoBefore = stateBefore.getPlayerManagement().getPlayerTwo();
+    final Set<Cell> cellsPlayerOneBefore = fieldBefore.getAllCellsForPlayer(playerOneBefore);
+    final Set<Cell> cellsPlayerTwoBefore = fieldBefore.getAllCellsForPlayer(playerTwoBefore);
+
+    Player newPlayerOne = new PlayerImpl("New 1", Color.CORNFLOWERBLUE);
+    Player newPlayerTwo = new PlayerImpl("New 2", Color.LIGHTGOLDENRODYELLOW);
+    game.substitutePlayersWith(newPlayerOne, newPlayerTwo);
+
+    GameField newField = game.getState().getField();
+    Assertions.assertEquals(
+        newPlayerOne,
+        game.getState().getPlayerManagement().getCurrentPlayer(),
+        "Current player should still be first player after player substitution");
+    Assertions.assertEquals(cellsPlayerOneBefore, newField.getAllCellsForPlayer(newPlayerOne));
+    Assertions.assertEquals(cellsPlayerTwoBefore, newField.getAllCellsForPlayer(newPlayerTwo));
+    newField
+        .getCellsOccupiedWithDisks()
+        .forEach(
+            (cell, player) -> {
+              if (!playerOneBefore.equals(newPlayerOne)) {
+                Assertions.assertNotSame(
+                    playerOneBefore,
+                    player,
+                    "After substitution no reference to old players should remain on game field");
+                Assertions.assertNotEquals(playerOneBefore, newField.get(cell).get());
+                // get() is safe if getCellsOccupiedWithDisks() works, which can be assumed here
+              }
+              if (!playerTwoBefore.equals(newPlayerTwo)) {
+                Assertions.assertNotSame(
+                    playerTwoBefore,
+                    player,
+                    "After substitution no reference to old players should remain on game field");
+                Assertions.assertNotEquals(playerTwoBefore, newField.get(cell).get());
+                // get() is safe if getCellsOccupiedWithDisks() works, which can be assumed here
+              }
+            });
+    Assertions.assertEquals(
+        fieldBefore.getCellsOccupiedWithDisks().size(),
+        newField.getCellsOccupiedWithDisks().size(),
+        "Same amount of disks should be on the bord before and after the player substitution");
   }
 }

@@ -41,4 +41,7 @@ public interface Controller {
    * @return the game's current game mode
    */
   GameMode getCurrentGameMode();
+
+  /** Starts a server instance for multiplayer games. */
+  void startServer();
 }

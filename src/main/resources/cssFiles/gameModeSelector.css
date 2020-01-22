@@ -15,7 +15,7 @@
 }
 
 #login-form{
-	-fx-background-color: rgba(181,181,181,0.8);
+	-fx-background-color: rgba(181,181,181,200);
 	-fx-padding: 20;
 	-fx-margin: 0 0 30 0;
 }
