@@ -26,6 +26,9 @@ import javafx.stage.Screen;
 public class GraphicCell extends BorderPane implements PropertyChangeListener {
 
   private GraphicDisk diskOnCell;
+  
+  static int MIN_WIDTH = 60;
+  static int MIN_HEIGHT = 60;
 
   private Model model;
   private GameBoardGrid gameBoardGrid;
@@ -35,7 +38,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
   private boolean indicateMoves;
   private boolean isMovePossibleOnCell;
 
-  static final float SPACING = 100;
+  static final float SPACING = 60;
 
   private String color;
 
@@ -70,10 +73,14 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
             / (double) (GameFieldImpl.SIZE + 1);
     setPrefHeight(initValue);
     setPrefWidth(initValue);
+    setMinWidth(MIN_WIDTH);
+    setMinHeight(MIN_HEIGHT);
 
     addListeners(gameBoardGrid);
     setOnMouseMoved(e -> handleMouseMoved(e));
     setOnMouseClicked(e -> handleMouseClicked(e));
+    
+    setCursor(Cursor.DEFAULT);
 
     isMovePossibleOnCell =
         model
@@ -97,7 +104,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
     }
 
     cssNormal =
-        "-fx-background-color: " + color + "; -fx-border-color: black;" + " -fx-border-width: 2;";
+        "-fx-background-color: " + color + "; -fx-border-color: black;" + " -fx-border-width: 1.5;";
     cssHighlighted =
         "-fx-background-color: "
             + color
@@ -113,7 +120,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
     setStyle(cssStart);
     double initValue =
         (Screen.getPrimary().getVisualBounds().getHeight() - SPACING)
-            / (double) (GameFieldImpl.SIZE + 1);
+            /  9.0;
     setPrefHeight(initValue);
     setPrefWidth(initValue);
   }
@@ -126,9 +133,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
               double prefWidth =
                   (gameBoardGrid.getHeight() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
               setPrefWidth(prefWidth);
-              setMinWidth(prefWidth);
               setPrefHeight(prefWidth);
-              setMinHeight(prefWidth);
 
               if (diskOnCell != null) {
                 diskOnCell.resizeDisk(
@@ -148,9 +153,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
               double prefHeight =
                   (gameBoardGrid.getHeight() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
               setPrefHeight(prefHeight);
-              setMinHeight(prefHeight);
               setPrefWidth(prefHeight);
-              setMinWidth(prefHeight);
 
               if (diskOnCell != null) {
                 diskOnCell.resizeDisk(
@@ -181,6 +184,10 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
             == model.getState().getPlayerManagement().getPlayerTwo()) {
       setCursor(Cursor.DEFAULT);
       return;
+    }
+    
+    if (getCursor() == null) {
+	return;
     }
 
     if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER
@@ -213,6 +220,10 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
   private void handleMouseClicked(MouseEvent e) {
     if (controller.getCurrentGameMode() == GameMode.SPECTATOR) {
       return;
+    }
+    
+    if (getCursor() == null) {
+	return;
     }
 
     if (getCursor().equals(Cursor.HAND)) {

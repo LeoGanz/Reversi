@@ -78,6 +78,7 @@ public class ViewImpl implements View {
             (obs, oldVal, newVal) -> {
               support.firePropertyChange(
                   new PropertyChangeEvent(this, STAGE_RESIZED, null, support));
+              
             });
 
     this.stage
@@ -118,6 +119,10 @@ public class ViewImpl implements View {
 
     scene = new Scene(root);
 
+    stage.setMinWidth(left.getWidth() + gameBoard.getMinWidth());
+    stage.setMinHeight(left.getHeight() + gameBoard.getMinHeight());
+    
+System.out.println(gameBoard.getMinHeight());    
     stage.setScene(scene);
     stage.show();
   }

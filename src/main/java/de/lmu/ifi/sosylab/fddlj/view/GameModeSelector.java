@@ -56,14 +56,14 @@ public class GameModeSelector extends Stage {
     borderPane.setRight(buildSelectionPane());
     startScreenDisks = new StartScreenDiskGrid();
     borderPane.setCenter(startScreenDisks);
-
+    
     scene = new Scene(borderPane);
 
     setScene(scene);
     setTitle("Reversi");
     initStyle(StageStyle.UNDECORATED);
     setMinWidth(2 * (Screen.getPrimary().getVisualBounds().getWidth() / 3));
-    setMinHeight(2 * (Screen.getPrimary().getVisualBounds().getHeight() / 3));
+    setMinHeight(2.1 * (Screen.getPrimary().getVisualBounds().getHeight() / 3));
     setWidth(getMinWidth());
     setHeight(getMinHeight());
     centerOnScreen();
@@ -125,6 +125,7 @@ public class GameModeSelector extends Stage {
     Region top = new Region();
     VBox.setVgrow(top, Priority.ALWAYS);
     vbox.getChildren().add(top);
+    
 
     Button singlePlayer = getButton("Singleplayer");
     singlePlayer.setOnAction(
@@ -160,6 +161,7 @@ public class GameModeSelector extends Stage {
           playerCreation.getSpectatorInformation(this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
+          
         });
 
     vbox.getChildren().addAll(singlePlayer, hotseat, multiPlayer, spectate);

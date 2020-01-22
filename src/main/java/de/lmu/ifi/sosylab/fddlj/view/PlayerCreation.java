@@ -5,6 +5,7 @@ import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -12,6 +13,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -38,6 +40,9 @@ public class PlayerCreation extends BorderPane {
   private Stage primaryStage;
 
   private Button start;
+  
+  private int[] gameFieldSizes = new int[] {8,10,12,14,16};
+  private String[] gameFieldSizeOptions = new String[]{"8x8", "10x10", "12x12", "14x14", "16x16"};
 
   private final String tooltipLobby =
       "If you want to join an already existing lobby enter the lobbie's ID here. \n"
@@ -85,9 +90,12 @@ public class PlayerCreation extends BorderPane {
 
     ColorPicker colorPicker = new ColorPicker(Color.WHITE);
     vbox.getChildren().add(getColorPickerPane(colorPicker));
+    
+    ChoiceBox<String> choiceBox = new ChoiceBox<String>(FXCollections.observableArrayList(gameFieldSizeOptions));
+    vbox.getChildren().add(getGameFieldSizeSelection(choiceBox));
     setCenter(vbox);
-
-    HBox bottom = buildBottomSingle(textField, colorPicker, gameModeSelector);
+    
+    HBox bottom = buildBottomSingle(textField, colorPicker, gameModeSelector, choiceBox);
     setBottom(bottom);
     BorderPane.setAlignment(bottom, Pos.CENTER);
     BorderPane.setMargin(bottom, new Insets(0, 0, 20, 0));
@@ -139,11 +147,16 @@ public class PlayerCreation extends BorderPane {
 
     setTop(alignment);
     BorderPane.setAlignment(alignment, Pos.CENTER);
-    BorderPane.setMargin(alignment, new Insets(50));
-
+    BorderPane.setMargin(alignment, new Insets(20));
+    
+    ChoiceBox<String> choiceBox = new ChoiceBox<String>(FXCollections.observableArrayList(gameFieldSizeOptions));
+    VBox choice = getGameFieldSizeSelection(choiceBox);
+    setCenter(choice);
+    BorderPane.setAlignment(choice, Pos.TOP_CENTER);
+    
     HBox bottom =
         buildBottomMulti(
-            textFieldOne, textFieldTwo, colorPickerOne, colorPickerTwo, gameModeSelector);
+            textFieldOne, textFieldTwo, colorPickerOne, colorPickerTwo, gameModeSelector, choiceBox);
     setBottom(bottom);
     BorderPane.setAlignment(bottom, Pos.CENTER);
     BorderPane.setMargin(bottom, new Insets(0, 0, 20, 0));
@@ -237,7 +250,7 @@ public class PlayerCreation extends BorderPane {
   }
 
   void getSpectatorInformation(GameModeSelector gameModeSelector) {
-    VBox vbox = new VBox(15);
+    VBox vbox = new VBox(0);
     vbox.setAlignment(Pos.CENTER);
 
     TextField textField = new TextField();
@@ -273,7 +286,7 @@ public class PlayerCreation extends BorderPane {
   }
 
   private HBox buildBottomSingle(
-      TextField textField, ColorPicker colorPicker, GameModeSelector gameModeSelector) {
+      TextField textField, ColorPicker colorPicker, GameModeSelector gameModeSelector, ChoiceBox<String> choiceBox) {
 
     HBox hbox = new HBox(30);
     hbox.setAlignment(Pos.CENTER);
@@ -285,12 +298,20 @@ public class PlayerCreation extends BorderPane {
             textField.setStyle("-fx-border-color: red;");
             return;
           }
-          startSinglePlayer(textField.getText(), colorPicker.getValue());
+          startSinglePlayer(textField.getText(), colorPicker.getValue(), gameFieldSizes[choiceBox.getSelectionModel().getSelectedIndex()]);
           gameModeSelector.close();
         });
 
     Button back = getButton("Back");
     back.setOnAction(e -> gameModeSelector.returnToMainScreen());
+    
+    textField.setOnKeyReleased(
+	    e -> {
+		if (e.getCode() == KeyCode.ENTER) {
+		    start.fire();
+		}
+	    });
+    
 
     hbox.getChildren().addAll(start, back);
     return hbox;
@@ -301,7 +322,7 @@ public class PlayerCreation extends BorderPane {
       TextField textFieldTwo,
       ColorPicker colorPickerOne,
       ColorPicker colorPickerTwo,
-      GameModeSelector gameModeSelector) {
+      GameModeSelector gameModeSelector, ChoiceBox<String> choiceBox) {
 
     HBox hbox = new HBox(30);
     hbox.setAlignment(Pos.CENTER);
@@ -325,12 +346,26 @@ public class PlayerCreation extends BorderPane {
               textFieldOne.getText(),
               colorPickerOne.getValue(),
               textFieldTwo.getText(),
-              colorPickerTwo.getValue());
+              colorPickerTwo.getValue(),
+              gameFieldSizes[choiceBox.getSelectionModel().getSelectedIndex()]);
           gameModeSelector.close();
         });
 
     Button back = getButton("Back");
     back.setOnAction(e -> gameModeSelector.returnToMainScreen());
+    
+    textFieldOne.setOnKeyReleased(
+	    e -> {
+		if (e.getCode() == KeyCode.ENTER) {
+		    start.fire();
+		}
+	    });
+    textFieldTwo.setOnKeyReleased(
+	    e -> {
+		if (e.getCode() == KeyCode.ENTER) {
+		    start.fire();
+		}
+	    });
 
     hbox.getChildren().addAll(start, back);
 
@@ -424,13 +459,13 @@ public class PlayerCreation extends BorderPane {
   }
 
   private VBox getInputField(TextField textField, String labelText) {
-    VBox vbox = new VBox(5);
-    vbox.setPadding(new Insets(20));
+    VBox vbox = new VBox(0);
+    vbox.setPadding(new Insets(15));
     vbox.setAlignment(Pos.CENTER);
 
     textField.setMinWidth(200);
     textField.setId("text-field");
-    textField.setMinWidth(200);
+    textField.setPrefWidth(200);
     textField.setMaxWidth(400);
     textField
         .focusedProperty()
@@ -470,9 +505,11 @@ public class PlayerCreation extends BorderPane {
     Pane color = new Pane();
     color.setId("color-pane");
     color.setStyle("-fx-background-color: " + toRgbCode(colorPicker.getValue()) + ";");
-    color.setMinHeight(50);
+    color.setMinHeight(30);
+    color.setPrefHeight(50);
     color.setMaxHeight(50);
-    color.setMinWidth(50);
+    color.setMinWidth(30);
+    color.setPrefWidth(50);
     color.setMaxWidth(50);
     colorPicker.setOnAction(
         (ActionEvent t) -> {
@@ -489,9 +526,10 @@ public class PlayerCreation extends BorderPane {
   private Button getButton(String text) {
     Button button = new Button(text);
     button.setId("button");
-    button.setMinHeight(50);
+    button.setMinHeight(30);
     button.setMaxWidth(250);
-    button.setMinWidth(150);
+    button.setMinWidth(100);
+    button.setPrefWidth(150);
     button.setCursor(Cursor.HAND);
     button.setFont(Font.font(18));
 
@@ -511,7 +549,7 @@ public class PlayerCreation extends BorderPane {
     return input != null && !input.equals("");
   }
 
-  private void startSinglePlayer(String playerName, Color playerColor) {
+  private void startSinglePlayer(String playerName, Color playerColor, int gameFieldSize) {
     Player player = new PlayerImpl(playerName, playerColor);
 
     Color aiColor;
@@ -526,7 +564,7 @@ public class PlayerCreation extends BorderPane {
   }
 
   private void startHotseat(
-      String playerOneName, Color playerOneColor, String playerTwoName, Color playerTwoColor) {
+      String playerOneName, Color playerOneColor, String playerTwoName, Color playerTwoColor, int gameFieldSize) {
 
     if (similarTo(playerOneColor, playerTwoColor)) {
       if (similarTo(playerTwoColor, Color.WHITE)) {
@@ -560,6 +598,22 @@ public class PlayerCreation extends BorderPane {
 
   private Color getRandomColor() {
     return new Color(Math.random(), Math.random(), Math.random(), 1.0);
+  }
+  
+  private VBox getGameFieldSizeSelection(ChoiceBox<String> choiceBox) {
+      VBox vbox = new VBox(5);
+      vbox.setAlignment(Pos.CENTER);
+      
+      Label label = new Label("Wie groﬂ soll das Spielfeld sein ?");
+      label.setId("normal-text");
+      vbox.getChildren().add(label);
+      
+      choiceBox.getSelectionModel().select(0);
+      vbox.getChildren().add(choiceBox);
+      
+      return vbox;
+      
+      
   }
 
   private boolean similarTo(Color c, Color v) {

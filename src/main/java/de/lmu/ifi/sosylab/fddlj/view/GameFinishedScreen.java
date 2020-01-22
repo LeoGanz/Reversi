@@ -50,7 +50,7 @@ public class GameFinishedScreen extends Stage {
     root.setId("main-pane");
     root.setPadding(new Insets(30));
 
-    Label title = new Label("Game over!");
+    Label title = new Label("Game finished!");
     title.setId("title-label");
     root.setTop(title);
     BorderPane.setAlignment(title, Pos.CENTER);

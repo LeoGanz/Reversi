@@ -63,3 +63,24 @@
     -fx-border-width: 1;
     -fx-border-radius: 15;  
 }
+
+.choice-box .context-menu { 
+	-fx-background-color: #46729c;
+}
+.choice-box .menu-item:focused { 
+	-fx-background-color: grey;
+}
+.choice-box .menu-item > .label {
+	-fx-text-fill: white;
+}
+.choice-box .menu-item:focused > .label { 
+	-fx-text-fill: white;
+}
+.choice-box {
+  -fx-background-color: #46729c;
+  -fx-mark-color: white; 
+}
+.choice-box > .label { 
+	-fx-text-fill: white;
+	-fx-font-size: 13;
+}

@@ -46,6 +46,8 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     setStyle("-fx-background-color: transparent;");
     initToggleSwitch();
     initGameBoard(stage, view);
+    setMinWidth(GameFieldImpl.SIZE * GraphicCell.MIN_WIDTH);
+    setMinHeight(GameFieldImpl.SIZE * GraphicCell.MIN_HEIGHT + switchButton.getHeight());
   }
 
   private void initGameBoard(Stage stage, View view) {
