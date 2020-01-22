@@ -20,7 +20,7 @@ public class StartScreenDiskGrid extends BorderPane {
 
   private ArrayList<GraphicDisk> animationStarter;
 
-  private final int animationCycle = 800;
+  private final int animationCycle = 700;
   private final int gridSize = 3;
 
   /** Public constructor of this class build a 2x2 grid with one disk placed on each cell. */

@@ -128,16 +128,8 @@ public class ViewImpl implements View {
     vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setPadding(new Insets(20));
 
-    DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:", this);
-
-    if (gameMode == GameMode.HOTSEAT) {
-      vbox.getChildren().add(currentPlayer);
-    } else {
-      DiskIndicator ownDiskIndicator =
-          new DiskIndicator(model, "You are playing the following disks:", this);
-
-      vbox.getChildren().addAll(currentPlayer, ownDiskIndicator);
-    }
+    DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:", this, controller);
+    vbox.getChildren().add(currentPlayer);
 
     Button reset = getButton("Reset game");
     reset.setOnAction(

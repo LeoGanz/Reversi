@@ -160,11 +160,9 @@ public class OnlineViewImpl implements OnlineView {
     vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setPadding(new Insets(20));
 
-    DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:", this);
-    DiskIndicator ownDiskIndicator =
-        new DiskIndicator(model, "You are playing the following disks:", this);
+    DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:", this, controller);
 
-    vbox.getChildren().addAll(currentPlayer, ownDiskIndicator);
+    vbox.getChildren().add(currentPlayer);
 
     Region spacer = new Region();
     VBox.setVgrow(spacer, Priority.ALWAYS);

@@ -52,7 +52,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
 
     VBox centerGrid = new VBox();
     centerGrid.setAlignment(Pos.CENTER);
-    centerGrid.setEffect(new DropShadow(10, 6, 6, Color.BLACK));
+    centerGrid.setEffect(new DropShadow(15, 5, 5, Color.BLACK));
     for (int row = 1; row < GameFieldImpl.SIZE + 1; row++) {
 
       HBox hboxRow = new HBox();

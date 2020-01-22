@@ -319,6 +319,8 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
         if (similarTo(color, ((MultiplayerController) controller).getOwnPlayer().getColor())) {
           if (similarTo(color, Color.WHITE)) {
             color = Color.SILVER;
+          } else if (similarTo(color, Color.BLACK)) {
+            color = Color.GRAY;
           } else {
             color = color.deriveColor(15, 15, 10, 1);
           }
@@ -360,7 +362,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
                 + (c.getGreen() - v.getGreen()) * (c.getGreen() - v.getGreen())
                 + (c.getBlue() - v.getBlue()) * (c.getBlue() - v.getBlue()));
 
-    if (distance < 0.15) {
+    if (distance < 0.25) {
       return true;
     } else {
       return false;

@@ -513,7 +513,14 @@ public class PlayerCreation extends BorderPane {
 
   private void startSinglePlayer(String playerName, Color playerColor) {
     Player player = new PlayerImpl(playerName, playerColor);
-    Player ai = new PlayerImpl("AI", Color.BLACK);
+
+    Color aiColor;
+    if (similarTo(playerColor, Color.BLACK)) {
+      aiColor = Color.WHITE;
+    } else {
+      aiColor = Color.BLACK;
+    }
+    Player ai = new PlayerImpl("AI", aiColor);
 
     controller.startMainView(GameMode.SINGLEPLAYER, primaryStage, player, ai);
   }
@@ -524,6 +531,8 @@ public class PlayerCreation extends BorderPane {
     if (similarTo(playerOneColor, playerTwoColor)) {
       if (similarTo(playerTwoColor, Color.WHITE)) {
         playerTwoColor = Color.SILVER;
+      } else if (similarTo(playerTwoColor, Color.BLACK)) {
+        playerTwoColor = Color.GRAY;
       } else {
         playerTwoColor = playerTwoColor.deriveColor(15, 15, 10, 1);
       }

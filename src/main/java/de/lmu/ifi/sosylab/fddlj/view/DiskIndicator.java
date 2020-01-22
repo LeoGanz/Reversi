@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 
 /**
  * This class offers a pane that can be used to indicate the current player's disk color and in case
@@ -17,12 +18,12 @@ import javafx.scene.layout.BorderPane;
 public class DiskIndicator extends BorderPane implements PropertyChangeListener {
 
   private static final int DISK_RADIUS = 65;
-  private static final float PADDING = 10;
 
   private Label titel;
   private Label name;
 
   private Model model;
+  private Controller controller;
 
   private GraphicDisk circle;
 
@@ -33,9 +34,10 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
    * @param labelText the text to be displayed
    * @param view a reference to a view instance
    */
-  public DiskIndicator(Model model, String labelText, View view) {
+  public DiskIndicator(Model model, String labelText, View view, Controller controller) {
 
     this.model = model;
+    this.controller = controller;
     view.addListener(this);
 
     setMinHeight(130);
@@ -55,12 +57,27 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
 
   private void initCanvas() {
 
-    circle =
-        new GraphicDisk(
-            getWidth(),
-            getHeight(),
-            DISK_RADIUS,
-            model.getState().getPlayerManagement().getCurrentPlayer().getColor());
+    Color color = model.getState().getPlayerManagement().getCurrentPlayer().getColor();
+
+    if (controller instanceof MultiplayerController) {
+      if (!model
+          .getState()
+          .getPlayerManagement()
+          .getCurrentPlayer()
+          .equals(((MultiplayerController) controller).getOwnPlayer())) {
+        if (similarTo(color, ((MultiplayerController) controller).getOwnPlayer().getColor())) {
+          if (similarTo(color, Color.WHITE)) {
+            color = Color.SILVER;
+          } else if (similarTo(color, Color.BLACK)) {
+            color = Color.GRAY;
+          } else {
+            color = color.deriveColor(15, 15, 10, 1);
+          }
+        }
+      }
+    }
+
+    circle = new GraphicDisk(getWidth(), getHeight(), DISK_RADIUS, color);
 
     setCenter(circle);
     BorderPane.setAlignment(circle, Pos.CENTER);
@@ -76,9 +93,6 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
       radius = DISK_RADIUS;
     }
 
-    circle.setCenterY(getHeight() / 2);
-    circle.setLightY(circle.getCenterY() - DISK_RADIUS / 2 + PADDING);
-    circle.setLightZ(1.15 * getHeight());
     circle.resizeDisk(getHeight(), getHeight(), radius);
   }
 
@@ -105,6 +119,20 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
       if (event.getNewValue() instanceof Model) {
         this.model = (Model) event.getNewValue();
       }
+    }
+  }
+
+  private boolean similarTo(Color c, Color v) {
+    double distance =
+        Math.sqrt(
+            (c.getRed() - v.getRed()) * (c.getRed() - v.getRed())
+                + (c.getGreen() - v.getGreen()) * (c.getGreen() - v.getGreen())
+                + (c.getBlue() - v.getBlue()) * (c.getBlue() - v.getBlue()));
+
+    if (distance < 0.25) {
+      return true;
+    } else {
+      return false;
     }
   }
 }
