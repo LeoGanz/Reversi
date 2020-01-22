@@ -169,7 +169,10 @@ public class GameModeSelector extends Stage {
     vbox.getChildren().add(bottom);
 
     Button server = getButton("Start Server");
-    server.setOnAction(e -> {});
+    server.setOnAction(
+        e -> {
+          controller.startServer();
+        });
     vbox.getChildren().add(server);
 
     return vbox;

@@ -7,6 +7,10 @@ import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.network.Server;
+import de.lmu.ifi.sosylab.fddlj.network.ServerImpl;
+import de.lmu.ifi.sosylab.fddlj.view.server.ServerGui;
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -84,5 +88,27 @@ public class ControllerImpl extends Application implements Controller {
   @Override
   public GameMode getCurrentGameMode() {
     return gameMode;
+  }
+
+  @Override
+  public void startServer() {
+
+    Server server;
+    try {
+      server = new ServerImpl();
+      server.startServer();
+    } catch (IOException e) {
+      showAlert(
+          AlertType.ERROR,
+          "Error",
+          "Error while creating server",
+          "Failed to create a server instance! Maybe there is one already running?");
+      return;
+    }
+
+    if (server != null) {
+      ServerGui view = new ServerGui(server);
+      server.addListener(view);
+    }
   }
 }

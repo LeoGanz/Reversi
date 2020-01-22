@@ -4,6 +4,12 @@ import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.network.Client;
+import de.lmu.ifi.sosylab.fddlj.network.Server;
+import de.lmu.ifi.sosylab.fddlj.network.ServerImpl;
+import de.lmu.ifi.sosylab.fddlj.view.server.ServerGui;
+import java.io.IOException;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 /**
@@ -73,5 +79,35 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   @Override
   public void startSpectateGame(Player ownPlayer, String serverAddress, int lobbyID) {
     gameMode = GameMode.SPECTATOR;
+  }
+
+  @Override
+  public void startServer() {
+    Server server;
+    try {
+      server = new ServerImpl();
+      server.startServer();
+    } catch (IOException e) {
+      showAlert(
+          AlertType.ERROR,
+          "Error",
+          "Error while creating server",
+          "Failed to create a server instance! Maybe there is one already running?");
+      return;
+    }
+
+    if (server != null) {
+      ServerGui view = new ServerGui(server);
+      server.addListener(view);
+    }
+  }
+
+  private void showAlert(AlertType alertType, String title, String header, String content) {
+    Alert alert = new Alert(alertType);
+    alert.setTitle(title);
+    alert.setHeaderText(header);
+    alert.setContentText(content);
+
+    alert.showAndWait();
   }
 }

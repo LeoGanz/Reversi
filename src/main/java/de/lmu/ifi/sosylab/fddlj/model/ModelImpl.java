@@ -164,6 +164,22 @@ public class ModelImpl implements Model {
     }
   }
 
+  @Override
+  public void substitutePlayersWith(Player newPlayerOne, Player newPlayerTwo) {
+    Set<Cell> cellsPlayerOne = state
+        .getField()
+        .getAllCellsForPlayer(state.getPlayerManagement().getPlayerOne());
+    Set<Cell> cellsPlayerTwo =
+        state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerTwo());
+
+    cellsPlayerOne.stream().forEach(c -> state.getField().set(c, new DiskImpl(newPlayerOne)));
+    cellsPlayerTwo.stream().forEach(c -> state.getField().set(c, new DiskImpl(newPlayerTwo)));
+
+    state.getPlayerManagement().setPlayerOne(newPlayerOne);
+    state.getPlayerManagement().setPlayerTwo(newPlayerTwo);
+    notifyListenersOfChangedState();
+  }
+
   /**
    * Turns all Disks belonging to the opponent lying between the placed Disk and another Disk of the
    * same Player.
