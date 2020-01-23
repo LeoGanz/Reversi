@@ -15,17 +15,41 @@ import java.util.Set;
  * @author Dora Pruteanu
  */
 public class GameFieldImpl implements ModifiableGameField {
-  public static final int SIZE = 8;
 
-  private Disk[][] field = new Disk[SIZE][SIZE];
+  private final int size;
 
-  /** The constructor GameFieldImpl sets the game field to its initial state. */
+  private Disk[][] field;
+
+  /**
+   * The constructor GameFieldImpl sets the game field to its initial state with the size {@value
+   * #STANDARD_SIZE}.
+   */
   public GameFieldImpl() {
-    for (int i = 0; i < SIZE; i++) {
-      for (int j = 0; j < SIZE; j++) {
+    this(GameField.STANDARD_SIZE);
+  }
+
+  /**
+   * The constructor GameFieldImpl sets the game field to its initial state with a given size.
+   *
+   * @param size of the GameFieldImpl which will be created. size must be divisible by 2 and at
+   *     least be 4.
+   */
+  public GameFieldImpl(int size) {
+    if (((size % 2) != 0) || size < 4) {
+      throw new IllegalArgumentException("Size must be divisible by 2 and be at least 4");
+    }
+    this.size = size;
+    field = new Disk[size][size];
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
         set(new CellImpl(i, j), null);
       }
     }
+  }
+
+  @Override
+  public int getSize() {
+    return size;
   }
 
   @Override
@@ -58,8 +82,8 @@ public class GameFieldImpl implements ModifiableGameField {
   @Override
   public Map<Cell, Player> getCellsOccupiedWithDisks() {
     Map<Cell, Player> map = new HashMap<>();
-    for (int column = 0; column < SIZE; column++) {
-      for (int row = 0; row < SIZE; row++) {
+    for (int column = 0; column < size; column++) {
+      for (int row = 0; row < size; row++) {
         if (field[column][row] != null) {
           map.put(new CellImpl(column, row), field[column][row].getPlayer());
         }
@@ -71,8 +95,8 @@ public class GameFieldImpl implements ModifiableGameField {
   @Override
   public Set<Cell> getAllCellsForPlayer(Player player) {
     Set<Cell> set = new HashSet<>();
-    for (int column = 0; column < SIZE; column++) {
-      for (int row = 0; row < SIZE; row++) {
+    for (int column = 0; column < size; column++) {
+      for (int row = 0; row < size; row++) {
         if ((field[column][row] != null) && field[column][row].getPlayer().equals(player)) {
           set.add(new CellImpl(column, row));
         }
@@ -93,16 +117,16 @@ public class GameFieldImpl implements ModifiableGameField {
   @Override
   public boolean isWithinBounds(Cell cell) {
     return (cell.getColumn() >= 0)
-        && (cell.getColumn() < SIZE)
+        && (cell.getColumn() < size)
         && (cell.getRow() >= 0)
-        && (cell.getRow() < SIZE);
+        && (cell.getRow() < size);
   }
 
   @Override
   public ModifiableGameField makeCopy() {
-    GameFieldImpl newField = new GameFieldImpl();
-    for (int column = 0; column < SIZE; column++) {
-      for (int row = 0; row < SIZE; row++) {
+    GameFieldImpl newField = new GameFieldImpl(size);
+    for (int column = 0; column < size; column++) {
+      for (int row = 0; row < size; row++) {
         if (field[column][row] != null) {
           newField.set(
               new CellImpl(column, row), new DiskImpl(field[column][row].getPlayer().makeCopy()));
@@ -133,8 +157,11 @@ public class GameFieldImpl implements ModifiableGameField {
     }
 
     GameFieldImpl other = (GameFieldImpl) obj;
-    for (int i = 0; i < SIZE; i++) {
-      for (int j = 0; j < SIZE; j++) {
+    if (other.size != size) {
+      return false;
+    }
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
         Cell toCheck = new CellImpl(i, j);
         if (!(get(toCheck).equals(other.get(toCheck)))) {
           return false;
@@ -143,7 +170,7 @@ public class GameFieldImpl implements ModifiableGameField {
     }
     return true;
   }
-  
+
   @Override
   public int hashCode() {
     return Arrays.deepHashCode(field);
