@@ -18,7 +18,7 @@ public class GameStateImplTest {
   }
 
   ModifiableGameField setUpField() {
-    ModifiableGameField field = new GameFieldImpl(8);
+    ModifiableGameField field = new GameFieldImpl();
     PlayerManagement manager = setUpManager();
     field.set(new CellImpl(0, 3), new DiskImpl(manager.getPlayerOne()));
     field.set(new CellImpl(3, 4), new DiskImpl(manager.getPlayerTwo()));
@@ -240,7 +240,7 @@ public class GameStateImplTest {
     GameStateImpl state2 = new GameStateImpl();
     state2.setCurrentPhase(Phase.WAITING);
     state2.setPlayerManagement(setUpManager());
-    state2.setGameField(new GameFieldImpl(8));
+    state2.setGameField(new GameFieldImpl());
 
     Assertions.assertNotEquals(
         state,
@@ -315,7 +315,7 @@ public class GameStateImplTest {
     GameStateImpl state2 = new GameStateImpl();
     state2.setCurrentPhase(Phase.WAITING);
     state2.setPlayerManagement(setUpManager());
-    state2.setGameField(new GameFieldImpl(8));
+    state2.setGameField(new GameFieldImpl());
 
     Assertions.assertNotEquals(state, state2);
     Assertions.assertNotEquals(

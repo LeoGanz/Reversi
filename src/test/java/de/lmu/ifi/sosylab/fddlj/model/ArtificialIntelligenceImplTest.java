@@ -31,7 +31,7 @@ public class ArtificialIntelligenceImplTest {
 
   @Test
   public void testCalculateBestMove_PlayerOneDepthOne() {
-    Model game = new ModelImpl(GameMode.HOTSEAT, 8, one, two);
+    Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
     ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(1, new DummyHeuristic());
 
     Assertions.assertEquals(new CellImpl(3, 3), ai.calculateBestMove(game.getState()));
@@ -60,7 +60,7 @@ public class ArtificialIntelligenceImplTest {
 
   @Test
   public void testCalculateBestMove_PlayerTwoDepthOne() {
-    Model game = new ModelImpl(GameMode.HOTSEAT, 8, one, two);
+    Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
     ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(1, new DummyHeuristic());
 
     helpPlaceDisk(game, diskOne, 3, 3);
@@ -90,7 +90,7 @@ public class ArtificialIntelligenceImplTest {
 
   @Test
   public void testCalculateBestMove_PlayerOneDepthTwo() {
-    Model game = new ModelImpl(GameMode.HOTSEAT, 8, one, two);
+    Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
     ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(2, new DummyHeuristic());
 
     Assertions.assertEquals(new CellImpl(3, 3), ai.calculateBestMove(game.getState()));
@@ -115,7 +115,7 @@ public class ArtificialIntelligenceImplTest {
 
   @Test
   public void testCalculateBestMove_PlayerTwoDepthTwo() {
-    Model game = new ModelImpl(GameMode.HOTSEAT, 8, one, two);
+    Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
     ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(2, new DummyHeuristic());
 
     helpPlaceDisk(game, diskOne, 3, 3);

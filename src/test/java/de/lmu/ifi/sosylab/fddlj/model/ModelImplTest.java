@@ -171,7 +171,7 @@ public class ModelImplTest {
             new CellImpl(2, 3));
     Assertions.assertTrue(move);
 
-    GameFieldImpl field = new GameFieldImpl(8);
+    GameFieldImpl field = new GameFieldImpl();
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
     field.set(new CellImpl(2, 3), diskTwo);
@@ -362,7 +362,7 @@ public class ModelImplTest {
 
   @Test
   public void testPlaceDisk_EmptyField() {
-    ModifiableGameField field = new GameFieldImpl(8);
+    ModifiableGameField field = new GameFieldImpl();
     ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState state = new GameStateImpl();
     state.setPlayerManagement(manager);
@@ -372,7 +372,7 @@ public class ModelImplTest {
     boolean move = model.placeDisk(new DiskImpl(playerOne), new CellImpl(3, 3));
     Assertions.assertTrue(move);
 
-    ModifiableGameField createdField = new GameFieldImpl(8);
+    ModifiableGameField createdField = new GameFieldImpl();
     ModifiablePlayerManagement createdManager = new PlayerManagementImpl(playerOne, playerTwo);
     createdField.set(new CellImpl(3, 3), new DiskImpl(playerOne));
     createdManager.switchCurrentPlayer();
@@ -387,7 +387,7 @@ public class ModelImplTest {
 
   @Test
   public void testPlaceDisk_EmptyField_InvalidMove() {
-    ModifiableGameField field = new GameFieldImpl(8);
+    ModifiableGameField field = new GameFieldImpl();
     ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState state = new GameStateImpl();
     state.setPlayerManagement(manager);
@@ -397,7 +397,7 @@ public class ModelImplTest {
     boolean move = model.placeDisk(new DiskImpl(playerOne), new CellImpl(7, 3));
     Assertions.assertFalse(move);
 
-    ModifiableGameField createdField = new GameFieldImpl(8);
+    ModifiableGameField createdField = new GameFieldImpl();
     ModifiablePlayerManagement createdManager = new PlayerManagementImpl(playerOne, playerTwo);
     ModifiableGameState createdState = new GameStateImpl();
     createdState.setPlayerManagement(createdManager);
@@ -566,7 +566,7 @@ public class ModelImplTest {
     expectedMoves.add(new CellImpl(4, 3));
     expectedMoves.add(new CellImpl(4, 4));
 
-    ModelImpl game = new ModelImpl(GameMode.HOTSEAT, 8, playerOne, playerTwo);
+    ModelImpl game = new ModelImpl(GameMode.HOTSEAT, playerOne, playerTwo);
 
     helperGetPossibleMovesForPlayer((ModifiableGameState) game.getState(), expectedMoves);
 
@@ -604,7 +604,7 @@ public class ModelImplTest {
         () -> {
           Random r = new Random();
           AiPlayer ai = new AiPlayerImpl();
-          ModelImpl game = new ModelImpl(GameMode.SINGLEPLAYER, 8, playerOne, ai);
+          ModelImpl game = new ModelImpl(GameMode.SINGLEPLAYER, playerOne, ai);
 
           while (game.getState().getCurrentPhase().equals(Phase.RUNNING)) {
             Set<Cell> moves = game.getPossibleMovesForPlayer(playerOne);

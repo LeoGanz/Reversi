@@ -100,7 +100,7 @@ public class GameFieldImplTest {
   }
 
   private void helperIsWithinBounds_correctCell(int column, int row) {
-    GameFieldImpl field = new GameFieldImpl(8);
+    GameFieldImpl field = new GameFieldImpl();
     Cell cell = new CellImpl(column, row);
 
     boolean test = field.isWithinBounds(cell);
@@ -108,7 +108,7 @@ public class GameFieldImplTest {
   }
 
   private void helperIsWithinBounds_incorrectCell(int column, int row) {
-    GameFieldImpl field = new GameFieldImpl(8);
+    GameFieldImpl field = new GameFieldImpl();
     Cell cell = new CellImpl(column, row);
 
     boolean test = field.isWithinBounds(cell);
@@ -120,7 +120,7 @@ public class GameFieldImplTest {
           new PlayerImpl("One", Color.ALICEBLUE), new PlayerImpl("two", Color.ANTIQUEWHITE));
 
   private GameFieldImpl createTestGameField() {
-    GameFieldImpl field = new GameFieldImpl(8);
+    GameFieldImpl field = new GameFieldImpl();
     Cell cell1 = new CellImpl(4, 2);
     Cell cell2 = new CellImpl(4, 3);
     Cell cell3 = new CellImpl(4, 4);
@@ -195,35 +195,35 @@ public class GameFieldImplTest {
   @Test
   public void testRemove_playerOne() {
     Cell cell = new CellImpl(4, 2);
-    GameFieldImpl field = new GameFieldImpl(8);
-    field.set(cell, new DiskImpl(manager.getPlayerOne()));
+    GameFieldImpl field = new GameFieldImpl();
+    field.set(cell,new DiskImpl(manager.getPlayerOne()));
     Disk test = field.remove(cell);
     Assertions.assertEquals(new DiskImpl(manager.getPlayerOne()), test);
-    Assertions.assertEquals(Optional.empty(), field.get(cell));
+    Assertions.assertEquals(Optional.empty(),field.get(cell));
   }
 
   @Test
   public void testRemove_playerTwo() {
     Cell cell = new CellImpl(3, 3);
-    GameFieldImpl field = new GameFieldImpl(8);
-    field.set(cell, new DiskImpl(manager.getPlayerTwo()));
+    GameFieldImpl field = new GameFieldImpl();
+    field.set(cell,new DiskImpl(manager.getPlayerTwo()));
     Disk test = field.remove(cell);
     Assertions.assertEquals(new DiskImpl(manager.getPlayerTwo()), test);
-    Assertions.assertEquals(Optional.empty(), field.get(cell));
+    Assertions.assertEquals(Optional.empty(),field.get(cell));
   }
 
   @Test
   public void testRemove_Empty() {
     Cell cell = new CellImpl(1, 1);
-    GameFieldImpl field = new GameFieldImpl(8);
+    GameFieldImpl field = new GameFieldImpl();
     Disk test = field.remove(cell);
     Assertions.assertNull(test);
-    Assertions.assertEquals(Optional.empty(), field.get(cell));
+    Assertions.assertEquals(Optional.empty(),field.get(cell));
   }
 
   private void helperTestSet(Disk newValue, int column, int row) {
     CellImpl cell = new CellImpl(column, row);
-    GameFieldImpl gameField = new GameFieldImpl(8);
+    GameFieldImpl gameField = new GameFieldImpl();
     Cell cell1 = new CellImpl(4, 2);
     Cell cell2 = new CellImpl(4, 3);
     Cell cell3 = new CellImpl(4, 4);
@@ -412,7 +412,7 @@ public class GameFieldImplTest {
   @Test
   public void testEquals_NotEqual() {
     GameFieldImpl field1 = createTestGameField();
-    GameFieldImpl field2 = new GameFieldImpl(8);
+    GameFieldImpl field2 = new GameFieldImpl();
 
     Assertions.assertNotEquals(
         field1, field2, "field1 should not be equal to the empty GameField field2!");
@@ -433,7 +433,7 @@ public class GameFieldImplTest {
   @Test
   public void testHashCode_NotEqual() {
     GameFieldImpl field1 = createTestGameField();
-    GameFieldImpl field2 = new GameFieldImpl(8);
+    GameFieldImpl field2 = new GameFieldImpl();
 
     Assertions.assertNotEquals(field1, field2);
     Assertions.assertNotEquals(
