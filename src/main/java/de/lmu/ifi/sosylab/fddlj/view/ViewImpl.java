@@ -39,6 +39,7 @@ import javafx.stage.Stage;
 public class ViewImpl implements View {
 
   static final String STAGE_RESIZED = "Stage resized";
+  static final String SOUND_MODE_CHANGED = "Sound mode changed";
 
   private Model model;
   private Controller controller;
@@ -52,6 +53,8 @@ public class ViewImpl implements View {
   private Label numberPlayerTwoDisks;
 
   private PropertyChangeSupport support;
+
+  private boolean playSound;
 
   /**
    * Constructor of this class initialises the main frame of the game.
@@ -67,6 +70,7 @@ public class ViewImpl implements View {
     this.model = model;
 
     support = new PropertyChangeSupport(this);
+    playSound = true;
 
     this.stage.setTitle("Reversi");
     this.stage.setMaximized(true);
@@ -78,7 +82,6 @@ public class ViewImpl implements View {
             (obs, oldVal, newVal) -> {
               support.firePropertyChange(
                   new PropertyChangeEvent(this, STAGE_RESIZED, null, support));
-              
             });
 
     this.stage
@@ -117,12 +120,28 @@ public class ViewImpl implements View {
     BorderPane.setAlignment(root, Pos.CENTER);
     BorderPane.setMargin(gameBoard, new Insets(30, 50, 30, 50));
 
-    scene = new Scene(root);
+    VBox right = getMuteButton();
+    root.setRight(right);
+    BorderPane.setMargin(right, new Insets(0, 15, 15, 0));
 
-    stage.setMinWidth(left.getWidth() + gameBoard.getMinWidth());
-    stage.setMinHeight(left.getHeight() + gameBoard.getMinHeight());
-    
-System.out.println(gameBoard.getMinHeight());    
+    scene = new Scene(root);
+    stage.setMinWidth(
+        left.getMinWidth()
+            + gameBoard.getMinWidth()
+            + BorderPane.getMargin(gameBoard).getLeft()
+            + BorderPane.getMargin(gameBoard).getRight()
+            + right.getMinWidth()
+            + BorderPane.getMargin(right).getRight());
+    double minHeightLeft =
+        left.getMinHeight() + spacerBottom.getMinHeight() + spacerTop.getMinHeight();
+    double minHeightBoard =
+        gameBoard.getMinHeight() + spacerBottom.getMinHeight() + spacerTop.getMinHeight();
+    if (minHeightLeft > minHeightBoard) {
+      stage.setMinHeight(minHeightLeft);
+    } else {
+      stage.setMinHeight(minHeightBoard);
+    }
+
     stage.setScene(scene);
     stage.show();
   }
@@ -135,6 +154,8 @@ System.out.println(gameBoard.getMinHeight());
 
     DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:", this, controller);
     vbox.getChildren().add(currentPlayer);
+    stage.heightProperty().addListener(e -> currentPlayer.resizeDisk());
+    stage.widthProperty().addListener(e -> currentPlayer.resizeDisk());
 
     Button reset = getButton("Reset game");
     reset.setOnAction(
@@ -148,13 +169,24 @@ System.out.println(gameBoard.getMinHeight());
     Region spacer = new Region();
     VBox.setVgrow(spacer, Priority.ALWAYS);
 
-    vbox.getChildren().addAll(new Separator(Orientation.HORIZONTAL), spacer, getDiskCounter());
+    VBox diskCounter = getDiskCounter();
+    vbox.getChildren().addAll(new Separator(Orientation.HORIZONTAL), spacer, diskCounter);
 
     Region bottomSpacer = new Region();
     VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
 
     vbox.getChildren()
         .addAll(bottomSpacer, new Separator(Orientation.HORIZONTAL), getHelpButton(), reset);
+    vbox.setMinWidth(
+        (diskCounter.getMinWidth() + vbox.getPadding().getLeft() + vbox.getPadding().getRight()));
+    vbox.setMinHeight(
+        vbox.getSpacing() * 7
+            + currentPlayer.getMinHeight()
+            + reset.getPrefHeight()
+            + diskCounter.getMinHeight()
+            + getHelpButton().getMinHeight()
+            + vbox.getPadding().getTop()
+            + vbox.getPadding().getBottom());
 
     return vbox;
   }
@@ -163,7 +195,6 @@ System.out.println(gameBoard.getMinHeight());
     VBox vbox = new VBox(30);
     vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setStyle("-fx-background-color: #6e7175;");
-    vbox.setFillWidth(true);
     vbox.setMaxWidth(Double.POSITIVE_INFINITY);
 
     if (model instanceof ModelImpl) {
@@ -174,12 +205,13 @@ System.out.println(gameBoard.getMinHeight());
       playerOneInfo.setMaxWidth(Double.POSITIVE_INFINITY);
 
       ModelImpl mod = (ModelImpl) model;
+      Font labelFont = Font.font("Boulder", FontWeight.BOLD, 25);
 
-      playerOneInfo
-          .getChildren()
-          .add(buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor()));
+      GridPane diskTriangle =
+          buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor());
+      playerOneInfo.getChildren().add(diskTriangle);
       numberPlayerOneDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerOne()));
-      numberPlayerOneDisks.setFont(Font.font("Boulder", FontWeight.BOLD, 25));
+      numberPlayerOneDisks.setFont(labelFont);
       numberPlayerOneDisks.setStyle("-fx-text-fill: white;");
       playerOneInfo.getChildren().add(numberPlayerOneDisks);
       vbox.getChildren().add(playerOneInfo);
@@ -192,11 +224,15 @@ System.out.println(gameBoard.getMinHeight());
           .getChildren()
           .add(buildDiskTriangle(model.getState().getPlayerManagement().getPlayerTwo().getColor()));
       numberPlayerTwoDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
-      numberPlayerTwoDisks.setFont(Font.font("Boulder", FontWeight.BOLD, 25));
+      numberPlayerTwoDisks.setFont(labelFont);
       numberPlayerTwoDisks.setStyle("-fx-text-fill: white;");
       playerTwoInfo.getChildren().add(numberPlayerTwoDisks);
 
       vbox.getChildren().add(playerTwoInfo);
+
+      vbox.setMinHeight((vbox.getSpacing() + diskTriangle.getMinHeight() * 2));
+      vbox.setMinWidth(
+          (diskTriangle.getMinWidth() + playerOneInfo.getSpacing() + labelFont.getSize() * 2));
     }
 
     return vbox;
@@ -217,8 +253,48 @@ System.out.println(gameBoard.getMinHeight());
         "Display a window with additional information about this reversi game,"
             + " such as the rules and licenses.");
     button.setTooltip(helper);
+    button.setMinHeight(50);
 
     return button;
+  }
+
+  private VBox getMuteButton() {
+    VBox vbox = new VBox();
+    vbox.setAlignment(Pos.BOTTOM_CENTER);
+
+    final Image play =
+        new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker.png"));
+    final Image mute =
+        new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker_mute.png"));
+
+    ImageView imageView = new ImageView(play);
+    imageView.setPreserveRatio(true);
+    imageView.setFitHeight(30);
+    Button button = new Button("", imageView);
+    button.setCursor(Cursor.HAND);
+    button.setStyle(
+        "-fx-background-color: white; -fx-border-color: transparent; -fx-background-radius: 50");
+    button.setPrefSize(50, 50);
+    button.setOnAction(
+        e -> {
+          if (playSound) {
+            playSound = false;
+
+            imageView.setImage(mute);
+            button.setGraphic(imageView);
+            support.firePropertyChange(SOUND_MODE_CHANGED, !playSound, playSound);
+          } else {
+            playSound = true;
+
+            imageView.setImage(play);
+            button.setGraphic(imageView);
+            support.firePropertyChange(SOUND_MODE_CHANGED, !playSound, playSound);
+          }
+        });
+
+    vbox.getChildren().add(button);
+    vbox.setMinWidth(button.getMinWidth());
+    return vbox;
   }
 
   @Override
@@ -276,7 +352,8 @@ System.out.println(gameBoard.getMinHeight());
   private Button getButton(String text) {
     Button button = new Button(text);
     button.setId("button");
-    button.setMinHeight(50);
+    button.setMinHeight(40);
+    button.setPrefHeight(50);
     button.setMaxWidth(250);
     button.setMinWidth(100);
     button.setCursor(Cursor.HAND);
@@ -311,6 +388,9 @@ System.out.println(gameBoard.getMinHeight());
     grid.add(diskTwo, 0, 1);
     grid.add(diskThree, 1, 1);
     grid.add(diskFour, 2, 1);
+
+    grid.setMinHeight(80);
+    grid.setMinWidth((3 * 30));
 
     return grid;
   }

@@ -3,10 +3,9 @@ package de.lmu.ifi.sosylab.fddlj.view;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 /**
@@ -15,9 +14,10 @@ import javafx.scene.paint.Color;
  *
  * @author Josef Feger
  */
-public class DiskIndicator extends BorderPane implements PropertyChangeListener {
+public class DiskIndicator extends VBox implements PropertyChangeListener {
 
-  private static final int DISK_RADIUS = 65;
+  private static final int DISK_RADIUS = 40;
+  private static final int MAX_RADIUS = 80;
 
   private Label titel;
   private Label name;
@@ -36,11 +36,14 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
    */
   public DiskIndicator(Model model, String labelText, View view, Controller controller) {
 
+    super(5);
+    setAlignment(Pos.CENTER);
+
     this.model = model;
     this.controller = controller;
     view.addListener(this);
 
-    setMinHeight(130);
+    setMinHeight(30 + getSpacing() + DISK_RADIUS + getSpacing() + 30);
 
     initLabel(labelText);
     initCanvas();
@@ -50,9 +53,7 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
   private void initLabel(String labelText) {
     titel = new Label(labelText);
     titel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: x-large; -fx-font-family: arial;");
-    setTop(titel);
-    BorderPane.setAlignment(titel, Pos.CENTER);
-    BorderPane.setMargin(titel, new Insets(0, 0, 10, 0));
+    getChildren().add(titel);
   }
 
   private void initCanvas() {
@@ -77,20 +78,20 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
       }
     }
 
-    circle = new GraphicDisk(getWidth(), getHeight(), DISK_RADIUS, color);
+    circle = new GraphicDisk(getWidth(), getHeight(), MAX_RADIUS, color);
 
-    setCenter(circle);
-    BorderPane.setAlignment(circle, Pos.CENTER);
-
-    widthProperty().addListener(e -> resizeDisk());
-    heightProperty().addListener(e -> resizeDisk());
+    getChildren().add(circle);
   }
 
-  private void resizeDisk() {
+  /** Resizes the disk to fit the current parent's size. */
+  void resizeDisk() {
+
     double radius =
         ((getHeight() - titel.getHeight() - name.getHeight()) - GraphicDisk.PADDING) / 2;
-    if (radius > DISK_RADIUS) {
+    if (radius < DISK_RADIUS) {
       radius = DISK_RADIUS;
+    } else if (radius > MAX_RADIUS) {
+      radius = MAX_RADIUS;
     }
 
     circle.resizeDisk(getHeight(), getHeight(), radius);
@@ -99,9 +100,7 @@ public class DiskIndicator extends BorderPane implements PropertyChangeListener 
   private void initPlayerName() {
     name = new Label(model.getState().getPlayerManagement().getCurrentPlayer().getName());
     name.setStyle("-fx-text-fill: #ffffff; -fx-font-size: x-large; -fx-font-family: arial;");
-    setBottom(name);
-    BorderPane.setAlignment(name, Pos.CENTER);
-    BorderPane.setMargin(name, new Insets(10, 0, 0, 0));
+    getChildren().add(name);
   }
 
   @Override

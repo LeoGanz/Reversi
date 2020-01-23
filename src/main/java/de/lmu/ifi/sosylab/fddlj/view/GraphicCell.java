@@ -26,9 +26,9 @@ import javafx.stage.Screen;
 public class GraphicCell extends BorderPane implements PropertyChangeListener {
 
   private GraphicDisk diskOnCell;
-  
-  static int MIN_WIDTH = 60;
-  static int MIN_HEIGHT = 60;
+
+  static final int MIN_WIDTH = 60;
+  static final int MIN_HEIGHT = 60;
 
   private Model model;
   private GameBoardGrid gameBoardGrid;
@@ -79,7 +79,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
     addListeners(gameBoardGrid);
     setOnMouseMoved(e -> handleMouseMoved(e));
     setOnMouseClicked(e -> handleMouseClicked(e));
-    
+
     setCursor(Cursor.DEFAULT);
 
     isMovePossibleOnCell =
@@ -118,54 +118,47 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
    */
   public GraphicCell() {
     setStyle(cssStart);
-    double initValue =
-        (Screen.getPrimary().getVisualBounds().getHeight() - SPACING)
-            /  9.0;
+    double initValue = (Screen.getPrimary().getVisualBounds().getHeight() - SPACING) / 9.0;
     setPrefHeight(initValue);
     setPrefWidth(initValue);
   }
 
   private void addListeners(GameBoardGrid gameBoardGrid) {
-    gameBoardGrid
-        .widthProperty()
-        .addListener(
-            (obs, oldVal, newVal) -> {
-              double prefWidth =
-                  (gameBoardGrid.getHeight() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
-              setPrefWidth(prefWidth);
-              setPrefHeight(prefWidth);
+    gameBoardGrid.widthProperty().addListener((obs, oldVal, newVal) -> resizeCell());
+    gameBoardGrid.heightProperty().addListener((obs, oldVal, newVal) -> resizeCell());
+  }
 
-              if (diskOnCell != null) {
-                diskOnCell.resizeDisk(
-                    getWidth() - GraphicDisk.PADDING,
-                    getHeight() - GraphicDisk.PADDING,
-                    (getHeight() - GraphicDisk.PADDING) / 2);
-              }
+  private void resizeCell() {
+    double prefSize;
+    if (gameBoardGrid.getWidth() >= gameBoardGrid.getHeight()) {
+      prefSize = (gameBoardGrid.getHeight() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
 
-              if (indicateMoves && isMovePossibleOnCell) {
-                indicatePossibleMove();
-              }
-            });
-    gameBoardGrid
-        .heightProperty()
-        .addListener(
-            (obs, oldVal, newVal) -> {
-              double prefHeight =
-                  (gameBoardGrid.getHeight() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
-              setPrefHeight(prefHeight);
-              setPrefWidth(prefHeight);
+      if (prefSize < MIN_HEIGHT) {
+        prefSize = MIN_HEIGHT;
+      }
+    } else {
+      prefSize = (gameBoardGrid.getWidth() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
 
-              if (diskOnCell != null) {
-                diskOnCell.resizeDisk(
-                    getWidth() - GraphicDisk.PADDING,
-                    getHeight() - GraphicDisk.PADDING,
-                    (getHeight() - GraphicDisk.PADDING) / 2);
-              }
+      if (prefSize < MIN_WIDTH) {
+        prefSize = MIN_WIDTH;
+      }
+    }
 
-              if (indicateMoves && isMovePossibleOnCell) {
-                indicatePossibleMove();
-              }
-            });
+    setPrefWidth(prefSize);
+    setPrefHeight(prefSize);
+    setMaxWidth(prefSize);
+    setMaxHeight(prefSize);
+
+    if (diskOnCell != null) {
+      diskOnCell.resizeDisk(
+          prefSize - 2 * GraphicDisk.PADDING,
+          prefSize - 2 * GraphicDisk.PADDING,
+          (prefSize - 2 * GraphicDisk.PADDING) / 2);
+    }
+
+    if (indicateMoves && isMovePossibleOnCell) {
+      indicatePossibleMove();
+    }
   }
 
   private void handleMouseMoved(MouseEvent e) {
@@ -185,9 +178,9 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
       setCursor(Cursor.DEFAULT);
       return;
     }
-    
+
     if (getCursor() == null) {
-	return;
+      return;
     }
 
     if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER
@@ -221,9 +214,9 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
     if (controller.getCurrentGameMode() == GameMode.SPECTATOR) {
       return;
     }
-    
+
     if (getCursor() == null) {
-	return;
+      return;
     }
 
     if (getCursor().equals(Cursor.HAND)) {
@@ -277,7 +270,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
 
       if (diskOnCell != null) {
         diskOnCell.resizeDisk(
-            getWidth() - GraphicDisk.PADDING,
+            getHeight() - GraphicDisk.PADDING,
             getHeight() - GraphicDisk.PADDING,
             (getHeight() - GraphicDisk.PADDING) / 2);
       }
@@ -309,6 +302,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
       diskOnCell =
           new GraphicDisk(
               getWidth() - 10, getHeight() - 10, (getHeight() - 10) / 2, getDiskColor());
+
       setCenter(diskOnCell);
       setStyle(cssNormal);
     } else if (model.getState().getField().get(current).isPresent() && diskOnCell != null) {
