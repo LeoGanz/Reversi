@@ -16,7 +16,6 @@ import java.util.Set;
  */
 public class GameFieldImpl implements ModifiableGameField {
 
-  private static final int STANDARD_SIZE = 8;
   private final int size;
 
   private Disk[][] field;
@@ -26,13 +25,7 @@ public class GameFieldImpl implements ModifiableGameField {
    * #STANDARD_SIZE}.
    */
   public GameFieldImpl() {
-    size = STANDARD_SIZE;
-    field = new Disk[size][size];
-    for (int i = 0; i < size; i++) {
-      for (int j = 0; j < size; j++) {
-        set(new CellImpl(i, j), null);
-      }
-    }
+    this(GameField.STANDARD_SIZE);
   }
 
   /**

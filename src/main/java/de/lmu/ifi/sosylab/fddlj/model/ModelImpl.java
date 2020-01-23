@@ -34,23 +34,7 @@ public class ModelImpl implements Model {
    * @param playerTwo who will play in this game.
    */
   public ModelImpl(GameMode mode, Player playerOne, Player playerTwo) {
-    support = new PropertyChangeSupport(this);
-
-    this.mode = mode;
-
-    state = new GameStateImpl();
-    state.setGameField(new GameFieldImpl());
-    state.setCurrentPhase(Phase.RUNNING);
-    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
-    state.setPlayerManagement(manager);
-
-    disksPerPlayer = ((int) Math.pow(state.getField().getSize(), 2)) / 2;
-    numberOfPlayerOneDisks = disksPerPlayer;
-    numberOfPlayerTwoDisks = disksPerPlayer;
-
-    if (mode.equals(GameMode.SINGLEPLAYER)) {
-      ai = new ArtificialIntelligenceImpl(AI_DEPTH, new HeuristicImpl());
-    }
+    this(mode, GameField.STANDARD_SIZE, playerOne, playerTwo);
   }
 
   /**

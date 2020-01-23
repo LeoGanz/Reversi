@@ -12,6 +12,8 @@ import java.util.Set;
  */
 public interface GameField {
 
+  public static final int STANDARD_SIZE = 8;
+
   /**
    * Return an {@link Optional} that may contain a {@link Disk}, depending on if there is one
    * positioned on the cell.
