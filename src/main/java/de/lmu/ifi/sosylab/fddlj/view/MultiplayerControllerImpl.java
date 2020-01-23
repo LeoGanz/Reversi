@@ -37,12 +37,13 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   }
 
   @Override
-  public void startMainView(GameMode gameMode, Stage stage, Player playerOne, Player playerTwo) {
+  public void startMainView(
+      GameMode gameMode, Stage stage, Player playerOne, Player playerTwo, int gameFieldSize) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void resetGame(GameMode gameMode, Player playerOne, Player playerTwo) {
+  public void resetGame(GameMode gameMode, Player playerOne, Player playerTwo, int gameFieldSize) {
     requestGameReset();
   }
 

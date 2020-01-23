@@ -13,6 +13,8 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -140,7 +142,7 @@ public class ViewImpl implements View {
             + BorderPane.getMargin(gameBoard).getLeft()
             + BorderPane.getMargin(gameBoard).getRight()
             + right.getMinWidth()
-            + BorderPane.getMargin(right).getRight());
+            + 2 * BorderPane.getMargin(right).getRight());
     double minHeightLeft =
         left.getMinHeight() + spacerBottom.getMinHeight() + spacerTop.getMinHeight();
     double minHeightBoard =
@@ -172,7 +174,8 @@ public class ViewImpl implements View {
           controller.resetGame(
               gameMode,
               model.getState().getPlayerManagement().getPlayerOne(),
-              model.getState().getPlayerManagement().getPlayerTwo());
+              model.getState().getPlayerManagement().getPlayerTwo(),
+              8 /*model.getState().getField().getSize()*/);
         });
 
     Region spacer = new Region();
@@ -216,7 +219,7 @@ public class ViewImpl implements View {
       ModelImpl mod = (ModelImpl) model;
       Font labelFont = Font.font("Boulder", FontWeight.BOLD, 25);
 
-      GridPane diskTriangle =
+      VBox diskTriangle =
           buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor());
       playerOneInfo.getChildren().add(diskTriangle);
       numberPlayerOneDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerOne()));
@@ -270,6 +273,7 @@ public class ViewImpl implements View {
   private VBox getMuteAndMainMenuButton() {
     VBox vbox = new VBox(10);
     vbox.setAlignment(Pos.BOTTOM_CENTER);
+    vbox.setPadding(new Insets(20));
 
     final Image play =
         new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker.png"));
@@ -315,9 +319,25 @@ public class ViewImpl implements View {
     vbox.getChildren().add(button);
 
     Button back = getButton("Hautpmenue");
+    back.setOnAction(
+        e -> {
+          stage.close();
+          if (controller instanceof ControllerImpl) {
+            ((ControllerImpl) controller).showGameModeSelector(new Stage());
+          } else {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Failed to return to main screen");
+            alert.setContentText("Failed to return to main screen. Exiting the program ...");
+
+            alert.showAndWait();
+            Platform.exit();
+          }
+        });
     vbox.getChildren().add(back);
 
-    vbox.setMinWidth(back.getMinWidth());
+    vbox.setMinWidth(
+        back.getPrefWidth() + vbox.getPadding().getRight() + vbox.getPadding().getLeft());
     return vbox;
   }
 
@@ -435,6 +455,7 @@ public class ViewImpl implements View {
     button.setPrefHeight(50);
     button.setMaxWidth(250);
     button.setMinWidth(100);
+    button.setPrefWidth(170);
     button.setCursor(Cursor.HAND);
     button.setFont(Font.font(18));
 
@@ -451,26 +472,31 @@ public class ViewImpl implements View {
     support.removePropertyChangeListener(listener);
   }
 
-  private GridPane buildDiskTriangle(Color color) {
+  private VBox buildDiskTriangle(Color color) {
     GridPane grid = new GridPane();
+    VBox vbox = new VBox(3);
 
-    grid.setStyle("-fx-background-color: transparent;");
+    vbox.setStyle("-fx-background-color: transparent;");
     grid.setGridLinesVisible(false);
-    grid.setAlignment(Pos.CENTER);
+    vbox.setAlignment(Pos.CENTER);
 
     GraphicDisk diskOne = new GraphicDisk(30, 30, 15, color);
+
+    HBox topRow = new HBox();
+    topRow.setAlignment(Pos.CENTER);
+    topRow.getChildren().add(diskOne);
     GraphicDisk diskTwo = new GraphicDisk(30, 30, 15, color);
     GraphicDisk diskThree = new GraphicDisk(30, 30, 15, color);
-    GraphicDisk diskFour = new GraphicDisk(30, 30, 15, color);
 
-    grid.add(diskOne, 1, 0);
-    grid.add(diskTwo, 0, 1);
-    grid.add(diskThree, 1, 1);
-    grid.add(diskFour, 2, 1);
+    HBox bottomRow = new HBox(3);
+    bottomRow.setAlignment(Pos.CENTER);
+    bottomRow.getChildren().addAll(diskTwo, diskThree);
 
-    grid.setMinHeight(80);
-    grid.setMinWidth((3 * 30));
+    vbox.setMinHeight(80);
+    vbox.setMinWidth((3 * 30));
 
-    return grid;
+    vbox.getChildren().addAll(topRow, bottomRow);
+
+    return vbox;
   }
 }

@@ -16,8 +16,13 @@ public interface Controller {
    * Initializes and starts the user interface.
    *
    * @param gameMode the game mode to use for the game
+   * @param stage the stage to use for the GUI
+   * @param playerOne the first player
+   * @param playerTwo the second player
+   * @param gameFieldSize the size of the game field
    */
-  void startMainView(GameMode gameMode, Stage stage, Player playerOne, Player playerTwo);
+  void startMainView(
+      GameMode gameMode, Stage stage, Player playerOne, Player playerTwo, int gameFieldSize);
 
   /**
    * Resets the game to the specified game mode with the two given players.
@@ -25,8 +30,9 @@ public interface Controller {
    * @param gameMode the new game mode
    * @param playerOne the new player one
    * @param playerTwo the new player two
+   * @param gameFieldSize the size of the game field
    */
-  void resetGame(GameMode gameMode, Player playerOne, Player playerTwo);
+  void resetGame(GameMode gameMode, Player playerOne, Player playerTwo, int gameFieldSize);
 
   /**
    * Execute a disk placement on the board.
