@@ -16,7 +16,6 @@ import de.lmu.ifi.sosylab.fddlj.network.communication.Message;
 import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement;
 import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
 import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -57,13 +56,13 @@ public class ClientImpl implements Client {
    */
   public ClientImpl(ClientCompatibleGui compatibleGui, InetAddress inetAddress, Player player) {
     this.compatibleGui = compatibleGui;
-    this.serverAddress = inetAddress;
-    this.clientPlayer = player;
+    serverAddress = inetAddress;
+    clientPlayer = player;
   }
 
   @Override
   public void startClient() {
-    this.running = true;
+    running = true;
 
     Thread connectorThread = new Thread(this::communicateWithServer);
     connectorThread.setDaemon(true);
@@ -71,43 +70,44 @@ public class ClientImpl implements Client {
   }
 
   @Override
-  public void joinAnyRandomPublicLobby() {
-    JoinRequest joinRequest = JoinRequest.generateJoinAnyPublicLobbyRequest(this.clientPlayer);
+  public void joinAnyRandomPublicLobby(boolean asSpectator) {
+    JoinRequest joinRequest =
+        JoinRequest.generateJoinAnyPublicLobbyRequest(clientPlayer, asSpectator);
 
-    this.sendMessage(joinRequest);
+    sendMessage(joinRequest);
   }
 
   @Override
   public void joinSpecificLobby(boolean asSpectator, int lobbyId) {
     JoinRequest joinRequest = JoinRequest.generateJoinSpecificLobbyRequest(
-            this.clientPlayer, asSpectator, lobbyId);
+            clientPlayer, asSpectator, lobbyId);
 
-    this.sendMessage(joinRequest);
+    sendMessage(joinRequest);
   }
 
   @Override
   public void createNewPrivateLobby() {
-    JoinRequest joinRequest = JoinRequest.generateJoinNewPrivateLobbyRequest(this.clientPlayer);
+    JoinRequest joinRequest = JoinRequest.generateJoinNewPrivateLobbyRequest(clientPlayer);
 
-    this.sendMessage(joinRequest);
+    sendMessage(joinRequest);
   }
 
   @Override
   public DiskPlacement placeDisk(Disk disk, Cell cell) {
-    DiskPlacement diskPlacement = new DiskPlacement(this.lastDiskPlacement, disk, cell);
+    DiskPlacement diskPlacement = new DiskPlacement(lastDiskPlacement, disk, cell);
 
-    this.sendMessage(diskPlacement);
+    sendMessage(diskPlacement);
     return diskPlacement;
   }
 
   @Override
   public void requestGameRestart() {
-    this.sendMessage(ClientNotification.REQUEST_RESTART);
+    sendMessage(ClientNotification.REQUEST_RESTART);
   }
 
   @Override
   public void acceptGameRestart() {
-    this.sendMessage(ClientNotification.ACCEPT_RESTART_REQUEST);
+    sendMessage(ClientNotification.ACCEPT_RESTART_REQUEST);
   }
 
   /**
@@ -116,25 +116,25 @@ public class ClientImpl implements Client {
    * @param messageObject message object do send to server
    */
   private void sendMessage(Object messageObject) {
-    if (this.connectionEstablished) {
-      this.out.println(new Message<>(messageObject).toJson());
+    if (connectionEstablished) {
+      out.println(new Message<>(messageObject).toJson());
     }
   }
 
   private void requestGameStateWithLastPlacementUuid() {
-    this.sendMessage(ClientNotification.REQUEST_CURRENT_GAMESTATE_WITH_LAST_PLACEMENT_UUID);
+    sendMessage(ClientNotification.REQUEST_CURRENT_GAMESTATE_WITH_LAST_PLACEMENT_UUID);
   }
 
   private void communicateWithServer() {
     try {
-      this.connection = new Socket(this.serverAddress, PORT);
-      this.out = new PrintWriter(connection.getOutputStream(), true, StandardCharsets.UTF_8);
-      this.out.flush();
-      this.in = new BufferedReader(
-                      new InputStreamReader(this.connection.getInputStream(),
+      connection = new Socket(serverAddress, PORT);
+      out = new PrintWriter(connection.getOutputStream(), true, StandardCharsets.UTF_8);
+      out.flush();
+      in = new BufferedReader(
+                      new InputStreamReader(connection.getInputStream(),
                               StandardCharsets.UTF_8));
 
-      this.connectionEstablished = true;
+      connectionEstablished = true;
     } catch (@SuppressWarnings("unused") IOException e) {
       terminate();
     }
@@ -161,80 +161,80 @@ public class ClientImpl implements Client {
     }
 
     if (message.getData() instanceof JoinRequest.Response) {
-      this.processJoinRequestResponse((JoinRequest.Response) message.getData());
+      processJoinRequestResponse((JoinRequest.Response) message.getData());
     } else if (message.getData() instanceof RejectedPlacement) {
-      this.processRejectedPlacement((RejectedPlacement) message.getData());
+      processRejectedPlacement((RejectedPlacement) message.getData());
     } else if (message.getData() instanceof ServerNotification) {
-      this.processServerNotification((ServerNotification) message.getData());
+      processServerNotification((ServerNotification) message.getData());
     } else if (message.getData() instanceof DiskPlacement) {
-      this.processDiskPlacement((DiskPlacement) message.getData());
+      processDiskPlacement((DiskPlacement) message.getData());
     } else if (message.getData() instanceof Spectators) {
-      this.processSpectators((Spectators) message.getData());
+      processSpectators((Spectators) message.getData());
     } else if (message.getData() instanceof GameState) {
-      this.processGamestate((GameState) message.getData());
+      processGamestate((GameState) message.getData());
     } else if (message.getData() instanceof GameStateWithLastPlacementUuid) {
-      this.processGameStateWithLastPlacementUuid(
+      processGameStateWithLastPlacementUuid(
               (GameStateWithLastPlacementUuid) message.getData());
     }
   }
 
   private void processJoinRequestResponse(JoinRequest.Response response) {
-    this.compatibleGui.receivedJoinRequestResponse(response);
+    compatibleGui.receivedJoinRequestResponse(response);
   }
 
   private void processRejectedPlacement(RejectedPlacement rejectedPlacement) {
-    if (rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PLACEMENT
-            || rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PREVIOUS_UUID) {
-      this.requestGameStateWithLastPlacementUuid();
+    if ((rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PLACEMENT)
+            || (rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PREVIOUS_UUID)) {
+      requestGameStateWithLastPlacementUuid();
     }
 
-    this.compatibleGui.receivedRejectedPlacementReason(rejectedPlacement.getReason());
+    compatibleGui.receivedRejectedPlacementReason(rejectedPlacement.getReason());
   }
 
   private void processServerNotification(ServerNotification serverNotification) {
     if (serverNotification == ServerNotification.SERVER_SHUTTING_DOWN) {
-      this.terminate();
-    } else if (serverNotification == ServerNotification.PLAYER_ONE_LEFT
-            || serverNotification == ServerNotification.PLAYER_TWO_LEFT) {
-      this.model.setWaiting();
+      terminate();
+    } else if ((serverNotification == ServerNotification.PLAYER_ONE_LEFT)
+            || (serverNotification == ServerNotification.PLAYER_TWO_LEFT)) {
+      model.setWaiting();
     }
 
-    this.compatibleGui.receivedServerNotification(serverNotification);
+    compatibleGui.receivedServerNotification(serverNotification);
   }
 
   private void processDiskPlacement(DiskPlacement diskPlacement) {
-    if (this.lastDiskPlacement != diskPlacement.getPrevious()) {
-      this.requestGameStateWithLastPlacementUuid();
+    if (lastDiskPlacement != diskPlacement.getPrevious()) {
+      requestGameStateWithLastPlacementUuid();
       return;
     }
 
-    if (this.model.placeDisk(diskPlacement.getDisk(), diskPlacement.getLocation())) {
-      this.lastDiskPlacement = diskPlacement.getUuid();
+    if (model.placeDisk(diskPlacement.getDisk(), diskPlacement.getLocation())) {
+      lastDiskPlacement = diskPlacement.getUuid();
     } else { // DiskPlacement from Server is not valid with current game state
-      this.requestGameStateWithLastPlacementUuid();
+      requestGameStateWithLastPlacementUuid();
     }
   }
 
   private void processSpectators(Spectators spectators) {
-    this.compatibleGui.receivedSpectator(spectators);
+    compatibleGui.receivedSpectator(spectators);
   }
 
   private void processGamestate(GameState gameState) {
-    this.model = new ModelImpl(gameState, GameMode.MULTIPLAYER);
+    model = new ModelImpl(gameState, GameMode.MULTIPLAYER);
 
-    this.compatibleGui.modelExchanged(this.model);
+    compatibleGui.modelExchanged(model);
   }
 
   private void processGameStateWithLastPlacementUuid(
           GameStateWithLastPlacementUuid gameStateWithLastPlacementUuid) {
-    this.processGamestate(gameStateWithLastPlacementUuid.getGameState());
-    this.lastDiskPlacement = gameStateWithLastPlacementUuid.getLastPlacementUuid();
+    processGamestate(gameStateWithLastPlacementUuid.getGameState());
+    lastDiskPlacement = gameStateWithLastPlacementUuid.getLastPlacementUuid();
   }
 
   @Override
   public void terminate() {
-    this.running = false;
-    this.connectionEstablished = false;
+    running = false;
+    connectionEstablished = false;
     try {
       if (connection != null) {
         connection.close();

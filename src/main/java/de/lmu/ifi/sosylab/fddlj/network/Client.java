@@ -25,7 +25,7 @@ public interface Client {
   /**
    * Joins any random, publicly available lobby.
    */
-  void joinAnyRandomPublicLobby();
+  void joinAnyRandomPublicLobby(boolean asSpectator);
 
   /**
    * Joins a specific lobby by its id.
