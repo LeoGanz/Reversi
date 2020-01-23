@@ -441,4 +441,32 @@ public class GameFieldImplTest {
         field2.hashCode(),
         "different GameFieldIml instances should have a different hashCode()!");
   }
+
+  @Test
+  public void testConstructor_WrongSizeTooSmall() {
+    try {
+      new GameFieldImpl(2);
+    } catch (Exception e) {
+      Assertions.assertTrue(e instanceof IllegalArgumentException);
+      return;
+    }
+    Assertions.fail();
+  }
+
+  @Test
+  public void testConstructor_WrongSizeNotDivisibleByTwo() {
+    try {
+      new GameFieldImpl(7);
+    } catch (Exception e) {
+      Assertions.assertTrue(e instanceof IllegalArgumentException);
+      return;
+    }
+    Assertions.fail();
+  }
+
+  @Test
+  public void testGetSize() {
+    GameFieldImpl field = new GameFieldImpl(10);
+    Assertions.assertEquals(10, field.getSize());
+  }
 }

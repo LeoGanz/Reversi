@@ -61,4 +61,11 @@ public interface GameField {
    * @return a deep copy of the game field
    */
   GameField makeCopy();
+
+  /**
+   * Returns the size of the {@link GameField}.
+   *
+   * @return the size of the {@link GameField}
+   */
+  int getSize();
 }
