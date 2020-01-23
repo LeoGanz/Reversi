@@ -16,9 +16,24 @@ import java.util.Set;
  */
 public class GameFieldImpl implements ModifiableGameField {
 
+  private static final int STANDARD_SIZE = 8;
   private final int size;
 
   private Disk[][] field;
+
+  /**
+   * The constructor GameFieldImpl sets the game field to its initial state with the size {@value
+   * #STANDARD_SIZE}.
+   */
+  public GameFieldImpl() {
+    size = STANDARD_SIZE;
+    field = new Disk[size][size];
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        set(new CellImpl(i, j), null);
+      }
+    }
+  }
 
   /**
    * The constructor GameFieldImpl sets the game field to its initial state with a given size.
