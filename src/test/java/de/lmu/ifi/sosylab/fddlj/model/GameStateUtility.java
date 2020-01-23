@@ -7,7 +7,7 @@ public class GameStateUtility {
 
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
     field.set(new CellImpl(3, 3), diskOne);
     field.set(new CellImpl(3, 4), diskOne);
     field.set(new CellImpl(3, 5), diskOne);
@@ -30,7 +30,7 @@ public class GameStateUtility {
     ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     manager.switchCurrentPlayer();
 
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
     field.set(new CellImpl(3, 1), diskTwo);
@@ -65,7 +65,7 @@ public class GameStateUtility {
     ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     manager.switchCurrentPlayer();
 
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
 
@@ -98,7 +98,7 @@ public class GameStateUtility {
 
     ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     manager.switchCurrentPlayer();
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
     field.set(new CellImpl(0, 7), diskOne);
@@ -143,7 +143,7 @@ public class GameStateUtility {
   }
 
   static ModifiableGameState lastMove06Game_PlayerOnesTurn(Player playerOne, Player playerTwo) {
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
 
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
@@ -211,7 +211,7 @@ public class GameStateUtility {
   }
 
   static ModifiableGameState finishedGame_PlayerTwoWins(Player playerOne, Player playerTwo) {
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
 
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
@@ -236,7 +236,7 @@ public class GameStateUtility {
   }
 
   static ModifiableGameState playerTwoDisksInCorners(Player playerOne, Player playerTwo) {
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
 
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
@@ -284,7 +284,7 @@ public class GameStateUtility {
 
   static ModifiableGameState midGame_PlayerOnesTurn(Player playerOne, Player playerTwo) {
 
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
 
     for (int column = 1; column < 6; column++) {
       field.set(new CellImpl(column, 4), new DiskImpl(playerOne));
@@ -312,7 +312,7 @@ public class GameStateUtility {
   }
 
   static ModifiableGameState earlyGame_PlayerOnesTurn(Player playerOne, Player playerTwo) {
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
 
@@ -340,7 +340,7 @@ public class GameStateUtility {
   }
 
   static ModifiableGameState midToLateGame_PlayerOnesTurn(Player playerOne, Player playerTwo) {
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);
 
@@ -389,7 +389,7 @@ public class GameStateUtility {
 
   static ModifiableGameState playerTwoCantMoveGame_PlayerOnesTurn(
       Player playerOne, Player playerTwo) {
-    ModifiableGameField field = new GameFieldImpl();
+    ModifiableGameField field = new GameFieldImpl(8);
 
     Disk diskOne = new DiskImpl(playerOne);
     Disk diskTwo = new DiskImpl(playerTwo);

@@ -31,7 +31,7 @@ public class ArtificialIntelligenceImplTest {
 
   @Test
   public void testCalculateBestMove_PlayerOneDepthOne() {
-    Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
+    Model game = new ModelImpl(GameMode.HOTSEAT, 8, one, two);
     ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(1, new DummyHeuristic());
 
     Assertions.assertEquals(new CellImpl(3, 3), ai.calculateBestMove(game.getState()));
@@ -60,7 +60,7 @@ public class ArtificialIntelligenceImplTest {
 
   @Test
   public void testCalculateBestMove_PlayerTwoDepthOne() {
-    Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
+    Model game = new ModelImpl(GameMode.HOTSEAT, 8, one, two);
     ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(1, new DummyHeuristic());
 
     helpPlaceDisk(game, diskOne, 3, 3);
@@ -90,7 +90,7 @@ public class ArtificialIntelligenceImplTest {
 
   @Test
   public void testCalculateBestMove_PlayerOneDepthTwo() {
-    Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
+    Model game = new ModelImpl(GameMode.HOTSEAT, 8, one, two);
     ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(2, new DummyHeuristic());
 
     Assertions.assertEquals(new CellImpl(3, 3), ai.calculateBestMove(game.getState()));
@@ -115,7 +115,7 @@ public class ArtificialIntelligenceImplTest {
 
   @Test
   public void testCalculateBestMove_PlayerTwoDepthTwo() {
-    Model game = new ModelImpl(GameMode.HOTSEAT, one, two);
+    Model game = new ModelImpl(GameMode.HOTSEAT, 8, one, two);
     ArtificialIntelligenceImpl ai = new ArtificialIntelligenceImpl(2, new DummyHeuristic());
 
     helpPlaceDisk(game, diskOne, 3, 3);
@@ -144,9 +144,9 @@ public class ArtificialIntelligenceImplTest {
     ModifiableGameState state = new GameStateImpl();
     state.setPlayerManagement(new PlayerManagementImpl(one, two));
     state.setCurrentPhase(Phase.RUNNING);
-    ModifiableGameField field = new GameFieldImpl();
-    for (int i = 0; i < GameFieldImpl.SIZE; i++) {
-      for (int j = 0; j < GameFieldImpl.SIZE; j++) {
+    ModifiableGameField field = new GameFieldImpl(8);
+    for (int i = 0; i < field.getSize(); i++) {
+      for (int j = 0; j < field.getSize(); j++) {
         field.set(new CellImpl(i, j), diskTwo);
       }
     }
