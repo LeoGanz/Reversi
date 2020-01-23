@@ -261,23 +261,8 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
                 .contains(current);
         indicatePossibleMove();
       }
-    }
-
-    if (evt.getPropertyName().equals(ViewImpl.STAGE_RESIZED)) {
-      double prefWidth = (gameBoardGrid.getHeight() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
-      setPrefWidth(prefWidth);
-      setPrefHeight(prefWidth);
-
-      if (diskOnCell != null) {
-        diskOnCell.resizeDisk(
-            getHeight() - GraphicDisk.PADDING,
-            getHeight() - GraphicDisk.PADDING,
-            (getHeight() - GraphicDisk.PADDING) / 2);
-      }
-
-      if (indicateMoves && isMovePossibleOnCell) {
-        indicatePossibleMove();
-      }
+    } else if (evt.getPropertyName().equals(ViewImpl.STAGE_RESIZED)) {
+      resizeCell();
     }
   }
 
@@ -302,6 +287,8 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
       diskOnCell =
           new GraphicDisk(
               getWidth() - 10, getHeight() - 10, (getHeight() - 10) / 2, getDiskColor());
+
+      gameBoardGrid.playPlacementSound();
 
       setCenter(diskOnCell);
       setStyle(cssNormal);

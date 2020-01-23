@@ -30,7 +30,7 @@ dependencies {
 }
 
 javafx {
-    modules = [ 'javafx.controls', 'javafx.graphics']
+    modules = [ 'javafx.controls', 'javafx.graphics', 'javafx.media']
     version = '11.0.2'
 }
 
@@ -45,6 +45,7 @@ run {
 		jvmArgs = ['--module-path', classpath.asPath,
 			'--add-modules', 'javafx.controls',
 			'--add-modules', 'javafx.graphics',
+			'--add-modules', 'javafx.media'
 		]
 	}
 }

@@ -16,9 +16,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -28,8 +30,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 /**
  * This class represents the game's main frame that holds all other GUI elements.
@@ -40,6 +44,7 @@ public class ViewImpl implements View {
 
   static final String STAGE_RESIZED = "Stage resized";
   static final String SOUND_MODE_CHANGED = "Sound mode changed";
+  static final String VOLUME_CHANGED = "Volume changed";
 
   private Model model;
   private Controller controller;
@@ -55,6 +60,9 @@ public class ViewImpl implements View {
   private PropertyChangeSupport support;
 
   private boolean playSound;
+  private boolean volumeControlShowing;
+
+  private float volume;
 
   /**
    * Constructor of this class initialises the main frame of the game.
@@ -71,6 +79,7 @@ public class ViewImpl implements View {
 
     support = new PropertyChangeSupport(this);
     playSound = true;
+    volume = 0.6f;
 
     this.stage.setTitle("Reversi");
     this.stage.setMaximized(true);
@@ -120,7 +129,7 @@ public class ViewImpl implements View {
     BorderPane.setAlignment(root, Pos.CENTER);
     BorderPane.setMargin(gameBoard, new Insets(30, 50, 30, 50));
 
-    VBox right = getMuteButton();
+    VBox right = getMuteAndMainMenuButton();
     root.setRight(right);
     BorderPane.setMargin(right, new Insets(0, 15, 15, 0));
 
@@ -258,8 +267,8 @@ public class ViewImpl implements View {
     return button;
   }
 
-  private VBox getMuteButton() {
-    VBox vbox = new VBox();
+  private VBox getMuteAndMainMenuButton() {
+    VBox vbox = new VBox(10);
     vbox.setAlignment(Pos.BOTTOM_CENTER);
 
     final Image play =
@@ -291,10 +300,80 @@ public class ViewImpl implements View {
             support.firePropertyChange(SOUND_MODE_CHANGED, !playSound, playSound);
           }
         });
+    button.setOnMouseClicked(
+        e -> {
+          if (e.getButton() == MouseButton.SECONDARY) {
+            showVolumeControl(button);
+            return;
+          }
+        });
+    button.setTooltip(
+        new Tooltip(
+            "Click with right mouse button for volume control. \n"
+                + " Click with left mouse button for enabling/disabling sound."));
 
     vbox.getChildren().add(button);
-    vbox.setMinWidth(button.getMinWidth());
+
+    Button back = getButton("Hautpmenue");
+    vbox.getChildren().add(back);
+
+    vbox.setMinWidth(back.getMinWidth());
     return vbox;
+  }
+
+  private void showVolumeControl(Button parent) {
+    if (!volumeControlShowing) {
+      volumeControlShowing = true;
+      final Stage dialog = new Stage();
+      dialog.initModality(Modality.NONE);
+
+      HBox dialogBox = new HBox(15);
+      dialogBox.setStyle("-fx-background-color: #dddddd");
+      dialogBox.setPadding(new Insets(10));
+
+      Slider slider = new Slider();
+      slider.setMin(0);
+      slider.setMax(100);
+      slider.setValue(volume * 100);
+      slider.setShowTickLabels(true);
+      slider.setShowTickMarks(true);
+      slider.setMajorTickUnit(50);
+      slider.setMinorTickCount(5);
+      slider.setBlockIncrement(5);
+      slider.setMinWidth(200);
+      slider.setMinHeight(35);
+      slider.setCursor(Cursor.HAND);
+
+      Label label = new Label(String.valueOf(volume * 100));
+      label.setStyle("-fx-text-file: #000000; -fx-font-size: x-large;");
+      slider
+          .valueProperty()
+          .addListener(
+              (ov, oldVal, newVal) -> {
+                volume = (float) (newVal.intValue() / 100.0);
+                label.setText(String.valueOf(newVal.intValue()));
+
+                support.firePropertyChange(VOLUME_CHANGED, null, volume);
+              });
+
+      dialogBox.getChildren().addAll(slider, label);
+      Scene dialogScene = new Scene(dialogBox, 280, 50);
+      dialog.setScene(dialogScene);
+      dialog.setX(
+          parent.localToScreen(parent.getBoundsInLocal()).getMinX() - dialogScene.getWidth() - 10);
+      dialog.setY(parent.localToScreen(parent.getBoundsInLocal()).getMinY());
+      dialog.initStyle(StageStyle.UNDECORATED);
+      dialog.show();
+      dialog
+          .focusedProperty()
+          .addListener(
+              (ov, oldVal, newVal) -> {
+                if (!newVal) {
+                  dialog.close();
+                  volumeControlShowing = false;
+                }
+              });
+    }
   }
 
   @Override

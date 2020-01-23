@@ -4,6 +4,8 @@ import de.lmu.ifi.sosylab.fddlj.model.GameFieldImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.InputStream;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +16,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  * This class offers a grid of cells that represents a game board.
@@ -26,6 +34,10 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
   private Controller controller;
 
   private SwitchButton switchButton;
+
+  private boolean playSound;
+
+  private float volume;
 
   /**
    * Constructor of this class initialises variables and is responsible for building GUI elements.
@@ -41,6 +53,9 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     this.model = model;
     this.controller = controller;
 
+    this.playSound = true;
+    this.volume = 0.6f;
+
     view.addListener(this);
 
     setStyle("-fx-background-color: transparent;");
@@ -48,6 +63,8 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     initGameBoard(stage, view);
     setMinWidth(GameFieldImpl.SIZE * GraphicCell.MIN_WIDTH);
     setMinHeight(GameFieldImpl.SIZE * GraphicCell.MIN_HEIGHT + switchButton.getHeight());
+
+    new Thread(() -> initialiseAudioSystem()).start();
   }
 
   private void initGameBoard(Stage stage, View view) {
@@ -97,6 +114,52 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     return label;
   }
 
+  void playPlacementSound() {
+
+    if (!playSound) {
+      return;
+    }
+
+    new Thread(
+        () -> {
+          try {
+            InputStream isAudioFile =
+                getClass().getClassLoader().getResourceAsStream("audio/placement.wav");
+            Clip clip = AudioSystem.getClip();
+            AudioInputStream inputStream = AudioSystem.getAudioInputStream(isAudioFile);
+            clip.open(inputStream);
+            FloatControl gainControl =
+                (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            gainControl.setValue(20f * (float) Math.log10(volume));
+            clip.start();
+          } catch (Exception e) {
+            return;
+          }
+        })
+        .start();
+  }
+
+  /**
+   * This method seems to be needed in order to initialise the OS's audio system because otherwise
+   * the first time playing the clip takes a really long time.
+   */
+  private void initialiseAudioSystem() {
+
+    try {
+      InputStream isAudioFile =
+          getClass().getClassLoader().getResourceAsStream("audio/placement.wav");
+      Clip clip = AudioSystem.getClip();
+      AudioInputStream inputStream = AudioSystem.getAudioInputStream(isAudioFile);
+      clip.open(inputStream);
+    } catch (LineUnavailableException e) {
+      return;
+    } catch (UnsupportedAudioFileException e) {
+      return;
+    } catch (IOException e) {
+      return;
+    }
+  }
+
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
     Platform.runLater(
@@ -106,6 +169,14 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
             if (evt.getNewValue() instanceof Model) {
 
               this.model = (Model) evt.getNewValue();
+            }
+          } else if (evt.getPropertyName().equals(ViewImpl.SOUND_MODE_CHANGED)) {
+            if (evt.getNewValue() instanceof Boolean) {
+              this.playSound = (boolean) evt.getNewValue();
+            }
+          } else if (evt.getPropertyName().equals(ViewImpl.VOLUME_CHANGED)) {
+            if (evt.getNewValue() instanceof Float) {
+              this.volume = (float) evt.getNewValue();
             }
           }
         });
