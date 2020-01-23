@@ -6,6 +6,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -36,8 +38,9 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
   private SwitchButton switchButton;
 
   private boolean playSound;
-
   private float volume;
+
+  private ResourceBundle messages;
 
   /**
    * Constructor of this class initialises variables and is responsible for building GUI elements.
@@ -46,8 +49,9 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
    * @param controller a reference to a controller instance
    * @param stage a reference to the game's main stage
    * @param view a reference to a view instance
+   * @param locale the locale object uses for displaying multi language text
    */
-  public GameBoardGrid(Model model, Controller controller, Stage stage, View view) {
+  public GameBoardGrid(Model model, Controller controller, Stage stage, View view, Locale locale) {
     super();
 
     this.model = model;
@@ -57,6 +61,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     this.volume = 0.6f;
 
     view.addListener(this);
+    messages = ResourceBundle.getBundle("MessagesBundle", locale);
 
     setStyle("-fx-background-color: transparent;");
     initToggleSwitch();
@@ -96,7 +101,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     HBox hbox = new HBox(15);
     hbox.setAlignment(Pos.CENTER);
 
-    Label hints = getLabel("Hints anzeigen?");
+    Label hints = getLabel(messages.getString("GameBoardGrid_ShowHints_Label"));
     switchButton = new SwitchButton(100, 15);
 
     hbox.getChildren().addAll(hints, switchButton);

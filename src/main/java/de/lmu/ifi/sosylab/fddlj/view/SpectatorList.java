@@ -4,6 +4,8 @@ import de.lmu.ifi.sosylab.fddlj.model.Player;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -18,7 +20,11 @@ import javafx.scene.paint.Color;
 
 public class SpectatorList extends BorderPane implements PropertyChangeListener {
 
-  public SpectatorList() {
+  private ResourceBundle messages;
+
+  public SpectatorList(Locale locale) {
+
+    messages = ResourceBundle.getBundle("MessagesBundle", locale);
 
     initSpectatorList();
   }
@@ -34,7 +40,7 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
     spectatorList.setAlignment(Pos.CENTER);
 
     if (spectators.isEmpty()) {
-      Label label = new Label("No spectators");
+      Label label = new Label(messages.getString("SpectatorList_NoSpectators"));
       label.setStyle("-fx-font-size: x-large; -fx-text-fill: #000000;");
       spectatorList.getChildren().add(label);
     }

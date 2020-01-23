@@ -11,6 +11,8 @@ import de.lmu.ifi.sosylab.fddlj.network.Server;
 import de.lmu.ifi.sosylab.fddlj.network.ServerImpl;
 import de.lmu.ifi.sosylab.fddlj.view.server.ServerGui;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -28,6 +30,9 @@ public class ControllerImpl extends Application implements Controller {
   private View view;
 
   private GameMode gameMode;
+  private Locale locale;
+
+  private ResourceBundle messages;
 
   @Override
   public void startMainView(
@@ -36,7 +41,7 @@ public class ControllerImpl extends Application implements Controller {
     this.gameMode = gameMode;
 
     model = new ModelImpl(gameMode, playerOne, playerTwo);
-    view = new ViewImpl(stage, model, this);
+    view = new ViewImpl(stage, model, this, locale);
     model.addListener(view);
     view.showGame(gameMode);
   }
@@ -57,9 +62,9 @@ public class ControllerImpl extends Application implements Controller {
     if (!succesful) {
       showAlert(
           AlertType.ERROR,
-          "Error",
-          "Error while placing disk",
-          "The placement of your disk on this cell resulted in an error. Please try again!");
+          messages.getString("ControllerImpl_DiskError_Title"),
+          messages.getString("ControllerImpl_DiskError_Subtitle"),
+          messages.getString("ControllerImpl_DiskError_Info"));
     }
   }
 
@@ -74,11 +79,14 @@ public class ControllerImpl extends Application implements Controller {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
+    locale = Locale.getDefault();
+    messages = ResourceBundle.getBundle("MessagesBundle", locale);
+
     showGameModeSelector(primaryStage);
   }
 
   void showGameModeSelector(Stage primaryStage) {
-    GameModeSelector gms = new GameModeSelector(this, primaryStage);
+    GameModeSelector gms = new GameModeSelector(this, primaryStage, locale);
     gms.showGameModeSelection();
   }
 
@@ -101,9 +109,9 @@ public class ControllerImpl extends Application implements Controller {
     } catch (IOException e) {
       showAlert(
           AlertType.ERROR,
-          "Error",
-          "Error while creating server",
-          "Failed to create a server instance! Maybe there is one already running?");
+          messages.getString("ControllerImpl_ServerError_Title"),
+          messages.getString("ControllerImpl_ServerError_Subtitle"),
+          messages.getString("ControllerImpl_ServerError_Info"));
       return;
     }
 

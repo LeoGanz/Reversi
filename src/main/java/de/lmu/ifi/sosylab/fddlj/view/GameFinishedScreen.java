@@ -1,6 +1,8 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Model;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,18 +30,23 @@ public class GameFinishedScreen extends Stage {
   private Model model;
   private Controller controller;
 
+  private ResourceBundle messages;
+
   /**
    * Constructor of this class initialises variables and is responsible for building GUI elements.
    *
    * @param controller a reference to a controller instance
    * @param model a reference to a model instance
    * @param mainStage a reference to the game's main stage
+   * @param locale the locale object uses for displaying multi language text
    */
-  public GameFinishedScreen(Controller controller, Model model, Stage mainStage) {
+  public GameFinishedScreen(Controller controller, Model model, Stage mainStage, Locale locale) {
     super();
 
     this.controller = controller;
     this.model = model;
+
+    messages = ResourceBundle.getBundle("MessagesBundle", locale);
 
     initScreen(mainStage);
   }
@@ -50,7 +57,7 @@ public class GameFinishedScreen extends Stage {
     root.setId("main-pane");
     root.setPadding(new Insets(30));
 
-    Label title = new Label("Game finished!");
+    Label title = new Label(messages.getString("GameFinishedScreen_Title"));
     title.setId("title-label");
     root.setTop(title);
     BorderPane.setAlignment(title, Pos.CENTER);
@@ -87,10 +94,10 @@ public class GameFinishedScreen extends Stage {
     hbox.setAlignment(Pos.CENTER);
     hbox.setPadding(new Insets(20));
 
-    Button exit = getButton("Exit");
+    Button exit = getButton(messages.getString("GameFinishedScreen_ExitButton_Text"));
     exit.setOnAction(e -> Platform.exit());
 
-    Button restart = getButton("Restart");
+    Button restart = getButton(messages.getString("GameFinishedScreen_RestartButton_Text"));
     restart.setOnAction(
         e -> {
           close();
@@ -100,7 +107,7 @@ public class GameFinishedScreen extends Stage {
               model.getState().getPlayerManagement().getPlayerTwo());
         });
 
-    Button mainScreen = getButton("Main screen");
+    Button mainScreen = getButton(messages.getString("GameFinishedScreen_MainScreenButton_Text"));
     mainScreen.setOnAction(
         e -> {
           mainStage.close();
@@ -109,9 +116,9 @@ public class GameFinishedScreen extends Stage {
             ((ControllerImpl) controller).showGameModeSelector(new Stage());
           } else {
             Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Failed to return to main screen");
-            alert.setContentText("Failed to return to main screen. Exiting the program ...");
+            alert.setTitle(messages.getString("GameFinishedScreen_ReturnError_Title"));
+            alert.setHeaderText(messages.getString("GameFinishedScreen_ReturnError_Subtitle"));
+            alert.setContentText(messages.getString("GameFinishedScreen_ReturnError_Info"));
 
             alert.showAndWait();
             Platform.exit();
@@ -139,11 +146,13 @@ public class GameFinishedScreen extends Stage {
 
     if (model.getState().getPlayerManagement().getWinner().isPresent()) {
       text =
-          "Congratulations! "
+          messages.getString("GameFinishedScreen_Congratulations")
+              + " "
               + model.getState().getPlayerManagement().getWinner().get().getName()
-              + " has won the game!";
+              + " "
+              + messages.getString("GameFinishedScreen_WinnerText");
     } else {
-      text = "The game resulted in a draw!";
+      text = messages.getString("GameFinishedScreen_Draw");
     }
 
     Label label = new Label(text);

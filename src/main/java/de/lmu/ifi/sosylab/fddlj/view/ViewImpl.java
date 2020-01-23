@@ -7,6 +7,8 @@ import de.lmu.ifi.sosylab.fddlj.model.Phase;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -66,18 +68,25 @@ public class ViewImpl implements View {
 
   private float volume;
 
+  private ResourceBundle messages;
+  private Locale locale;
+
   /**
    * Constructor of this class initialises the main frame of the game.
    *
    * @param stage the stage created upon launching the application
    * @param model a reference to the model instance
    * @param controller a reference to the controller instance
+   * @param locale the Locale to use for output text
    */
-  public ViewImpl(Stage stage, Model model, Controller controller) {
+  public ViewImpl(Stage stage, Model model, Controller controller, Locale locale) {
 
     this.controller = controller;
     this.stage = stage;
     this.model = model;
+    this.locale = locale;
+
+    messages = ResourceBundle.getBundle("MessagesBundle", locale);
 
     support = new PropertyChangeSupport(this);
     playSound = true;
@@ -126,7 +135,7 @@ public class ViewImpl implements View {
     root.setLeft(left);
     BorderPane.setAlignment(left, Pos.CENTER);
 
-    gameBoard = new GameBoardGrid(model, controller, stage, this);
+    gameBoard = new GameBoardGrid(model, controller, stage, this, locale);
     root.setCenter(gameBoard);
     BorderPane.setAlignment(root, Pos.CENTER);
     BorderPane.setMargin(gameBoard, new Insets(30, 50, 30, 50));
@@ -163,12 +172,13 @@ public class ViewImpl implements View {
     vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setPadding(new Insets(20));
 
-    DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:", this, controller);
+    DiskIndicator currentPlayer =
+        new DiskIndicator(model, messages.getString("ViewImpl_CurrentPlayer"), this, controller);
     vbox.getChildren().add(currentPlayer);
     stage.heightProperty().addListener(e -> currentPlayer.resizeDisk());
     stage.widthProperty().addListener(e -> currentPlayer.resizeDisk());
 
-    Button reset = getButton("Reset game");
+    Button reset = getButton(messages.getString("ViewImpl_ButtonResetGame"));
     reset.setOnAction(
         e -> {
           controller.resetGame(
@@ -259,11 +269,9 @@ public class ViewImpl implements View {
     Button button = new Button("", imageView);
     button.setCursor(Cursor.HAND);
     button.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-    button.setOnAction(e -> new AboutWindow());
+    button.setOnAction(e -> new AboutWindow(locale));
     Tooltip helper = new Tooltip();
-    helper.setText(
-        "Display a window with additional information about this reversi game,"
-            + " such as the rules and licenses.");
+    helper.setText(messages.getString("ViewImpl_ButtonHelp_Tooltip"));
     button.setTooltip(helper);
     button.setMinHeight(50);
 
@@ -311,14 +319,11 @@ public class ViewImpl implements View {
             return;
           }
         });
-    button.setTooltip(
-        new Tooltip(
-            "Click with right mouse button for volume control. \n"
-                + " Click with left mouse button for enabling/disabling sound."));
+    button.setTooltip(new Tooltip(messages.getString("ViewImpl_ButtonSound_Tooltip")));
 
     vbox.getChildren().add(button);
 
-    Button back = getButton("Hautpmenue");
+    Button back = getButton(messages.getString("ViewImpl_ButtonBack_Text"));
     back.setOnAction(
         e -> {
           stage.close();
@@ -326,9 +331,9 @@ public class ViewImpl implements View {
             ((ControllerImpl) controller).showGameModeSelector(new Stage());
           } else {
             Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Failed to return to main screen");
-            alert.setContentText("Failed to return to main screen. Exiting the program ...");
+            alert.setTitle(messages.getString("ViewImpl_ReturnError_Title"));
+            alert.setHeaderText(messages.getString("ViewImpl_ReturnError_Subtitle"));
+            alert.setContentText(messages.getString("ViewImpl_ReturnError_Info"));
 
             alert.showAndWait();
             Platform.exit();
@@ -430,7 +435,7 @@ public class ViewImpl implements View {
       if (model.getState().getCurrentPhase() == Phase.FINISHED) {
 
         root.setDisable(true);
-        new GameFinishedScreen(controller, model, stage);
+        new GameFinishedScreen(controller, model, stage, locale);
       }
     }
 

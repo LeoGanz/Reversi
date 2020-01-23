@@ -2,6 +2,8 @@ package de.lmu.ifi.sosylab.fddlj.view;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.stream.Stream;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -21,9 +23,17 @@ import javafx.stage.Stage;
  */
 public class AboutWindow extends Stage {
 
-  /** Public constructor of this class initialises stage and content. */
-  public AboutWindow() {
+  private ResourceBundle messages;
+
+  /**
+   * Public constructor of this class initialises stage and content.
+   *
+   * @param locale the Locale to use for output text
+   */
+  public AboutWindow(Locale locale) {
     super();
+
+    messages = ResourceBundle.getBundle("MessagesBundle", locale);
 
     initWindow();
   }
@@ -46,7 +56,7 @@ public class AboutWindow extends Stage {
     setHeight(5 * Screen.getPrimary().getVisualBounds().getHeight() / 6);
 
     setScene(scene);
-    setTitle("About");
+    setTitle(messages.getString("aboutWindow_Title"));
     centerOnScreen();
     show();
   }
@@ -64,7 +74,7 @@ public class AboutWindow extends Stage {
     scrollPane.setFitToHeight(true);
     scrollPane.setPrefWidth(600);
 
-    Tab tab = new Tab("Licenses", scrollPane);
+    Tab tab = new Tab(messages.getString("aboutWindow_Tab_Licenses_Title"), scrollPane);
     tab.setClosable(false);
 
     return tab;
@@ -84,7 +94,7 @@ public class AboutWindow extends Stage {
     scrollPane.setFitToHeight(true);
     scrollPane.setPrefWidth(600);
 
-    Tab tab = new Tab("Rules", scrollPane);
+    Tab tab = new Tab(messages.getString("aboutWindow_Tab_Rules_Title"), scrollPane);
     tab.setClosable(false);
 
     return tab;

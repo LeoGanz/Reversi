@@ -1,5 +1,7 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -32,17 +34,24 @@ public class GameModeSelector extends Stage {
   private BorderPane borderPane;
   private StartScreenDiskGrid startScreenDisks;
 
+  private ResourceBundle messages;
+  private Locale locale;
+
   /**
    * Constructor of this class initialises variables and builds the stage.
    *
    * @param controller a reference to a controller instance
    * @param stage the stage created by the application thread
+   * @param locale the Locale to use for output text
    */
-  public GameModeSelector(Controller controller, Stage stage) {
+  public GameModeSelector(Controller controller, Stage stage, Locale locale) {
     super();
 
     this.controller = controller;
     this.primaryStage = stage;
+    this.locale = locale;
+
+    messages = ResourceBundle.getBundle("MessagesBundle", locale);
   }
 
   /** Displays a stage that allows the user to select which game mode he/she wants to play. */
@@ -56,7 +65,7 @@ public class GameModeSelector extends Stage {
     borderPane.setRight(buildSelectionPane());
     startScreenDisks = new StartScreenDiskGrid();
     borderPane.setCenter(startScreenDisks);
-    
+
     scene = new Scene(borderPane);
 
     setScene(scene);
@@ -125,43 +134,41 @@ public class GameModeSelector extends Stage {
     Region top = new Region();
     VBox.setVgrow(top, Priority.ALWAYS);
     vbox.getChildren().add(top);
-    
 
-    Button singlePlayer = getButton("Singleplayer");
+    Button singlePlayer = getButton(messages.getString("GameModeSelector_ButtonSingleplayer_Text"));
     singlePlayer.setOnAction(
         e -> {
-          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
+          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, locale);
           playerCreation.getSinglePlayerInformation(controller, this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
         });
 
-    Button hotseat = getButton("Hotseat");
+    Button hotseat = getButton(messages.getString("GameModeSelector_ButtonHotseat_Text"));
     hotseat.setOnAction(
         e -> {
-          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
+          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, locale);
           playerCreation.getMultiplePlayersInformation(this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
         });
 
-    Button multiPlayer = getButton("Multiplayer");
+    Button multiPlayer = getButton(messages.getString("GameModeSelector_ButtonMultiplayer"));
     multiPlayer.setOnAction(
         e -> {
-          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
+          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, locale);
           playerCreation.getOnlinePlayerInformation(this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
         });
 
-    Button spectate = getButton("Spectate");
+    Button spectate = getButton(messages.getString("GameModeSelector_ButtonSpectate"));
     spectate.setOnAction(
         e -> {
-          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage);
+          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, locale);
           playerCreation.getSpectatorInformation(this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
-          
         });
 
     vbox.getChildren().addAll(singlePlayer, hotseat, multiPlayer, spectate);
@@ -170,7 +177,7 @@ public class GameModeSelector extends Stage {
     VBox.setVgrow(bottom, Priority.ALWAYS);
     vbox.getChildren().add(bottom);
 
-    Button server = getButton("Start Server");
+    Button server = getButton(messages.getString("GameModeSelector_ButtonStartServer"));
     server.setOnAction(
         e -> {
           controller.startServer();
