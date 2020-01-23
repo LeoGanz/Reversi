@@ -149,6 +149,9 @@ public class GameFieldImpl implements ModifiableGameField {
     }
 
     GameFieldImpl other = (GameFieldImpl) obj;
+    if (other.size != size) {
+      return false;
+    }
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
         Cell toCheck = new CellImpl(i, j);
