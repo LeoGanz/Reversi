@@ -99,7 +99,7 @@ public class ModelImpl implements Model {
     numberOfPlayerTwoDisks = disksPerPlayer;
 
     if (mode.equals(GameMode.SINGLEPLAYER)) {
-      ai = new ArtificialIntelligenceImpl(3, new HeuristicImpl());
+      ai = new ArtificialIntelligenceImpl(AI_DEPTH, new HeuristicImpl());
     }
   }
 
