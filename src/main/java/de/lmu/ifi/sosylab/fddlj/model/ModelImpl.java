@@ -20,10 +20,38 @@ public class ModelImpl implements Model {
   private ModifiableGameState state;
   private GameMode mode;
   private ArtificialIntelligence ai;
+  private static final int AI_DEPTH = 3;
   private static final int NUMBER_OF_MOVES_IN_BEGINNING_PHASE = 4;
-  private static final int DISKS_PER_PLAYER = 32;
-  private int numberOfPlayerOneDisks = DISKS_PER_PLAYER;
-  private int numberOfPlayerTwoDisks = DISKS_PER_PLAYER;
+  private final int disksPerPlayer;
+  private int numberOfPlayerOneDisks;
+  private int numberOfPlayerTwoDisks;
+
+  /**
+   * Creates a new game with a given {@link GameMode} and two given {@link Player}.
+   *
+   * @param mode the game shall be played in.
+   * @param playerOne who will play in this game.
+   * @param playerTwo who will play in this game.
+   */
+  public ModelImpl(GameMode mode, Player playerOne, Player playerTwo) {
+    support = new PropertyChangeSupport(this);
+
+    this.mode = mode;
+
+    state = new GameStateImpl();
+    state.setGameField(new GameFieldImpl());
+    state.setCurrentPhase(Phase.RUNNING);
+    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
+    state.setPlayerManagement(manager);
+
+    disksPerPlayer = ((int) Math.pow(state.getField().getSize(), 2)) / 2;
+    numberOfPlayerOneDisks = disksPerPlayer;
+    numberOfPlayerTwoDisks = disksPerPlayer;
+
+    if (mode.equals(GameMode.SINGLEPLAYER)) {
+      ai = new ArtificialIntelligenceImpl(AI_DEPTH, new HeuristicImpl());
+    }
+  }
 
   /**
    * Creates a new game with a given {@link GameMode}, a given size for the {@link GameField} and
@@ -36,14 +64,21 @@ public class ModelImpl implements Model {
    */
   public ModelImpl(GameMode mode, int fieldSize, Player playerOne, Player playerTwo) {
     support = new PropertyChangeSupport(this);
+
     this.mode = mode;
+
     state = new GameStateImpl();
     state.setGameField(new GameFieldImpl(fieldSize));
     state.setCurrentPhase(Phase.RUNNING);
     ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);
     state.setPlayerManagement(manager);
+
+    disksPerPlayer = ((int) Math.pow(state.getField().getSize(), 2)) / 2;
+    numberOfPlayerOneDisks = disksPerPlayer;
+    numberOfPlayerTwoDisks = disksPerPlayer;
+
     if (mode.equals(GameMode.SINGLEPLAYER)) {
-      ai = new ArtificialIntelligenceImpl(3, new HeuristicImpl());
+      ai = new ArtificialIntelligenceImpl(AI_DEPTH, new HeuristicImpl());
     }
   }
 
@@ -55,8 +90,17 @@ public class ModelImpl implements Model {
    */
   public ModelImpl(GameState newState, GameMode mode) {
     support = new PropertyChangeSupport(this);
+
     state = (ModifiableGameState) newState.makeCopy();
     this.mode = mode;
+
+    disksPerPlayer = ((int) Math.pow(state.getField().getSize(), 2)) / 2;
+    numberOfPlayerOneDisks = disksPerPlayer;
+    numberOfPlayerTwoDisks = disksPerPlayer;
+
+    if (mode.equals(GameMode.SINGLEPLAYER)) {
+      ai = new ArtificialIntelligenceImpl(3, new HeuristicImpl());
+    }
   }
 
   @Override
