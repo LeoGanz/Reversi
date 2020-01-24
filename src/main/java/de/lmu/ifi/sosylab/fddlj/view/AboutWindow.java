@@ -24,7 +24,7 @@ import javafx.stage.Stage;
  */
 public class AboutWindow extends Stage {
 
-  //private ResourceBundle messages;
+  // private ResourceBundle messages;
 
   private String rulesGeneral =
       "Auf einem quadratischen Brett legen die Spieler "
@@ -41,14 +41,11 @@ public class AboutWindow extends Stage {
           + "Spiels ist es, am Ende eine möglichst große Anzahl von Steinen der eigenen "
           + "Farbe auf dem Brett zu haben.";
 
-  /**
-   * Public constructor of this class initialises stage and content.
-   *
-   */
-  public AboutWindow(/*ResourceBundle messages*/) {
+  /** Public constructor of this class initialises stage and content. */
+  public AboutWindow(/*ResourceBundle messages*/ ) {
     super();
 
-    //this.messages = messages;
+    // this.messages = messages;
 
     initWindow();
   }
@@ -96,12 +93,6 @@ public class AboutWindow extends Stage {
   }
 
   private Tab getRulesTab() {
-
-    TextArea textArea = new TextArea();
-    textArea.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3);
-    textArea.setWrapText(true);
-    textArea.setFont(Font.font(16));
-    textArea.setText(readFile("files/rules.txt"));
 
     VBox vbox = new VBox(15);
     vbox.setAlignment(Pos.CENTER);

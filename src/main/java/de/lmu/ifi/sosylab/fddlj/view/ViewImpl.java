@@ -69,6 +69,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   private boolean playSound;
   private boolean volumeControlShowing;
+  private boolean guiShowing;
 
   private float volume;
 
@@ -116,6 +117,11 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   @Override
   public void showGame(GameMode gameMode) {
+    if (guiShowing) {
+      return;
+    }
+
+    guiShowing = true;
     root = new BorderPane();
     root.getStylesheets().add("cssFiles/mainGame.css");
     root.setId("main-background");
