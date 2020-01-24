@@ -22,9 +22,9 @@ public class Shell {
     GameField gameField = state.getField();
     StringBuilder print = new StringBuilder();
 
-    for (int row = GameFieldImpl.SIZE - 1; row >= 0; row--) {
+    for (int row = gameField.getSize() - 1; row >= 0; row--) {
       print.append(row + " ");
-      for (int column = 0; column < GameFieldImpl.SIZE; column++) {
+      for (int column = 0; column < gameField.getSize(); column++) {
         Optional<Disk> pawn = gameField.get(new CellImpl(column, row));
         if (pawn.isPresent()) {
           if (pawn.get().getPlayer() == state.getPlayerManagement().getPlayerOne()) {

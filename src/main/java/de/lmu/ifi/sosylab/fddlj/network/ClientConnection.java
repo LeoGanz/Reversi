@@ -73,10 +73,11 @@ public class ClientConnection implements Runnable {
           return;
         }
         String receivedData = in.readLine();
-        if (receivedData == null) { //EOF
+        if (receivedData == null) { // EOF
           terminate();
+        } else {
+          //  processReceivedData(receivedData);
         }
-        processReceivedData(receivedData);
       } catch (@SuppressWarnings("unused") IOException e) {
         // client probably lost connection. Clean up can be done.
         terminate();
@@ -86,6 +87,8 @@ public class ClientConnection implements Runnable {
 
   private void processReceivedData(String receivedData) {
     try {
+      System.out.println("receivedData is null: " + (receivedData == null));
+      System.out.println("receivedData: " + receivedData);
       Message<?> receivedMessage = Message.fromJson(receivedData);
       Object data = receivedMessage.getData();
       if (data instanceof DiskPlacement) {
@@ -98,7 +101,7 @@ public class ClientConnection implements Runnable {
         System.out.println("Received unknown message type: " + data.getClass().getName());
         sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
       }
-    } catch (@SuppressWarnings("unused") JsonSyntaxException e) {
+    } catch (@SuppressWarnings("unused")JsonSyntaxException e) {
       sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
     }
   }
