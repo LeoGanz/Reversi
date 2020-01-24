@@ -87,8 +87,6 @@ public class Message<T> {
     return CustomGson.createGson().fromJson(json, Message.class);
   }
 
-
-
   /**
    * Convert a JSON string to pretty print version.
    *
