@@ -1,7 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Model;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -38,15 +37,16 @@ public class GameFinishedScreen extends Stage {
    * @param controller a reference to a controller instance
    * @param model a reference to a model instance
    * @param mainStage a reference to the game's main stage
-   * @param locale the locale object uses for displaying multi language text
+   * @param messages the ResourceBundle for the externalised strings
    */
-  public GameFinishedScreen(Controller controller, Model model, Stage mainStage, Locale locale) {
+  public GameFinishedScreen(
+      Controller controller, Model model, Stage mainStage, ResourceBundle messages) {
     super();
 
     this.controller = controller;
     this.model = model;
 
-    messages = ResourceBundle.getBundle("MessagesBundle", locale);
+    this.messages = messages;
 
     initScreen(mainStage);
   }

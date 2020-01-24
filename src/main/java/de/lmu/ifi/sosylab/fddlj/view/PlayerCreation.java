@@ -3,7 +3,6 @@ package de.lmu.ifi.sosylab.fddlj.view;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -52,16 +51,16 @@ public class PlayerCreation extends BorderPane {
    *
    * @param controller the reference to a controller instance
    * @param stage the reference to the stage created by the application thread
-   * @param locale the Locale to use for output text
+   * @param messages the ResourceBundle for the externalised strings
    */
-  public PlayerCreation(Controller controller, Stage stage, Locale locale) {
+  public PlayerCreation(Controller controller, Stage stage, ResourceBundle messages) {
     super();
 
     this.controller = controller;
     this.primaryStage = stage;
     setStyle("-fx-background-color: transparent");
 
-    messages = ResourceBundle.getBundle("MessagesBundle", locale);
+    this.messages = messages;
   }
 
   /**

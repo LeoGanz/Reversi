@@ -2,15 +2,17 @@ package de.lmu.ifi.sosylab.fddlj.view;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -28,12 +30,12 @@ public class AboutWindow extends Stage {
   /**
    * Public constructor of this class initialises stage and content.
    *
-   * @param locale the Locale to use for output text
+   * @param messages the ResourceBundle for the externalised strings
    */
-  public AboutWindow(Locale locale) {
+  public AboutWindow(ResourceBundle messages) {
     super();
 
-    messages = ResourceBundle.getBundle("MessagesBundle", locale);
+    this.messages = messages;
 
     initWindow();
   }
@@ -88,8 +90,13 @@ public class AboutWindow extends Stage {
     textArea.setFont(Font.font(16));
     textArea.setText(readFile("files/rules.txt"));
 
+    VBox vbox = new VBox(15);
+    vbox.setAlignment(Pos.CENTER);
+    vbox.getChildren().add(getGeneralRules());
+    vbox.getChildren().add(new SpecificRulesPane(messages));
+
     ScrollPane scrollPane = new ScrollPane();
-    scrollPane.setContent(textArea);
+    scrollPane.setContent(vbox);
     scrollPane.setFitToWidth(true);
     scrollPane.setFitToHeight(true);
     scrollPane.setPrefWidth(600);
@@ -111,5 +118,23 @@ public class AboutWindow extends Stage {
     stream.forEach(s -> contentBuilder.append(s).append("\n"));
 
     return contentBuilder.toString();
+  }
+
+  private VBox getGeneralRules() {
+    VBox vbox = new VBox(10);
+    vbox.setAlignment(Pos.CENTER);
+
+    Label heading = new Label(messages.getString("aboutWindow_Rules_General_Heading"));
+    heading.setId("heading");
+    vbox.getChildren().add(heading);
+
+    TextArea textArea = new TextArea();
+    textArea.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3);
+    textArea.setWrapText(true);
+    textArea.setFont(Font.font("Calibri", 16));
+    textArea.setText(messages.getString("aboutWindow_Rules_General"));
+    vbox.getChildren().add(textArea);
+
+    return vbox;
   }
 }

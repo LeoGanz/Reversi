@@ -41,7 +41,7 @@ public class ControllerImpl extends Application implements Controller {
     this.gameMode = gameMode;
 
     model = new ModelImpl(gameMode, playerOne, playerTwo);
-    view = new ViewImpl(stage, model, this, locale);
+    view = new ViewImpl(stage, model, this, messages);
     model.addListener(view);
     view.showGame(gameMode);
   }
@@ -86,7 +86,7 @@ public class ControllerImpl extends Application implements Controller {
   }
 
   void showGameModeSelector(Stage primaryStage) {
-    GameModeSelector gms = new GameModeSelector(this, primaryStage, locale);
+    GameModeSelector gms = new GameModeSelector(this, primaryStage, messages);
     gms.showGameModeSelection();
   }
 

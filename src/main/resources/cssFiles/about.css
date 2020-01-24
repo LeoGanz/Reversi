@@ -28,6 +28,7 @@
 .tab-pane
 {
     -fx-tab-min-width:120px;
+    -fx-tab-min-height: 60px;
 }
 
 .tab{
@@ -135,4 +136,27 @@
     -fx-background-color:derive(gray,100%);
 	-fx-border-color:derive(gray,80%);	
 	-fx-padding:10px;
+}
+
+.text-area .text {
+     -fx-line-spacing: 4px;
+}
+
+.text-area .scroll-pane {
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: never;
+}
+
+#heading {
+	-fx-border-color: transparent transparent #FF8C00 transparent;
+	-fx-border-width: 4;
+	-fx-font-family: 'Boulder';
+	-fx-font-size: xx-large;
+	-fx-text-fill: white;
+}
+
+#plain_rule_text{
+	-fx-font-family: 'Calibri';
+	-fx-font-size: 16;
+	-fx-text-fill: white;
 }

@@ -1,10 +1,9 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashSet;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,13 +17,24 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+/**
+ * This class offers a pane for the multiplayer view in which all spectators currently watching the
+ * game are being displayed.
+ *
+ * @author Josef Feger
+ */
 public class SpectatorList extends BorderPane implements PropertyChangeListener {
 
   private ResourceBundle messages;
 
-  public SpectatorList(Locale locale) {
+  /**
+   * Public constructor of this class initialises variables and builds pane.
+   *
+   * @param messages the ResourceBundle for the externalised strings
+   */
+  public SpectatorList(ResourceBundle messages) {
 
-    messages = ResourceBundle.getBundle("MessagesBundle", locale);
+    this.messages = messages;
 
     initSpectatorList();
   }
@@ -34,7 +44,7 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
     setId("spectator-pane");
   }
 
-  private void buildSpectatorList(HashSet<Player> spectators) {
+  private void buildSpectatorList(Spectators spectators) {
 
     VBox spectatorList = new VBox(15);
     spectatorList.setAlignment(Pos.CENTER);

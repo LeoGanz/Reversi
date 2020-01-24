@@ -6,7 +6,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -49,9 +48,10 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
    * @param controller a reference to a controller instance
    * @param stage a reference to the game's main stage
    * @param view a reference to a view instance
-   * @param locale the locale object uses for displaying multi language text
+   * @param messages the ResourceBundle for the externalised strings
    */
-  public GameBoardGrid(Model model, Controller controller, Stage stage, View view, Locale locale) {
+  public GameBoardGrid(
+      Model model, Controller controller, Stage stage, View view, ResourceBundle messages) {
     super();
 
     this.model = model;
@@ -61,7 +61,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     this.volume = 0.6f;
 
     view.addListener(this);
-    messages = ResourceBundle.getBundle("MessagesBundle", locale);
+    this.messages = messages;
 
     setStyle("-fx-background-color: transparent;");
     initToggleSwitch();

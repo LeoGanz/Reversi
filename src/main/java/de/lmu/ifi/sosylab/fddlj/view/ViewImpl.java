@@ -7,7 +7,6 @@ import de.lmu.ifi.sosylab.fddlj.model.Phase;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -69,7 +68,6 @@ public class ViewImpl implements View {
   private float volume;
 
   private ResourceBundle messages;
-  private Locale locale;
 
   /**
    * Constructor of this class initialises the main frame of the game.
@@ -77,16 +75,15 @@ public class ViewImpl implements View {
    * @param stage the stage created upon launching the application
    * @param model a reference to the model instance
    * @param controller a reference to the controller instance
-   * @param locale the Locale to use for output text
+   * @param messages the ResourceBundle for the externalised strings
    */
-  public ViewImpl(Stage stage, Model model, Controller controller, Locale locale) {
+  public ViewImpl(Stage stage, Model model, Controller controller, ResourceBundle messages) {
 
     this.controller = controller;
     this.stage = stage;
     this.model = model;
-    this.locale = locale;
 
-    messages = ResourceBundle.getBundle("MessagesBundle", locale);
+    this.messages = messages;
 
     support = new PropertyChangeSupport(this);
     playSound = true;
@@ -135,7 +132,7 @@ public class ViewImpl implements View {
     root.setLeft(left);
     BorderPane.setAlignment(left, Pos.CENTER);
 
-    gameBoard = new GameBoardGrid(model, controller, stage, this, locale);
+    gameBoard = new GameBoardGrid(model, controller, stage, this, messages);
     root.setCenter(gameBoard);
     BorderPane.setAlignment(root, Pos.CENTER);
     BorderPane.setMargin(gameBoard, new Insets(30, 50, 30, 50));
@@ -269,7 +266,7 @@ public class ViewImpl implements View {
     Button button = new Button("", imageView);
     button.setCursor(Cursor.HAND);
     button.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-    button.setOnAction(e -> new AboutWindow(locale));
+    button.setOnAction(e -> new AboutWindow(messages));
     Tooltip helper = new Tooltip();
     helper.setText(messages.getString("ViewImpl_ButtonHelp_Tooltip"));
     button.setTooltip(helper);
@@ -435,7 +432,7 @@ public class ViewImpl implements View {
       if (model.getState().getCurrentPhase() == Phase.FINISHED) {
 
         root.setDisable(true);
-        new GameFinishedScreen(controller, model, stage, locale);
+        new GameFinishedScreen(controller, model, stage, messages);
       }
     }
 

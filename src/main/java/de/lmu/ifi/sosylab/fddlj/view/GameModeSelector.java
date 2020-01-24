@@ -1,6 +1,5 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,23 +34,21 @@ public class GameModeSelector extends Stage {
   private StartScreenDiskGrid startScreenDisks;
 
   private ResourceBundle messages;
-  private Locale locale;
 
   /**
    * Constructor of this class initialises variables and builds the stage.
    *
    * @param controller a reference to a controller instance
    * @param stage the stage created by the application thread
-   * @param locale the Locale to use for output text
+   * @param messages the ResourceBundle for the externalised strings
    */
-  public GameModeSelector(Controller controller, Stage stage, Locale locale) {
+  public GameModeSelector(Controller controller, Stage stage, ResourceBundle messages) {
     super();
 
     this.controller = controller;
     this.primaryStage = stage;
-    this.locale = locale;
 
-    messages = ResourceBundle.getBundle("MessagesBundle", locale);
+    this.messages = messages;
   }
 
   /** Displays a stage that allows the user to select which game mode he/she wants to play. */
@@ -135,10 +132,11 @@ public class GameModeSelector extends Stage {
     VBox.setVgrow(top, Priority.ALWAYS);
     vbox.getChildren().add(top);
 
+    PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, messages);
+
     Button singlePlayer = getButton(messages.getString("GameModeSelector_ButtonSingleplayer_Text"));
     singlePlayer.setOnAction(
         e -> {
-          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, locale);
           playerCreation.getSinglePlayerInformation(controller, this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
@@ -147,7 +145,6 @@ public class GameModeSelector extends Stage {
     Button hotseat = getButton(messages.getString("GameModeSelector_ButtonHotseat_Text"));
     hotseat.setOnAction(
         e -> {
-          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, locale);
           playerCreation.getMultiplePlayersInformation(this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
@@ -156,7 +153,6 @@ public class GameModeSelector extends Stage {
     Button multiPlayer = getButton(messages.getString("GameModeSelector_ButtonMultiplayer"));
     multiPlayer.setOnAction(
         e -> {
-          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, locale);
           playerCreation.getOnlinePlayerInformation(this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
@@ -165,7 +161,6 @@ public class GameModeSelector extends Stage {
     Button spectate = getButton(messages.getString("GameModeSelector_ButtonSpectate"));
     spectate.setOnAction(
         e -> {
-          PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, locale);
           playerCreation.getSpectatorInformation(this);
           borderPane.setCenter(playerCreation);
           borderPane.setRight(null);
