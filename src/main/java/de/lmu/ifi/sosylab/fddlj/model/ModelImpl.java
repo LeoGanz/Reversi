@@ -20,7 +20,6 @@ public class ModelImpl implements Model {
   private ModifiableGameState state;
   private GameMode mode;
   private ArtificialIntelligence ai;
-  private static final int AI_DEPTH = 3;
   private static final int NUMBER_OF_MOVES_IN_BEGINNING_PHASE = 4;
   private final int disksPerPlayer;
   private int numberOfPlayerOneDisks;
@@ -62,7 +61,7 @@ public class ModelImpl implements Model {
     numberOfPlayerTwoDisks = disksPerPlayer;
 
     if (mode.equals(GameMode.SINGLEPLAYER)) {
-      ai = new ArtificialIntelligenceImpl(AI_DEPTH, new HeuristicImpl());
+      ai = new ArtificialIntelligenceImpl(3, new HeuristicImpl());
     }
   }
 
@@ -199,9 +198,8 @@ public class ModelImpl implements Model {
 
   @Override
   public void substitutePlayersWith(Player newPlayerOne, Player newPlayerTwo) {
-    Set<Cell> cellsPlayerOne = state
-        .getField()
-        .getAllCellsForPlayer(state.getPlayerManagement().getPlayerOne());
+    Set<Cell> cellsPlayerOne =
+        state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerOne());
     Set<Cell> cellsPlayerTwo =
         state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerTwo());
 
@@ -309,9 +307,7 @@ public class ModelImpl implements Model {
     return false;
   }
 
-  /** 
-   * Notifies all Listeners of a changed {@link GameState}. 
-   */
+  /** Notifies all Listeners of a changed {@link GameState}. */
   private void notifyListenersOfChangedState() {
     support.firePropertyChange(Model.STATE_CHANGED, null, state);
   }
