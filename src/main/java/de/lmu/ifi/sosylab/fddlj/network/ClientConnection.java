@@ -1,6 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonParseException;
 import de.lmu.ifi.sosylab.fddlj.network.communication.ClientNotification;
 import de.lmu.ifi.sosylab.fddlj.network.communication.DiskPlacement;
 import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest;
@@ -87,8 +87,6 @@ public class ClientConnection implements Runnable {
 
   private void processReceivedData(String receivedData) {
     try {
-      System.out.println("receivedData is null: " + (receivedData == null));
-      System.out.println("receivedData: " + receivedData);
       Message<?> receivedMessage = Message.fromJson(receivedData);
       Object data = receivedMessage.getData();
       if (data instanceof DiskPlacement) {
@@ -101,7 +99,7 @@ public class ClientConnection implements Runnable {
         System.out.println("Received unknown message type: " + data.getClass().getName());
         sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
       }
-    } catch (@SuppressWarnings("unused") JsonSyntaxException e) {
+    } catch (@SuppressWarnings("unused") JsonParseException e) {
       sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
     }
   }

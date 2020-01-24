@@ -94,8 +94,10 @@ public class MessageJsonDeserializer<T> implements JsonDeserializer<Message<T>> 
             | NoSuchMethodException
             | SecurityException
             | NoSuchFieldException ex) {
-          // reflection did not work, nothing left to do
-          return null;
+          // reflection did not work, nothing left that can be done
+          throw new JsonParseException(
+              "Class of data not found. "
+                  + "Trying to populate a message object with failure causing data did not work.");
         }
       }
     }

@@ -1,6 +1,10 @@
 package de.lmu.ifi.sosylab.fddlj.network;
 
 import com.google.gson.Gson;
+import de.lmu.ifi.sosylab.fddlj.model.CustomGson;
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
 import de.lmu.ifi.sosylab.fddlj.network.communication.Message;
@@ -22,6 +26,7 @@ import org.junit.jupiter.api.Test;
 public class MessageTest {
 
   private final Player dummy = new PlayerImpl("Dummy", Color.BLUEVIOLET);
+  private final Player otherDummy = new PlayerImpl("Other Dummy", Color.BISQUE);
   private final Message<Player> dummyMessage = new Message<>(dummy);
   private final Message<Boolean> trueMessage = new Message<>(true);
   private final Message<Message<Message<Player>>> nestedMessage =
@@ -62,11 +67,12 @@ public class MessageTest {
 
   @Test
   public void testJsonSerialization_Regular() {
-
     ArrayList<Message<?>> messages = new ArrayList<>();
     messages.add(trueMessage);
     messages.add(dummyMessage);
     messages.add(nestedMessage);
+    Model model = new ModelImpl(GameMode.HOTSEAT, dummy, otherDummy);
+    messages.add(new Message<>(model.getState()));
 
     for (Message<?> message : messages) {
       testToJson(message);
@@ -78,6 +84,7 @@ public class MessageTest {
       Assertions.assertEquals(message, fromJson);
     }
   }
+
 
   @Test
   public void testJsonSerialization_InvalidDataClass() {
@@ -132,7 +139,7 @@ public class MessageTest {
   }
 
   private void testToJson(Message<?> message, String dataClassName, boolean dataNull) {
-    Gson gson = new Gson();
+    Gson gson = CustomGson.createGson();
     String jsonString;
     if (dataNull) {
       jsonString = "{\"" + Message.DATA_CLASS_FIELD + "\":\"" + dataClassName + "\"}";

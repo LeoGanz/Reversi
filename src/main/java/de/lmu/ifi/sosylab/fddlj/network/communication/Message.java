@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
+import de.lmu.ifi.sosylab.fddlj.model.CustomGson;
 
 /**
  * A generic implementation for JSON serializable network messages. This kind of structure give us
@@ -73,9 +74,7 @@ public class Message<T> {
    * @return a string containing this message encoded with json
    */
   public String toJson() {
-    Gson gson = new Gson();
-
-    return gson.toJson(this);
+    return CustomGson.createGson().toJson(this);
   }
 
   /**
@@ -85,14 +84,10 @@ public class Message<T> {
    * @return Message decoded from the json string
    */
   public static Message<?> fromJson(String json) {
-    Gson gson =
-        new GsonBuilder()
-            .registerTypeAdapter(
-                Message.class, MessageJsonDeserializer.getContentJsonDeserializer())
-            .create();
-
-    return gson.fromJson(json, Message.class);
+    return CustomGson.createGson().fromJson(json, Message.class);
   }
+
+
 
   /**
    * Convert a JSON string to pretty print version.
