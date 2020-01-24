@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import de.lmu.ifi.sosylab.fddlj.network.communication.InterfaceAdapter;
 import de.lmu.ifi.sosylab.fddlj.network.communication.Message;
 import de.lmu.ifi.sosylab.fddlj.network.communication.MessageJsonDeserializer;
+import javafx.scene.paint.Color;
+import org.hildan.fxgson.adapters.extras.ColorTypeAdapter;
 
 /**
  * Provider of preconfigured {@link Gson}.
@@ -34,6 +36,7 @@ public class CustomGson {
           .registerTypeAdapter(ModifiableGameField.class, new InterfaceAdapter<>())
           .registerTypeAdapter(PlayerManagement.class, new InterfaceAdapter<>())
           .registerTypeAdapter(ModifiablePlayerManagement.class, new InterfaceAdapter<>())
+          .registerTypeAdapter(Color.class, new ColorTypeAdapter())
           .create();
     }
     return INSTANCE;
