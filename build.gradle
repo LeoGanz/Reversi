@@ -16,7 +16,7 @@ if (currentOS.isWindows()) {
 	platform = 'win'
 } else if (currentOS.isLinux()) {
 	platform = 'linux'
-} else if (currentOS.isMaxOsX()) {
+} else if (currentOS.isMacOsX()) {
 	platform = 'mac'
 }
 
