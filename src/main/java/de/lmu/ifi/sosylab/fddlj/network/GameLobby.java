@@ -156,10 +156,14 @@ public class GameLobby {
 
     if (connOne.getConnectionID() == connectionID) {
       connOne = null;
-      broadcast(ServerNotification.PLAYER_ONE_LEFT);
+      if (server.isRunning()) { // reduce spam on server shutdown
+        broadcast(ServerNotification.PLAYER_ONE_LEFT);
+      }
     } else if (connTwo.getConnectionID() == connectionID) {
       connTwo = null;
-      broadcast(ServerNotification.PLAYER_TWO_LEFT);
+      if (server.isRunning()) { // reduce spam on server shutdown
+        broadcast(ServerNotification.PLAYER_TWO_LEFT);
+      }
     } else {
       spectatorsConnections.remove(server.getConnection(connectionID));
       spectatorsPlayers.remove(connectionID);
@@ -308,7 +312,9 @@ public class GameLobby {
   }
 
   private void closeLobby() {
-    broadcast(ServerNotification.LOBBY_CLOSED);
+    if (server.isRunning()) { // reduce spam on server shutdown
+      broadcast(ServerNotification.LOBBY_CLOSED);
+    }
     server.lobbyClosed(lobbyID);
   }
 
