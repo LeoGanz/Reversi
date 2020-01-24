@@ -44,8 +44,9 @@ public class HeuristicImpl implements Heuristic {
   private double disksInCorner(GameState state, Player player) {
     Set<Cell> disksOfPlayer = state.getField().getAllCellsForPlayer(player);
     double temp = 0;
-    for (int column = 0; column < GameFieldImpl.SIZE; column = column + (GameFieldImpl.SIZE - 1)) {
-      for (int row = 0; row < GameFieldImpl.SIZE; row = row + (GameFieldImpl.SIZE - 1)) {
+    int size = state.getField().getSize();
+    for (int column = 0; column < size; column = column + (size - 1)) {
+      for (int row = 0; row < size; row = row + (size - 1)) {
         if (disksOfPlayer.contains(new CellImpl(column, row))) {
           temp++;
         }

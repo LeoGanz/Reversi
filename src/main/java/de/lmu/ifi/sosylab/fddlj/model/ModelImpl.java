@@ -20,6 +20,7 @@ public class ModelImpl implements Model {
   private ModifiableGameState state;
   private GameMode mode;
   private ArtificialIntelligence ai;
+  private static final int AI_DEPTH = 3;
   private static final int NUMBER_OF_MOVES_IN_BEGINNING_PHASE = 4;
   private final int disksPerPlayer;
   private int numberOfPlayerOneDisks;
@@ -61,7 +62,7 @@ public class ModelImpl implements Model {
     numberOfPlayerTwoDisks = disksPerPlayer;
 
     if (mode.equals(GameMode.SINGLEPLAYER)) {
-      ai = new ArtificialIntelligenceImpl(3, new HeuristicImpl());
+      ai = new ArtificialIntelligenceImpl(AI_DEPTH, new HeuristicImpl());
     }
   }
 
