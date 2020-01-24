@@ -1,6 +1,7 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
+import de.lmu.ifi.sosylab.fddlj.model.DiskImpl;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.network.Client;
@@ -14,6 +15,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
@@ -34,6 +37,8 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
   private ResourceBundle messages;
 
+  private BlockingQueue<Runnable> asynchronousWorkload = new LinkedBlockingQueue<Runnable>();
+
   /**
    * Public constructor of this class takes the stage created by the JavaFX thread that is used to
    * display the game.
@@ -45,6 +50,23 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
     Locale locale = Locale.getDefault();
     messages = ResourceBundle.getBundle("files/MessagesBundle", locale);
+
+    initWorkerThread();
+  }
+
+  private void initWorkerThread() {
+    new Thread(
+        () -> {
+          while (true) {
+            try {
+              asynchronousWorkload.take().run();
+            } catch (InterruptedException e) {
+              continue;
+            }
+          }
+        })
+        .start();
+    ;
   }
 
   @Override
@@ -60,7 +82,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
   @Override
   public void placeDisk(Cell on) {
-    // place disk in client
+    client.placeDisk(new DiskImpl(ownPlayer), on);
   }
 
   @Override
@@ -76,17 +98,22 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     try {
       client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);
       gui.showWaitingScreen();
-      client.startClient();
 
-      if (createPrivateLobby) {
-        client.createNewPrivateLobby();
-      } else {
-        if (lobbyID > 0) {
-          client.joinSpecificLobby(false, lobbyID);
-        } else {
-          client.joinAnyRandomPublicLobby(false);
-        }
-      }
+      asynchronousWorkload.add(
+          () -> {
+            client.startClient();
+
+            if (createPrivateLobby) {
+              client.createNewPrivateLobby();
+            } else {
+              if (lobbyID > 0) {
+                client.joinSpecificLobby(false, lobbyID);
+              } else {
+                client.joinAnyRandomPublicLobby(false);
+              }
+            }
+          });
+
     } catch (UnknownHostException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -97,7 +124,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
   @Override
   public void requestGameReset() {
-    // TODO Auto-generated method stub
+    client.requestGameRestart();
   }
 
   @Override
@@ -108,6 +135,25 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   @Override
   public void startSpectateGame(Player ownPlayer, String serverAddress, int lobbyID) {
     gameMode = GameMode.SPECTATOR;
+    ClientCompatibleGui gui = new ViewImpl(mainStage, null, this, messages);
+
+    try {
+      client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);
+      gui.showWaitingScreen();
+
+      asynchronousWorkload.add(
+          () -> {
+            client.startClient();
+
+            if (lobbyID > 0) {
+              client.joinSpecificLobby(true, lobbyID);
+            } else {
+              client.joinAnyRandomPublicLobby(true);
+            }
+          });
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override

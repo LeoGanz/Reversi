@@ -63,9 +63,28 @@ public class ClientImpl implements Client {
   public void startClient() {
     running = true;
 
+    initServerConnection();
+
     Thread connectorThread = new Thread(this::communicateWithServer);
     connectorThread.setDaemon(true);
     connectorThread.start();
+  }
+
+  private void initServerConnection() {
+    try {
+      connection = new Socket(serverAddress, PORT);
+      out = new PrintWriter(connection.getOutputStream(), true, StandardCharsets.UTF_8);
+      out.flush();
+      in =
+          new BufferedReader(
+              new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+
+      connectionEstablished = true;
+    } catch (
+        @SuppressWarnings("unused")
+        IOException e) {
+      terminate();
+    }
   }
 
   @Override
@@ -125,21 +144,6 @@ public class ClientImpl implements Client {
   }
 
   private void communicateWithServer() {
-
-    try {
-      connection = new Socket(serverAddress, PORT);
-      out = new PrintWriter(connection.getOutputStream(), true, StandardCharsets.UTF_8);
-      out.flush();
-      in =
-          new BufferedReader(
-              new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-
-      connectionEstablished = true;
-    } catch (
-        @SuppressWarnings("unused")
-        IOException e) {
-      terminate();
-    }
 
     while (running) {
       String receivedLine;

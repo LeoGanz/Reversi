@@ -408,14 +408,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   @Override
   public void propertyChange(PropertyChangeEvent event) {
-    Platform.runLater(
-        new Runnable() {
-
-          @Override
-          public void run() {
-            handleChangeEvent(event);
-          }
-        });
+    Platform.runLater(() -> handleChangeEvent(event));
   }
 
   /**
