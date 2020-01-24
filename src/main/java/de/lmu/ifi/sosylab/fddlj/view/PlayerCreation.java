@@ -1,5 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
+import de.lmu.ifi.sosylab.fddlj.model.AiPlayerImpl;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
@@ -573,7 +574,7 @@ public class PlayerCreation extends BorderPane {
     } else {
       aiColor = Color.BLACK;
     }
-    Player ai = new PlayerImpl("AI", aiColor);
+    Player ai = new AiPlayerImpl("AI", aiColor);
 
     controller.startMainView(GameMode.SINGLEPLAYER, primaryStage, player, ai, gameFieldSize);
   }

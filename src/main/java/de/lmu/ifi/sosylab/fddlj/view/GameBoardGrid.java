@@ -1,6 +1,5 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
-import de.lmu.ifi.sosylab.fddlj.model.GameFieldImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -66,8 +65,9 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     setStyle("-fx-background-color: transparent;");
     initToggleSwitch();
     initGameBoard(stage, view);
-    setMinWidth(GameFieldImpl.SIZE * GraphicCell.MIN_WIDTH);
-    setMinHeight(GameFieldImpl.SIZE * GraphicCell.MIN_HEIGHT + switchButton.getHeight());
+    setMinWidth(model.getState().getField().getSize() * GraphicCell.MIN_WIDTH);
+    setMinHeight(
+        model.getState().getField().getSize() * GraphicCell.MIN_HEIGHT + switchButton.getHeight());
 
     new Thread(() -> initialiseAudioSystem()).start();
   }
@@ -77,12 +77,12 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     VBox centerGrid = new VBox();
     centerGrid.setAlignment(Pos.CENTER);
     centerGrid.setEffect(new DropShadow(10, 5, 5, Color.BLACK));
-    for (int row = 1; row < GameFieldImpl.SIZE + 1; row++) {
+    for (int row = 1; row < model.getState().getField().getSize() + 1; row++) {
 
       HBox hboxRow = new HBox();
       hboxRow.setAlignment(Pos.CENTER);
 
-      for (int column = 1; column < GameFieldImpl.SIZE + 1; column++) {
+      for (int column = 1; column < model.getState().getField().getSize() + 1; column++) {
 
         GraphicCell cell = new GraphicCell(column - 1, row - 1, this, model, controller);
         hboxRow.getChildren().add(cell);

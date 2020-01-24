@@ -104,14 +104,16 @@ public class GameFinishedScreen extends Stage {
           controller.resetGame(
               controller.getCurrentGameMode(),
               model.getState().getPlayerManagement().getPlayerOne(),
-              model.getState().getPlayerManagement().getPlayerTwo());
+              model.getState().getPlayerManagement().getPlayerTwo(),
+              model.getState().getField().getSize());
         });
 
     Button mainScreen = getButton(messages.getString("GameFinishedScreen_MainScreenButton_Text"));
     mainScreen.setOnAction(
         e -> {
-          mainStage.close();
           close();
+          mainStage.close();
+
           if (controller instanceof ControllerImpl) {
             ((ControllerImpl) controller).showGameModeSelector(new Stage());
           } else {

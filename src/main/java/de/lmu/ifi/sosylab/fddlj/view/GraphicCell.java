@@ -4,7 +4,6 @@ import de.lmu.ifi.sosylab.fddlj.model.AiPlayer;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.CellImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Disk;
-import de.lmu.ifi.sosylab.fddlj.model.GameFieldImpl;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.Phase;
@@ -70,7 +69,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
     setStyle(cssNormal);
     double initValue =
         (Screen.getPrimary().getVisualBounds().getHeight() - SPACING)
-            / (double) (GameFieldImpl.SIZE + 1);
+            / (double) (model.getState().getField().getSize() + 1);
     setPrefHeight(initValue);
     setPrefWidth(initValue);
     setMinWidth(MIN_WIDTH);
@@ -131,13 +130,17 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
   private void resizeCell() {
     double prefSize;
     if (gameBoardGrid.getWidth() >= gameBoardGrid.getHeight()) {
-      prefSize = (gameBoardGrid.getHeight() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
+      prefSize =
+          (gameBoardGrid.getHeight() - SPACING)
+              / (double) (model.getState().getField().getSize() + 1);
 
       if (prefSize < MIN_HEIGHT) {
         prefSize = MIN_HEIGHT;
       }
     } else {
-      prefSize = (gameBoardGrid.getWidth() - SPACING) / (double) (GameFieldImpl.SIZE + 1);
+      prefSize =
+          (gameBoardGrid.getWidth() - SPACING)
+              / (double) (model.getState().getField().getSize() + 1);
 
       if (prefSize < MIN_WIDTH) {
         prefSize = MIN_WIDTH;

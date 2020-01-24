@@ -40,7 +40,7 @@ public class ControllerImpl extends Application implements Controller {
 
     this.gameMode = gameMode;
 
-    model = new ModelImpl(gameMode, playerOne, playerTwo);
+    model = new ModelImpl(gameMode, gameFieldSize, playerOne, playerTwo);
     view = new ViewImpl(stage, model, this, messages);
     model.addListener(view);
     view.showGame(gameMode);
@@ -48,7 +48,7 @@ public class ControllerImpl extends Application implements Controller {
 
   @Override
   public void resetGame(GameMode gameMode, Player playerOne, Player playerTwo, int gameFieldSize) {
-    model = new ModelImpl(gameMode, playerOne, playerTwo);
+    model = new ModelImpl(gameMode, gameFieldSize, playerOne, playerTwo);
     model.addListener(view);
 
     this.gameMode = gameMode;
