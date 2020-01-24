@@ -170,7 +170,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     }
 
     stage.setScene(scene);
-    stage.show();
+    if (!stage.isShowing()) {
+      stage.show();
+    }
   }
 
   private VBox getDiskIndicators(GameMode gameMode) {
@@ -601,6 +603,8 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   public void modelExchanged(Model model) {
     this.model = model;
     support.firePropertyChange(Model.LISTENERS_CHANGED, null, model);
+
+    showGame(controller.getCurrentGameMode());
   }
 
   @Override
