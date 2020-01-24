@@ -214,10 +214,25 @@ public class GameLobby {
   public synchronized void acceptRestart(int connectionID) {
     if ((connOne.getConnectionID() == connectionID) && restartRequestTwo) {
       connTwo.sendMessageWith(ServerNotification.PARTNER_ACCEPTED_RESTART);
+      restartRequestOne = true; // needed for not firing "partner denied" when resetting
       restartGame();
     } else if ((connTwo.getConnectionID() == connectionID) && restartRequestOne) {
       connOne.sendMessageWith(ServerNotification.PARTNER_ACCEPTED_RESTART);
+      restartRequestTwo = true; // needed for not firing "partner denied" when resetting
       restartGame();
+    }
+  }
+
+  /**
+   * Deny the partner's request of restarting the game. Has no effect if no request has been made by
+   * the partner.
+   *
+   * @param connectionID integer to reference the connection denying the request
+   */
+  public synchronized void denyRestart(int connectionID) {
+    if (((connOne.getConnectionID() == connectionID) && restartRequestTwo)
+        || ((connTwo.getConnectionID() == connectionID) && restartRequestOne)) {
+      resetRestartRequests();
     }
   }
 
@@ -238,6 +253,15 @@ public class GameLobby {
   }
 
   private void resetRestartRequests() {
+    // if both were true, reset has been accepted
+    if (restartRequestOne ^ restartRequestTwo) {
+      if (restartRequestOne && (connTwo != null)) {
+        connTwo.sendMessageWith(ServerNotification.PARTNER_DENIED_RESTART);
+      } else if (restartRequestTwo && (connOne != null)) {
+        connOne.sendMessageWith(ServerNotification.PARTNER_DENIED_RESTART);
+      }
+    }
+
     restartRequestOne = false;
     restartRequestTwo = false;
   }
