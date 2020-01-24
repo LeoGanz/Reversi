@@ -25,7 +25,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -555,6 +554,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
     switch (serverNotification) {
       case SERVER_SHUTTING_DOWN:
+        handleServerShuttingDown();
         break;
       case RESTARTING:
         break;
@@ -585,7 +585,12 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     buttonTypes.add(continueAgainstAi);
     buttonTypes.add(exit);
 
-    // showOptionDialog(AlertType.INFORMATION, title, header, content, buttonTypes);
+    showOptionDialog(
+        AlertType.INFORMATION,
+        messages.getString("ViewImpl_ServerShutdown_Title"),
+        messages.getString("ViewImpl_ServerShutdown_Subtitle"),
+        messages.getString("ViewImpl_ServerShutdown_Info"),
+        buttonTypes);
   }
 
   @Override
@@ -650,7 +655,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     ButtonType buttonTypeOne = new ButtonType("One");
     ButtonType buttonTypeTwo = new ButtonType("Two");
     ButtonType buttonTypeThree = new ButtonType("Three");
-    ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+    // ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
     alert.getButtonTypes().setAll(buttonTypes);
 

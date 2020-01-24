@@ -37,7 +37,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
   private ResourceBundle messages;
 
-  private BlockingQueue<Runnable> asynchronousWorkload = new LinkedBlockingQueue<Runnable>();
+  private BlockingQueue<Runnable> asynchronousWorkloads;
 
   /**
    * Public constructor of this class takes the stage created by the JavaFX thread that is used to
@@ -48,6 +48,8 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   public MultiplayerControllerImpl(Stage primaryStage) {
     this.mainStage = primaryStage;
 
+    asynchronousWorkloads = new LinkedBlockingQueue<>();
+
     Locale locale = Locale.getDefault();
     messages = ResourceBundle.getBundle("files/MessagesBundle", locale);
 
@@ -55,18 +57,19 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   }
 
   private void initWorkerThread() {
-    new Thread(
-        () -> {
-          while (true) {
-            try {
-              asynchronousWorkload.take().run();
-            } catch (InterruptedException e) {
-              continue;
-            }
-          }
-        })
-        .start();
-    ;
+    Thread worker =
+        new Thread(
+            () -> {
+              while (true) {
+                try {
+                  asynchronousWorkloads.take().run();
+                } catch (InterruptedException e) {
+                  continue;
+                }
+              }
+            });
+    worker.setDaemon(true);
+    worker.start();
   }
 
   @Override
@@ -99,7 +102,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
       client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);
       gui.showWaitingScreen();
 
-      asynchronousWorkload.add(
+      asynchronousWorkloads.add(
           () -> {
             client.startClient();
 
@@ -141,7 +144,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
       client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);
       gui.showWaitingScreen();
 
-      asynchronousWorkload.add(
+      asynchronousWorkloads.add(
           () -> {
             client.startClient();
 
@@ -171,10 +174,8 @@ public class MultiplayerControllerImpl implements MultiplayerController {
       return;
     }
 
-    if (server != null) {
-      ServerGui view = new ServerGui(server);
-      server.addListener(view);
-    }
+    ServerGui view = new ServerGui(server);
+    server.addListener(view);
   }
 
   private void showAlert(AlertType alertType, String title, String header, String content) {
