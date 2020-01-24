@@ -12,6 +12,8 @@ import de.lmu.ifi.sosylab.fddlj.view.server.ServerGui;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
@@ -30,7 +32,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
   private GameMode gameMode;
 
-  // private ResourceBundle messages;
+  private ResourceBundle messages;
 
   /**
    * Public constructor of this class takes the stage created by the JavaFX thread that is used to
@@ -41,8 +43,8 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   public MultiplayerControllerImpl(Stage primaryStage) {
     this.mainStage = primaryStage;
 
-    // Locale locale = Locale.getDefault();
-    // messages = ResourceBundle.getBundle("MessagesBundle", locale);
+    Locale locale = Locale.getDefault();
+    messages = ResourceBundle.getBundle("files/MessagesBundle", locale);
   }
 
   @Override
@@ -69,7 +71,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   @Override
   public void startOnlineGame(
       Player ownPlayer, String serverAddress, int lobbyID, boolean createPrivateLobby) {
-    ClientCompatibleGui gui = new ViewImpl(mainStage, null, this);
+    ClientCompatibleGui gui = new ViewImpl(mainStage, null, this, messages);
 
     try {
       client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);
@@ -117,9 +119,9 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     } catch (IOException e) {
       showAlert(
           AlertType.ERROR,
-          "Error",
-          "Error while creating server",
-          "Failed to create a server instance! Maybe there is one already running?");
+          messages.getString("ControllerImpl_ServerError_Title"),
+          messages.getString("ControllerImpl_ServerError_Subtitle"),
+          messages.getString("ControllerImpl_ServerError_Info"));
       return;
     }
 

@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -73,7 +74,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   private float volume;
 
-  // private ResourceBundle messages;
+  private ResourceBundle messages;
 
   /**
    * Constructor of this class initialises the main frame of the game.
@@ -81,14 +82,15 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
    * @param stage the stage created upon launching the application
    * @param model a reference to the model instance
    * @param controller a reference to the controller instance
+   * @param messages the ResourceBundle for the externalised strings
    */
-  public ViewImpl(Stage stage, Model model, Controller controller /*, ResourceBundle messages*/) {
+  public ViewImpl(Stage stage, Model model, Controller controller, ResourceBundle messages) {
 
     this.controller = controller;
     this.stage = stage;
     this.model = model;
 
-    // this.messages = messages;
+    this.messages = messages;
 
     support = new PropertyChangeSupport(this);
     playSound = true;
@@ -142,7 +144,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     root.setLeft(left);
     BorderPane.setAlignment(left, Pos.CENTER);
 
-    gameBoard = new GameBoardGrid(model, controller, stage, this);
+    gameBoard = new GameBoardGrid(model, controller, stage, this, messages);
     root.setCenter(gameBoard);
     BorderPane.setAlignment(root, Pos.CENTER);
     BorderPane.setMargin(gameBoard, new Insets(30, 50, 30, 50));
@@ -159,10 +161,12 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
             + BorderPane.getMargin(gameBoard).getRight()
             + right.getMinWidth()
             + 2 * BorderPane.getMargin(right).getRight());
+
     double minHeightLeft =
         left.getMinHeight() + spacerBottom.getMinHeight() + spacerTop.getMinHeight();
     double minHeightBoard =
         gameBoard.getMinHeight() + spacerBottom.getMinHeight() + spacerTop.getMinHeight();
+
     if (minHeightLeft > minHeightBoard) {
       stage.setMinHeight(minHeightLeft);
     } else {
@@ -181,12 +185,13 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setPadding(new Insets(20));
 
-    DiskIndicator currentPlayer = new DiskIndicator(model, "Aktueller Spieler:", this, controller);
+    DiskIndicator currentPlayer =
+        new DiskIndicator(model, messages.getString("ViewImpl_CurrentPlayer"), this, controller);
     vbox.getChildren().add(currentPlayer);
     stage.heightProperty().addListener(e -> currentPlayer.resizeDisk());
     stage.widthProperty().addListener(e -> currentPlayer.resizeDisk());
 
-    Button reset = getButton("Zurücksetzen");
+    Button reset = getButton(messages.getString("ViewImpl_ButtonResetGame"));
     reset.setOnAction(
         e -> {
           controller.resetGame(
@@ -277,11 +282,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     Button button = new Button("", imageView);
     button.setCursor(Cursor.HAND);
     button.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-    button.setOnAction(e -> new AboutWindow());
+    button.setOnAction(e -> new AboutWindow(messages));
     Tooltip helper = new Tooltip();
-    helper.setText(
-        "Zeigt ein Fenster mit zusätzlichen Informationen über dieses Spiel, wie z.B."
-            + " die Regeln und Lizenzen, an.");
+    helper.setText(messages.getString("ViewImpl_ButtonHelp_Tooltip"));
     button.setTooltip(helper);
     button.setMinHeight(50);
 
@@ -294,7 +297,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     vbox.setPadding(new Insets(20));
 
     if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {
-      SpectatorList spectatorList = new SpectatorList();
+      SpectatorList spectatorList = new SpectatorList(messages);
       addListener(spectatorList);
       vbox.getChildren().add(spectatorList);
     }
@@ -335,14 +338,11 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
             return;
           }
         });
-    button.setTooltip(
-        new Tooltip(
-            "Mit der linken Maustaste drücken, um Tonausgaben zu (de-/)aktivieren."
-                + " \nMit der rechten Maustaste drücken, um die Lautstärke anzupassen."));
+    button.setTooltip(new Tooltip(messages.getString("ViewImpl_ButtonSound_Tooltip")));
 
     vbox.getChildren().add(button);
 
-    Button back = getButton("Hauptmenü");
+    Button back = getButton("ViewImpl_ButtonBack_Text");
     back.setOnAction(e -> returnToMainMenu());
     vbox.getChildren().add(back);
 
@@ -440,7 +440,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       if (model.getState().getCurrentPhase() == Phase.FINISHED) {
 
         root.setDisable(true);
-        new GameFinishedScreen(controller, model, stage);
+        new GameFinishedScreen(controller, model, stage, messages);
       }
     }
 
@@ -518,18 +518,17 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     } else if (response.getType() == ResponseType.LOBBY_NOT_FOUND) {
       showAlert(
           AlertType.ERROR,
-          "Fehler",
-          "Lobby konnte nicht gefunden werden",
-          "Die angegebene Lobby konnte leider nicht gefunden werden!");
+          messages.getString("ViewImpl_JoinError_LobbyNotFound_Title"),
+          messages.getString("ViewImpl_JoinError_LobbyNotFound_Subtitle"),
+          messages.getString("ViewImpl_JoinError_LobbyNotFound_Info"));
       returnToMainMenu();
     } else if (response.getType() == ResponseType.NO_PLAYERS_NEEDED) {
 
       showAlert(
           AlertType.ERROR,
-          "Fehler",
-          "Die angegeben Lobby ist voll",
-          "Die angegebene Lobby ist leider schon voll und kann keine"
-              + " weiteren Spieler mehr aufnehmen.");
+          messages.getString("ViewImpl_JoinError_NoPlayerNeeded_Title"),
+          messages.getString("ViewImpl_JoinError_NoPlayerNeeded_Subtitle"),
+          messages.getString("ViewImpl_JoinError_NoPlayerNeeded_Info"));
       returnToMainMenu();
     }
   }
@@ -541,11 +540,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     } else {
       showAlert(
           AlertType.ERROR,
-          "Fehler",
-          "Server fährt herunter",
-          "Der Server fährt herunter. Sie haben folgende Optionen:"
-              + " Das derzeitige Spiel gegen die AI fortsetzen,"
-              + " zurück zum Hautbildschirm oder das Spiel verlassen.");
+          messages.getString("ViewImpl_ReturnError_Title"),
+          messages.getString("ViewImpl_ReturnError_Subtitle"),
+          messages.getString("ViewImpl_ReturnError_Info"));
 
       Platform.exit();
     }
@@ -555,10 +552,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   public void receivedRejectedPlacementReason(Reason rejectedPlacement) {
     showAlert(
         AlertType.ERROR,
-        "Fehler",
-        "Fehler beim Platzieren der Disk",
-        "Das Platzieren der Disk auf der gewünschten Zelle führte zu einem Fehler"
-            + ". Bitte versuche es erneut!");
+        messages.getString("ViewImpl_DiskError_Title"),
+        messages.getString("ViewImpl_DiskError_Subtitle"),
+        messages.getString("ViewImpl_DiskError_Info"));
   }
 
   @Override
@@ -624,7 +620,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     ImageView imageView = new ImageView(loadingGif);
     root.setCenter(imageView);
 
-    Label waiting = new Label("Waiting for opponent to join lobby...");
+    Label waiting = new Label(messages.getString("ViewImpl_WaitForOpponent"));
     waiting.setFont(Font.font(20));
     waiting.setStyle("-fx-text-fill: white");
     root.setTop(waiting);

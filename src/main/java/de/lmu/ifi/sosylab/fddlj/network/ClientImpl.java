@@ -125,6 +125,7 @@ public class ClientImpl implements Client {
   }
 
   private void communicateWithServer() {
+
     try {
       connection = new Socket(serverAddress, PORT);
       out = new PrintWriter(connection.getOutputStream(), true, StandardCharsets.UTF_8);

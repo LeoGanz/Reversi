@@ -189,7 +189,9 @@ public class ServerImpl implements Server {
    * @param connectionID integer to reference the connection that has (been) terminated
    */
   public synchronized void connectionTerminated(int connectionID) {
-    connections.remove(connectionID);
+    if (serverRunning) {
+      connections.remove(connectionID);
+    }
   }
 
   @Override
