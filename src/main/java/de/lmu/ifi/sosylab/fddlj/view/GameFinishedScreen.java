@@ -1,7 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Model;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -29,7 +28,7 @@ public class GameFinishedScreen extends Stage {
   private Model model;
   private Controller controller;
 
-  private ResourceBundle messages;
+  // private ResourceBundle messages;
 
   /**
    * Constructor of this class initialises variables and is responsible for building GUI elements.
@@ -37,16 +36,15 @@ public class GameFinishedScreen extends Stage {
    * @param controller a reference to a controller instance
    * @param model a reference to a model instance
    * @param mainStage a reference to the game's main stage
-   * @param messages the ResourceBundle for the externalised strings
    */
   public GameFinishedScreen(
-      Controller controller, Model model, Stage mainStage, ResourceBundle messages) {
+      Controller controller, Model model, Stage mainStage /*, ResourceBundle messages*/) {
     super();
 
     this.controller = controller;
     this.model = model;
 
-    this.messages = messages;
+    // this.messages = messages;
 
     initScreen(mainStage);
   }
@@ -57,7 +55,7 @@ public class GameFinishedScreen extends Stage {
     root.setId("main-pane");
     root.setPadding(new Insets(30));
 
-    Label title = new Label(messages.getString("GameFinishedScreen_Title"));
+    Label title = new Label("Spiel beendet!");
     title.setId("title-label");
     root.setTop(title);
     BorderPane.setAlignment(title, Pos.CENTER);
@@ -94,10 +92,10 @@ public class GameFinishedScreen extends Stage {
     hbox.setAlignment(Pos.CENTER);
     hbox.setPadding(new Insets(20));
 
-    Button exit = getButton(messages.getString("GameFinishedScreen_ExitButton_Text"));
+    Button exit = getButton("Beenden");
     exit.setOnAction(e -> Platform.exit());
 
-    Button restart = getButton(messages.getString("GameFinishedScreen_RestartButton_Text"));
+    Button restart = getButton("Neustart");
     restart.setOnAction(
         e -> {
           close();
@@ -108,7 +106,7 @@ public class GameFinishedScreen extends Stage {
               model.getState().getField().getSize());
         });
 
-    Button mainScreen = getButton(messages.getString("GameFinishedScreen_MainScreenButton_Text"));
+    Button mainScreen = getButton("Startbildschirm");
     mainScreen.setOnAction(
         e -> {
           close();
@@ -118,9 +116,10 @@ public class GameFinishedScreen extends Stage {
             ((ControllerImpl) controller).showGameModeSelector(new Stage());
           } else {
             Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle(messages.getString("GameFinishedScreen_ReturnError_Title"));
-            alert.setHeaderText(messages.getString("GameFinishedScreen_ReturnError_Subtitle"));
-            alert.setContentText(messages.getString("GameFinishedScreen_ReturnError_Info"));
+            alert.setTitle("Fehler");
+            alert.setHeaderText("Fehler beim Zurückkehren zum Startbildschirm");
+            alert.setContentText(
+                "Konnte nicht zum Startbildschirm zurückkehren. Das Programm wird beendet...");
 
             alert.showAndWait();
             Platform.exit();
@@ -148,13 +147,13 @@ public class GameFinishedScreen extends Stage {
 
     if (model.getState().getPlayerManagement().getWinner().isPresent()) {
       text =
-          messages.getString("GameFinishedScreen_Congratulations")
+          "Herzlichen Glückwunsch!"
               + " "
               + model.getState().getPlayerManagement().getWinner().get().getName()
               + " "
-              + messages.getString("GameFinishedScreen_WinnerText");
+              + "hat das Spiel gewonnen.";
     } else {
-      text = messages.getString("GameFinishedScreen_Draw");
+      text = "Das Spiel endete in einem Unentschieden!";
     }
 
     Label label = new Label(text);

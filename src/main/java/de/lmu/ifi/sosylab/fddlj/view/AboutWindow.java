@@ -2,7 +2,6 @@ package de.lmu.ifi.sosylab.fddlj.view;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ResourceBundle;
 import java.util.stream.Stream;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,17 +24,31 @@ import javafx.stage.Stage;
  */
 public class AboutWindow extends Stage {
 
-  private ResourceBundle messages;
+  //private ResourceBundle messages;
+
+  private String rulesGeneral =
+      "Auf einem quadratischen Brett legen die Spieler "
+          + "abwechselnd Spielsteine, deren Seiten unterschiedlich "
+          + " (z.B. schwarz und weiß) gefärbt sind. Ein Spieler ('Weiß') legt seinen"
+          + " Stein immer mit der weißen "
+          + "Seite nach oben, der andere ('Schwarz') entsprechend mit der Schwarzen. "
+          + "Ein Spieler muss seinen Stein auf ein leeres Feld legen, das horizontal, "
+          + "vertikal oder diagonal"
+          + " an ein bereits belegtes Feld angrenzt. Wird ein Stein gelegt, werden alle "
+          + "gegnerischen Steine, die sich zwischen dem neuen Spielstein und einem bereits "
+          + "gelegten Stein der eigenen Farbe befinden, umgedreht. Spielzüge, die zu keinem"
+          + " Umdrehen von gegnerischen Steinen führen, sind nicht erlaubt. Das Ziel des "
+          + "Spiels ist es, am Ende eine möglichst große Anzahl von Steinen der eigenen "
+          + "Farbe auf dem Brett zu haben.";
 
   /**
    * Public constructor of this class initialises stage and content.
    *
-   * @param messages the ResourceBundle for the externalised strings
    */
-  public AboutWindow(ResourceBundle messages) {
+  public AboutWindow(/*ResourceBundle messages*/) {
     super();
 
-    this.messages = messages;
+    //this.messages = messages;
 
     initWindow();
   }
@@ -58,7 +71,7 @@ public class AboutWindow extends Stage {
     setHeight(5 * Screen.getPrimary().getVisualBounds().getHeight() / 6);
 
     setScene(scene);
-    setTitle(messages.getString("aboutWindow_Title"));
+    setTitle("Über");
     centerOnScreen();
     show();
   }
@@ -76,7 +89,7 @@ public class AboutWindow extends Stage {
     scrollPane.setFitToHeight(true);
     scrollPane.setPrefWidth(600);
 
-    Tab tab = new Tab(messages.getString("aboutWindow_Tab_Licenses_Title"), scrollPane);
+    Tab tab = new Tab("Lizenzen", scrollPane);
     tab.setClosable(false);
 
     return tab;
@@ -93,7 +106,7 @@ public class AboutWindow extends Stage {
     VBox vbox = new VBox(15);
     vbox.setAlignment(Pos.CENTER);
     vbox.getChildren().add(getGeneralRules());
-    vbox.getChildren().add(new SpecificRulesPane(messages));
+    vbox.getChildren().add(new SpecificRulesPane());
 
     ScrollPane scrollPane = new ScrollPane();
     scrollPane.setContent(vbox);
@@ -101,7 +114,7 @@ public class AboutWindow extends Stage {
     scrollPane.setFitToHeight(true);
     scrollPane.setPrefWidth(600);
 
-    Tab tab = new Tab(messages.getString("aboutWindow_Tab_Rules_Title"), scrollPane);
+    Tab tab = new Tab("Regeln", scrollPane);
     tab.setClosable(false);
 
     return tab;
@@ -124,7 +137,7 @@ public class AboutWindow extends Stage {
     VBox vbox = new VBox(10);
     vbox.setAlignment(Pos.CENTER);
 
-    Label heading = new Label(messages.getString("aboutWindow_Rules_General_Heading"));
+    Label heading = new Label("Allgemein");
     heading.setId("heading");
     vbox.getChildren().add(heading);
 
@@ -132,7 +145,7 @@ public class AboutWindow extends Stage {
     textArea.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3);
     textArea.setWrapText(true);
     textArea.setFont(Font.font("Calibri", 16));
-    textArea.setText(messages.getString("aboutWindow_Rules_General"));
+    textArea.setText(rulesGeneral);
     vbox.getChildren().add(textArea);
 
     return vbox;

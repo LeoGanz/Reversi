@@ -26,9 +26,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
- * The client enables a communication with a {@link Server}. It can connect to
- * a given address on the port 43200. The client makes callbacks on a
- * {@link ClientCompatibleGui} with the data received from the server.
+ * The client enables a communication with a {@link Server}. It can connect to a given address on
+ * the port 43200. The client makes callbacks on a {@link ClientCompatibleGui} with the data
+ * received from the server.
  */
 public class ClientImpl implements Client {
 
@@ -45,10 +45,9 @@ public class ClientImpl implements Client {
   private boolean running;
 
   /**
-   * Creates a new Client. The client will connect to a server, after it's started.
-   * To identify within matches a {@link Player} is required. For callbacks for
-   * notifications, which are sent by the server a {@link ClientCompatibleGui} must
-   * be provided.
+   * Creates a new Client. The client will connect to a server, after it's started. To identify
+   * within matches a {@link Player} is required. For callbacks for notifications, which are sent by
+   * the server a {@link ClientCompatibleGui} must be provided.
    *
    * @param compatibleGui compatibleGui to make callbacks
    * @param inetAddress Address of server to connect
@@ -79,8 +78,8 @@ public class ClientImpl implements Client {
 
   @Override
   public void joinSpecificLobby(boolean asSpectator, int lobbyId) {
-    JoinRequest joinRequest = JoinRequest.generateJoinSpecificLobbyRequest(
-            clientPlayer, asSpectator, lobbyId);
+    JoinRequest joinRequest =
+        JoinRequest.generateJoinSpecificLobbyRequest(clientPlayer, asSpectator, lobbyId);
 
     sendMessage(joinRequest);
   }
@@ -130,12 +129,14 @@ public class ClientImpl implements Client {
       connection = new Socket(serverAddress, PORT);
       out = new PrintWriter(connection.getOutputStream(), true, StandardCharsets.UTF_8);
       out.flush();
-      in = new BufferedReader(
-                      new InputStreamReader(connection.getInputStream(),
-                              StandardCharsets.UTF_8));
+      in =
+          new BufferedReader(
+              new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 
       connectionEstablished = true;
-    } catch (@SuppressWarnings("unused") IOException e) {
+    } catch (
+        @SuppressWarnings("unused")
+        IOException e) {
       terminate();
     }
 
@@ -173,8 +174,7 @@ public class ClientImpl implements Client {
     } else if (message.getData() instanceof GameState) {
       processGamestate((GameState) message.getData());
     } else if (message.getData() instanceof GameStateWithLastPlacementUuid) {
-      processGameStateWithLastPlacementUuid(
-              (GameStateWithLastPlacementUuid) message.getData());
+      processGameStateWithLastPlacementUuid((GameStateWithLastPlacementUuid) message.getData());
     }
   }
 
@@ -184,7 +184,7 @@ public class ClientImpl implements Client {
 
   private void processRejectedPlacement(RejectedPlacement rejectedPlacement) {
     if ((rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PLACEMENT)
-            || (rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PREVIOUS_UUID)) {
+        || (rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PREVIOUS_UUID)) {
       requestGameStateWithLastPlacementUuid();
     }
 
@@ -195,7 +195,7 @@ public class ClientImpl implements Client {
     if (serverNotification == ServerNotification.SERVER_SHUTTING_DOWN) {
       terminate();
     } else if ((serverNotification == ServerNotification.PLAYER_ONE_LEFT)
-            || (serverNotification == ServerNotification.PLAYER_TWO_LEFT)) {
+        || (serverNotification == ServerNotification.PLAYER_TWO_LEFT)) {
       model.setWaiting();
     }
 
@@ -226,7 +226,7 @@ public class ClientImpl implements Client {
   }
 
   private void processGameStateWithLastPlacementUuid(
-          GameStateWithLastPlacementUuid gameStateWithLastPlacementUuid) {
+      GameStateWithLastPlacementUuid gameStateWithLastPlacementUuid) {
     processGamestate(gameStateWithLastPlacementUuid.getGameState());
     lastDiskPlacement = gameStateWithLastPlacementUuid.getLastPlacementUuid();
   }
@@ -249,5 +249,4 @@ public class ClientImpl implements Client {
       System.out.println("Error due terminating client");
     }
   }
-
 }

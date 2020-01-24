@@ -4,10 +4,17 @@ import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Phase;
+import de.lmu.ifi.sosylab.fddlj.network.ClientCompatibleGui;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest.Response;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest.Response.ResponseType;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement.Reason;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ResourceBundle;
+import java.util.ArrayList;
+import java.util.Optional;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -17,6 +24,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
@@ -43,7 +52,7 @@ import javafx.stage.StageStyle;
  *
  * @author Josef Feger
  */
-public class ViewImpl implements View {
+public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   private Model model;
   private Controller controller;
@@ -63,7 +72,7 @@ public class ViewImpl implements View {
 
   private float volume;
 
-  private ResourceBundle messages;
+  // private ResourceBundle messages;
 
   /**
    * Constructor of this class initialises the main frame of the game.
@@ -71,15 +80,14 @@ public class ViewImpl implements View {
    * @param stage the stage created upon launching the application
    * @param model a reference to the model instance
    * @param controller a reference to the controller instance
-   * @param messages the ResourceBundle for the externalised strings
    */
-  public ViewImpl(Stage stage, Model model, Controller controller, ResourceBundle messages) {
+  public ViewImpl(Stage stage, Model model, Controller controller /*, ResourceBundle messages*/) {
 
     this.controller = controller;
     this.stage = stage;
     this.model = model;
 
-    this.messages = messages;
+    // this.messages = messages;
 
     support = new PropertyChangeSupport(this);
     playSound = true;
@@ -128,7 +136,7 @@ public class ViewImpl implements View {
     root.setLeft(left);
     BorderPane.setAlignment(left, Pos.CENTER);
 
-    gameBoard = new GameBoardGrid(model, controller, stage, this, messages);
+    gameBoard = new GameBoardGrid(model, controller, stage, this);
     root.setCenter(gameBoard);
     BorderPane.setAlignment(root, Pos.CENTER);
     BorderPane.setMargin(gameBoard, new Insets(30, 50, 30, 50));
@@ -165,13 +173,12 @@ public class ViewImpl implements View {
     vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setPadding(new Insets(20));
 
-    DiskIndicator currentPlayer =
-        new DiskIndicator(model, messages.getString("ViewImpl_CurrentPlayer"), this, controller);
+    DiskIndicator currentPlayer = new DiskIndicator(model, "Aktueller Spieler:", this, controller);
     vbox.getChildren().add(currentPlayer);
     stage.heightProperty().addListener(e -> currentPlayer.resizeDisk());
     stage.widthProperty().addListener(e -> currentPlayer.resizeDisk());
 
-    Button reset = getButton(messages.getString("ViewImpl_ButtonResetGame"));
+    Button reset = getButton("Zurücksetzen");
     reset.setOnAction(
         e -> {
           controller.resetGame(
@@ -262,9 +269,11 @@ public class ViewImpl implements View {
     Button button = new Button("", imageView);
     button.setCursor(Cursor.HAND);
     button.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-    button.setOnAction(e -> new AboutWindow(messages));
+    button.setOnAction(e -> new AboutWindow());
     Tooltip helper = new Tooltip();
-    helper.setText(messages.getString("ViewImpl_ButtonHelp_Tooltip"));
+    helper.setText(
+        "Zeigt ein Fenster mit zusätzlichen Informationen über dieses Spiel, wie z.B."
+            + " die Regeln und Lizenzen, an.");
     button.setTooltip(helper);
     button.setMinHeight(50);
 
@@ -273,12 +282,13 @@ public class ViewImpl implements View {
 
   private VBox getMuteAndMainMenuButton() {
     VBox vbox = new VBox(10);
-    vbox.setAlignment(Pos.CENTER);
+    vbox.setAlignment(Pos.BOTTOM_CENTER);
     vbox.setPadding(new Insets(20));
 
     if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {
-      SpectatorList spectatorList = new SpectatorList(messages);
+      SpectatorList spectatorList = new SpectatorList();
       addListener(spectatorList);
+      vbox.getChildren().add(spectatorList);
     }
 
     final Image play =
@@ -317,26 +327,15 @@ public class ViewImpl implements View {
             return;
           }
         });
-    button.setTooltip(new Tooltip(messages.getString("ViewImpl_ButtonSound_Tooltip")));
+    button.setTooltip(
+        new Tooltip(
+            "Mit der linken Maustaste drücken, um Tonausgaben zu (de-/)aktivieren."
+                + " \nMit der rechten Maustaste drücken, um die Lautstärke anzupassen."));
 
     vbox.getChildren().add(button);
 
-    Button back = getButton(messages.getString("ViewImpl_ButtonBack_Text"));
-    back.setOnAction(
-        e -> {
-          stage.close();
-          if (controller instanceof ControllerImpl) {
-            ((ControllerImpl) controller).showGameModeSelector(new Stage());
-          } else {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle(messages.getString("ViewImpl_ReturnError_Title"));
-            alert.setHeaderText(messages.getString("ViewImpl_ReturnError_Subtitle"));
-            alert.setContentText(messages.getString("ViewImpl_ReturnError_Info"));
-
-            alert.showAndWait();
-            Platform.exit();
-          }
-        });
+    Button back = getButton("Hauptmenü");
+    back.setOnAction(e -> returnToMainMenu());
     vbox.getChildren().add(back);
 
     vbox.setMinWidth(
@@ -433,7 +432,7 @@ public class ViewImpl implements View {
       if (model.getState().getCurrentPhase() == Phase.FINISHED) {
 
         root.setDisable(true);
-        new GameFinishedScreen(controller, model, stage, messages);
+        new GameFinishedScreen(controller, model, stage);
       }
     }
 
@@ -501,5 +500,172 @@ public class ViewImpl implements View {
     vbox.getChildren().addAll(topRow, bottomRow);
 
     return vbox;
+  }
+
+  @Override
+  public void receivedJoinRequestResponse(Response response) {
+    System.out.println(response);
+    if (response.getType() == ResponseType.JOIN_SUCCESSFUL) {
+      showGame(controller.getCurrentGameMode());
+    } else if (response.getType() == ResponseType.LOBBY_NOT_FOUND) {
+      showAlert(
+          AlertType.ERROR,
+          "Fehler",
+          "Lobby konnte nicht gefunden werden",
+          "Die angegebene Lobby konnte leider nicht gefunden werden!");
+      returnToMainMenu();
+    } else if (response.getType() == ResponseType.NO_PLAYERS_NEEDED) {
+
+      showAlert(
+          AlertType.ERROR,
+          "Fehler",
+          "Die angegeben Lobby ist voll",
+          "Die angegebene Lobby ist leider schon voll und kann keine"
+              + " weiteren Spieler mehr aufnehmen.");
+      returnToMainMenu();
+    }
+  }
+
+  private void returnToMainMenu() {
+    stage.close();
+    if (controller instanceof ControllerImpl) {
+      ((ControllerImpl) controller).showGameModeSelector(new Stage());
+    } else {
+      showAlert(
+          AlertType.ERROR,
+          "Fehler",
+          "Server fährt herunter",
+          "Der Server fährt herunter. Sie haben folgende Optionen:"
+              + " Das derzeitige Spiel gegen die AI fortsetzen,"
+              + " zurück zum Hautbildschirm oder das Spiel verlassen.");
+
+      Platform.exit();
+    }
+  }
+
+  @Override
+  public void receivedRejectedPlacementReason(Reason rejectedPlacement) {
+    showAlert(
+        AlertType.ERROR,
+        "Fehler",
+        "Fehler beim Platzieren der Disk",
+        "Das Platzieren der Disk auf der gewünschten Zelle führte zu einem Fehler"
+            + ". Bitte versuche es erneut!");
+  }
+
+  @Override
+  public void receivedServerNotification(ServerNotification serverNotification) {
+
+    switch (serverNotification) {
+      case SERVER_SHUTTING_DOWN:
+        break;
+      case RESTARTING:
+        break;
+      case RECEIVED_INVALID_DATA:
+        break;
+      case PARTNER_ACCEPTED_RESTART:
+        break;
+      case PARTNER_REQUESTED_RESTART:
+        break;
+      case PLAYER_ONE_LEFT:
+        break;
+      case PLAYER_TWO_LEFT:
+        break;
+      case LOBBY_CLOSED:
+        break;
+      default:
+        break;
+    }
+  }
+
+  private void handleServerShuttingDown() {
+    ButtonType backToMainMenu = new ButtonType("");
+    ButtonType continueAgainstAi = new ButtonType("");
+    ButtonType exit = new ButtonType("");
+
+    ArrayList<ButtonType> buttonTypes = new ArrayList<>();
+    buttonTypes.add(backToMainMenu);
+    buttonTypes.add(continueAgainstAi);
+    buttonTypes.add(exit);
+
+    // showOptionDialog(AlertType.INFORMATION, title, header, content, buttonTypes);
+  }
+
+  @Override
+  public void modelExchanged(Model model) {
+    this.model = model;
+    support.firePropertyChange(Model.LISTENERS_CHANGED, null, model);
+  }
+
+  @Override
+  public void receivedSpectator(Spectators spectators) {
+    support.firePropertyChange(View.SPECTATORS_CHANGED, null, spectators);
+  }
+
+  @Override
+  public void showWaitingScreen() {
+    root = new BorderPane();
+    root.getStylesheets().add("cssFiles/mainGame.css");
+    root.setId("main-background");
+    root.setPadding(new Insets(50));
+
+    Image loadingGif =
+        new Image(getClass().getClassLoader().getResourceAsStream("images/LoadingGif.gif"));
+    ImageView imageView = new ImageView(loadingGif);
+    root.setCenter(imageView);
+
+    Label waiting = new Label("Waiting for opponent to join lobby...");
+    waiting.setFont(Font.font(20));
+    waiting.setStyle("-fx-text-fill: white");
+    root.setTop(waiting);
+    BorderPane.setAlignment(waiting, Pos.CENTER);
+
+    scene = new Scene(root);
+    stage.setScene(scene);
+    if (!stage.isShowing()) {
+      stage.show();
+    }
+  }
+
+  private void showAlert(AlertType alertType, String title, String header, String content) {
+    Alert alert = new Alert(alertType);
+    alert.setTitle(title);
+    alert.setHeaderText(header);
+    alert.setContentText(content);
+
+    alert.showAndWait();
+  }
+
+  private Alert showOptionDialog(
+      AlertType alertType,
+      String title,
+      String header,
+      String content,
+      ArrayList<ButtonType> buttonTypes) {
+
+    Alert alert = new Alert(alertType);
+    alert.setTitle(title);
+    alert.setHeaderText(header);
+    alert.setContentText(content);
+
+    ButtonType buttonTypeOne = new ButtonType("One");
+    ButtonType buttonTypeTwo = new ButtonType("Two");
+    ButtonType buttonTypeThree = new ButtonType("Three");
+    ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+
+    alert.getButtonTypes().setAll(buttonTypes);
+
+    Optional<ButtonType> result = alert.showAndWait();
+    if (result.get() == buttonTypeOne) {
+      // ... user chose "One"
+    } else if (result.get() == buttonTypeTwo) {
+      // ... user chose "Two"
+    } else if (result.get() == buttonTypeThree) {
+      // ... user chose "Three"
+    } else {
+      // ... user chose CANCEL or closed the dialog
+    }
+
+    return alert;
   }
 }

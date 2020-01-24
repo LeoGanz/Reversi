@@ -4,7 +4,6 @@ import de.lmu.ifi.sosylab.fddlj.model.AiPlayerImpl;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
-import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -40,28 +39,39 @@ public class PlayerCreation extends BorderPane {
 
   private Controller controller;
   private Stage primaryStage;
-  private ResourceBundle messages;
+  // private ResourceBundle messages;
 
   private Button start;
 
   private int[] gameFieldSizes = new int[] {8, 10, 12, 14, 16};
   private String[] gameFieldSizeOptions = new String[] {"8x8", "10x10", "12x12", "14x14", "16x16"};
 
+  private String tooltipLobbyID =
+      "Wenn du einer bereits bestehenden Lobby beitreten willst,"
+          + " gib hier die ID der Lobby ein. \\n Standardm‰ﬂig - "
+          + "wenn das Feld leer bleibt - werden Sie einer Lobby aufgrund"
+          + " von automatischer Spielevermittlung zugewiesen.";
+
+  private String alternatyLobbyIdText =
+      "Wenn Sie eine private Lobby erstellen kˆnnen "
+          + "sie keine Lobby ID eingeben, da der Server "
+          + "eine ID zuweisen wird. Um die Lobby mit Freunden"
+          + " zu teilen erfahren Sie die Lobby ID sobald sie auf \"Starten\" dr¸cken.";
+
   /**
    * Constructor of this class initialises variables and sets basic styling.
    *
    * @param controller the reference to a controller instance
    * @param stage the reference to the stage created by the application thread
-   * @param messages the ResourceBundle for the externalised strings
    */
-  public PlayerCreation(Controller controller, Stage stage, ResourceBundle messages) {
+  public PlayerCreation(Controller controller, Stage stage /*, ResourceBundle messages*/) {
     super();
 
     this.controller = controller;
     this.primaryStage = stage;
     setStyle("-fx-background-color: transparent");
 
-    this.messages = messages;
+    // this.messages = messages;
   }
 
   /**
@@ -82,8 +92,7 @@ public class PlayerCreation extends BorderPane {
             start.fire();
           }
         });
-    vbox.getChildren()
-        .add(getInputField(textField, messages.getString("PlayerCreation_UsernamePrompt")));
+    vbox.getChildren().add(getInputField(textField, "Geben Sie Ihren Benutzernamen ein:"));
 
     ColorPicker colorPicker = new ColorPicker(Color.WHITE);
     vbox.getChildren().add(getColorPickerPane(colorPicker));
@@ -120,9 +129,7 @@ public class PlayerCreation extends BorderPane {
         });
     vboxPlayerOne
         .getChildren()
-        .add(
-            getInputField(
-                textFieldOne, messages.getString("PlayerCreation_UsernamePlayerOnePrompt")));
+        .add(getInputField(textFieldOne, "Geben Sie den Benutzernamen von Spieler 1 ein:"));
     ColorPicker colorPickerOne = new ColorPicker(getRandomColor());
     vboxPlayerOne.getChildren().add(getColorPickerPane(colorPickerOne));
     alignment.getChildren().add(vboxPlayerOne);
@@ -140,9 +147,7 @@ public class PlayerCreation extends BorderPane {
         });
     vboxPlayerTwo
         .getChildren()
-        .add(
-            getInputField(
-                textFieldTwo, messages.getString("PlayerCreation_usernamePlayerTwoPrompt")));
+        .add(getInputField(textFieldTwo, "Geben Sie den Benutzernamen von Spieler 2 ein:"));
     ColorPicker colorPickerTwo = new ColorPicker(getRandomColor());
     vboxPlayerTwo.getChildren().add(getColorPickerPane(colorPickerTwo));
     alignment.getChildren().add(vboxPlayerTwo);
@@ -183,9 +188,7 @@ public class PlayerCreation extends BorderPane {
     VBox vboxPlayer = new VBox(50);
     vboxPlayer.setAlignment(Pos.TOP_CENTER);
     TextField textField = new TextField();
-    vboxPlayer
-        .getChildren()
-        .add(getInputField(textField, messages.getString("PlayerCreation_UsernamePrompt")));
+    vboxPlayer.getChildren().add(getInputField(textField, "Geben Sie Ihren Benutzernamen ein:"));
     ColorPicker colorPicker = new ColorPicker(getRandomColor());
     vboxPlayer.getChildren().add(getColorPickerPane(colorPicker));
     alignment.getChildren().add(vboxPlayer);
@@ -197,18 +200,17 @@ public class PlayerCreation extends BorderPane {
     TextField textFieldServer = new TextField();
     vboxConnection
         .getChildren()
-        .add(getInputField(textFieldServer, messages.getString("PlayerCreation_serverIPAddress")));
+        .add(getInputField(textFieldServer, "Geben Sie die IP-Adresse des Servers an:"));
     TextField textFieldLobby = new TextField();
-    textFieldLobby.setPromptText(messages.getString("PlayerCreation_TextFieldPrompt"));
+    textFieldLobby.setPromptText("Maus hier halten f¸r mehr Infos");
     Tooltip tooltip = new Tooltip();
-    tooltip.setText(messages.getString("PlayerCreation_TooltipLobbyId"));
+    tooltip.setText(tooltipLobbyID);
     textFieldLobby.setTooltip(tooltip);
-    VBox container =
-        getInputField(textFieldLobby, messages.getString("PlayerCreation_LobbyIDPrompt"));
+    VBox container = getInputField(textFieldLobby, "Lobby ID:");
     vboxConnection.getChildren().add(container);
 
     Label alternateText = new Label();
-    alternateText.setText(messages.getString("PlayerCreation_AlternateLobbyIDText"));
+    alternateText.setText(alternatyLobbyIdText);
     alternateText.setMaxWidth(300);
     alternateText.setWrapText(true);
     alternateText.setFont(Font.font(15));
@@ -220,8 +222,7 @@ public class PlayerCreation extends BorderPane {
     BorderPane.setAlignment(alignment, Pos.CENTER);
     BorderPane.setMargin(alignment, new Insets(50));
 
-    CheckBox checkbox =
-        new CheckBox(messages.getString("PlayerCreation_PrivateLobbyCheckbox_Text"));
+    CheckBox checkbox = new CheckBox("Ausw‰hlen, wenn Sie eine private Lobby erstellen wollen");
     checkbox.setFont(Font.font(15));
     checkbox.setSelected(false);
     checkbox.setMinHeight(25);
@@ -244,7 +245,10 @@ public class PlayerCreation extends BorderPane {
               }
             });
     Tooltip tooltipCheckbox = new Tooltip();
-    tooltipCheckbox.setText(messages.getString("PlayerCreation_PrivateLobbyCheckbox_Tooltip"));
+    tooltipCheckbox.setText(
+        "Sie kˆnnen eine private Lobby erstellen, um nicht irgendeiner"
+            + " ÷ffentlichten beizutreten sondern um ihre Lobby ID z.B. "
+            + "mit einem Freund zu teilen, damit Sie mit diesem gemeinsam spielen kˆnnen.");
     checkbox.setTooltip(tooltipCheckbox);
     setCenter(checkbox);
     BorderPane.setAlignment(checkbox, Pos.TOP_CENTER);
@@ -263,18 +267,17 @@ public class PlayerCreation extends BorderPane {
     vbox.setAlignment(Pos.CENTER);
 
     TextField textField = new TextField();
-    vbox.getChildren()
-        .add(getInputField(textField, messages.getString("PlayerCreation_Spectator_Lobby")));
+    vbox.getChildren().add(getInputField(textField, "Geben Sie Ihren Benutzernamen ein:"));
 
     TextField textFieldServerAdress = new TextField();
     vbox.getChildren()
-        .add(
-            getInputField(
-                textFieldServerAdress, messages.getString("PlayerCreation_serverIPAddress")));
+        .add(getInputField(textFieldServerAdress, "Geben Sie die IP-Adresse des Servers an:"));
 
     TextField textFieldLobbyID = new TextField();
     vbox.getChildren()
-        .add(getInputField(textFieldLobbyID, messages.getString("PlayerCreation_Spectator_Lobby")));
+        .add(
+            getInputField(
+                textFieldLobbyID, "Optional - Geben Sie hier die ID einer bestimmten Lobby an:"));
 
     setTop(vbox);
     BorderPane.setAlignment(vbox, Pos.CENTER);
@@ -304,7 +307,7 @@ public class PlayerCreation extends BorderPane {
     HBox hbox = new HBox(30);
     hbox.setAlignment(Pos.CENTER);
 
-    start = getButton(messages.getString("PlayerCreation_ButtonStart_Text"));
+    start = getButton("Starten");
     start.setOnAction(
         e -> {
           if (!isTextFieldInputValid(textField.getText())) {
@@ -318,7 +321,7 @@ public class PlayerCreation extends BorderPane {
           gameModeSelector.close();
         });
 
-    Button back = getButton(messages.getString("PlayerCreation_ButtonBack_Text"));
+    Button back = getButton("Zur¸ck");
     back.setOnAction(e -> gameModeSelector.returnToMainScreen());
 
     textField.setOnKeyReleased(
@@ -343,7 +346,7 @@ public class PlayerCreation extends BorderPane {
     HBox hbox = new HBox(30);
     hbox.setAlignment(Pos.CENTER);
 
-    Button start = getButton(messages.getString("PlayerCreation_ButtonStart_Text"));
+    Button start = getButton("Starten");
     start.setOnAction(
         e -> {
           if (!isTextFieldInputValid(textFieldOne.getText())) {
@@ -367,7 +370,7 @@ public class PlayerCreation extends BorderPane {
           gameModeSelector.close();
         });
 
-    Button back = getButton(messages.getString("PlayerCreation_ButtonBack_Text"));
+    Button back = getButton("Zur¸ck");
     back.setOnAction(e -> gameModeSelector.returnToMainScreen());
 
     textFieldOne.setOnKeyReleased(
@@ -399,7 +402,7 @@ public class PlayerCreation extends BorderPane {
     HBox hbox = new HBox(30);
     hbox.setAlignment(Pos.CENTER);
 
-    Button start = getButton(messages.getString("PlayerCreation_ButtonStart_Text"));
+    Button start = getButton("Starten");
     start.setOnAction(
         e -> {
           if (!isTextFieldInputValid(playerName.getText())) {
@@ -413,23 +416,28 @@ public class PlayerCreation extends BorderPane {
                 "-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
             return;
           }
-
-          if (!lobbyNumber.getText().trim().matches("(?<=\\s|^)\\d+(?=\\s|$)")) {
+          if (!lobbyNumber.getText().isEmpty()
+              && !lobbyNumber.getText().trim().matches("(?<=\\s|^)\\d+(?=\\s|$)")) {
             lobbyNumber.setStyle(
                 "-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
             return;
+          }
+
+          int id = -1;
+          if (!lobbyNumber.getText().isEmpty()) {
+            id = Integer.parseInt(lobbyNumber.getText().trim());
           }
 
           startMultiplayer(
               playerName.getText(),
               playerColor.getValue(),
               serverAddress.getText(),
-              Integer.parseInt(lobbyNumber.getText().trim()),
+              id,
               checkbox.isSelected());
           selector.close();
         });
 
-    Button back = getButton(messages.getString("PlayerCreation_ButtonBack_Text"));
+    Button back = getButton("Zur¸ck");
     back.setOnAction(e -> selector.returnToMainScreen());
 
     hbox.getChildren().addAll(start, back);
@@ -442,7 +450,7 @@ public class PlayerCreation extends BorderPane {
     HBox hbox = new HBox(30);
     hbox.setAlignment(Pos.CENTER);
 
-    Button start = getButton(messages.getString("PlayerCreation_ButtonStart_Text"));
+    Button start = getButton("Starten");
     start.setOnAction(
         e -> {
           if (!isTextFieldInputValid(playername.getText())) {
@@ -466,7 +474,7 @@ public class PlayerCreation extends BorderPane {
               playername.getText(), serverAddress.getText(), Integer.parseInt(lobbyID.getText()));
         });
 
-    Button back = getButton(messages.getString("PlayerCreation_ButtonBack_Text"));
+    Button back = getButton("Zur¸ck");
     back.setOnAction(e -> selector.returnToMainScreen());
 
     hbox.getChildren().addAll(start, back);
@@ -532,7 +540,7 @@ public class PlayerCreation extends BorderPane {
           color.setStyle("-fx-background-color: " + toRgbCode(colorPicker.getValue()) + ";");
         });
 
-    Label label = new Label(messages.getString("PlayerCreation_ChooseColor"));
+    Label label = new Label("W‰hlen Sie Ihre Spielsteinfarbe:");
     label.setId("normal-text");
     vbox.getChildren().addAll(label, color, colorPicker);
 
@@ -624,7 +632,7 @@ public class PlayerCreation extends BorderPane {
     VBox vbox = new VBox(5);
     vbox.setAlignment(Pos.CENTER);
 
-    Label label = new Label(messages.getString("PlayerCreation_ChooseGameFieldSize"));
+    Label label = new Label("Wie groﬂ soll das Spielfeld sein ?");
     label.setId("normal-text");
     vbox.getChildren().add(label);
 

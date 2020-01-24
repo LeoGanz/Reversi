@@ -4,7 +4,6 @@ import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -25,16 +24,12 @@ import javafx.scene.paint.Color;
  */
 public class SpectatorList extends BorderPane implements PropertyChangeListener {
 
-  private ResourceBundle messages;
+  // private ResourceBundle messages;
 
-  /**
-   * Public constructor of this class initialises variables and builds pane.
-   *
-   * @param messages the ResourceBundle for the externalised strings
-   */
-  public SpectatorList(ResourceBundle messages) {
+  /** Public constructor of this class initialises variables and builds pane. */
+  public SpectatorList(/*ResourceBundle messages*/) {
 
-    this.messages = messages;
+    // this.messages = messages;
 
     initSpectatorList();
   }
@@ -50,7 +45,7 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
     spectatorList.setAlignment(Pos.CENTER);
 
     if (spectators.isEmpty()) {
-      Label label = new Label(messages.getString("SpectatorList_NoSpectators"));
+      Label label = new Label("Keine Zuschauer");
       label.setStyle("-fx-font-size: x-large; -fx-text-fill: #000000;");
       spectatorList.getChildren().add(label);
     }
@@ -90,7 +85,13 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
   }
 
   @Override
-  public void propertyChange(PropertyChangeEvent evt) {}
+  public void propertyChange(PropertyChangeEvent evt) {
+    if (evt.getPropertyName() == View.SPECTATORS_CHANGED) {
+      if (evt.getNewValue() instanceof Spectators) {
+        buildSpectatorList((Spectators) evt.getNewValue());
+      }
+    }
+  }
 
   private String format(double val) {
     String in = Integer.toHexString((int) Math.round(val * 255));

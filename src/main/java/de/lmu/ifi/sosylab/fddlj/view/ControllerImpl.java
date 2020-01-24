@@ -11,8 +11,6 @@ import de.lmu.ifi.sosylab.fddlj.network.Server;
 import de.lmu.ifi.sosylab.fddlj.network.ServerImpl;
 import de.lmu.ifi.sosylab.fddlj.view.server.ServerGui;
 import java.io.IOException;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -30,9 +28,9 @@ public class ControllerImpl extends Application implements Controller {
   private View view;
 
   private GameMode gameMode;
-  private Locale locale;
+  // private Locale locale;
 
-  private ResourceBundle messages;
+  // private ResourceBundle messages;
 
   @Override
   public void startMainView(
@@ -41,7 +39,7 @@ public class ControllerImpl extends Application implements Controller {
     this.gameMode = gameMode;
 
     model = new ModelImpl(gameMode, gameFieldSize, playerOne, playerTwo);
-    view = new ViewImpl(stage, model, this, messages);
+    view = new ViewImpl(stage, model, this);
     model.addListener(view);
     view.showGame(gameMode);
   }
@@ -62,9 +60,10 @@ public class ControllerImpl extends Application implements Controller {
     if (!succesful) {
       showAlert(
           AlertType.ERROR,
-          messages.getString("ControllerImpl_DiskError_Title"),
-          messages.getString("ControllerImpl_DiskError_Subtitle"),
-          messages.getString("ControllerImpl_DiskError_Info"));
+          "Fehler",
+          "Fehler beim Platzieren der Disk",
+          " Das Platzieren der Disk auf der gewünschten Zelle führte zu einem Fehler."
+              + " Bitte versuche es erneut!");
     }
   }
 
@@ -79,14 +78,14 @@ public class ControllerImpl extends Application implements Controller {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-    locale = Locale.getDefault();
-    messages = ResourceBundle.getBundle("MessagesBundle", locale);
+    // locale = Locale.getDefault();
+    // messages = ResourceBundle.getBundle("MessagesBundle", locale);
 
     showGameModeSelector(primaryStage);
   }
 
   void showGameModeSelector(Stage primaryStage) {
-    GameModeSelector gms = new GameModeSelector(this, primaryStage, messages);
+    GameModeSelector gms = new GameModeSelector(this, primaryStage);
     gms.showGameModeSelection();
   }
 
@@ -109,9 +108,9 @@ public class ControllerImpl extends Application implements Controller {
     } catch (IOException e) {
       showAlert(
           AlertType.ERROR,
-          messages.getString("ControllerImpl_ServerError_Title"),
-          messages.getString("ControllerImpl_ServerError_Subtitle"),
-          messages.getString("ControllerImpl_ServerError_Info"));
+          "Fehler",
+          "Fehler beim Erstellen des Servers",
+          "Server-Instanz konnte nicht erstellt werden. Vielleicht läuft schon ein Server?");
       return;
     }
 

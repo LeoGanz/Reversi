@@ -4,10 +4,14 @@ import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.network.Client;
+import de.lmu.ifi.sosylab.fddlj.network.ClientCompatibleGui;
+import de.lmu.ifi.sosylab.fddlj.network.ClientImpl;
 import de.lmu.ifi.sosylab.fddlj.network.Server;
 import de.lmu.ifi.sosylab.fddlj.network.ServerImpl;
 import de.lmu.ifi.sosylab.fddlj.view.server.ServerGui;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
@@ -26,6 +30,8 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
   private GameMode gameMode;
 
+  // private ResourceBundle messages;
+
   /**
    * Public constructor of this class takes the stage created by the JavaFX thread that is used to
    * display the game.
@@ -34,6 +40,9 @@ public class MultiplayerControllerImpl implements MultiplayerController {
    */
   public MultiplayerControllerImpl(Stage primaryStage) {
     this.mainStage = primaryStage;
+
+    // Locale locale = Locale.getDefault();
+    // messages = ResourceBundle.getBundle("MessagesBundle", locale);
   }
 
   @Override
@@ -60,9 +69,26 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   @Override
   public void startOnlineGame(
       Player ownPlayer, String serverAddress, int lobbyID, boolean createPrivateLobby) {
-    // create client
-    // create view
-    // connect to server
+    ClientCompatibleGui gui = new ViewImpl(mainStage, null, this);
+
+    try {
+      client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);
+      gui.showWaitingScreen();
+      client.startClient();
+
+      if (createPrivateLobby) {
+        client.createNewPrivateLobby();
+      } else {
+        if (lobbyID > 0) {
+          client.joinSpecificLobby(false, lobbyID);
+        } else {
+          client.joinAnyRandomPublicLobby(false);
+        }
+      }
+    } catch (UnknownHostException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
     gameMode = GameMode.MULTIPLAYER;
   }
