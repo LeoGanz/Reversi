@@ -96,6 +96,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   @Override
   public void startOnlineGame(
       Player ownPlayer, String serverAddress, int lobbyID, boolean createPrivateLobby) {
+    this.ownPlayer = ownPlayer;
     ClientCompatibleGui gui = new ViewImpl(mainStage, null, this, messages);
 
     try {
@@ -138,6 +139,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   @Override
   public void startSpectateGame(Player ownPlayer, String serverAddress, int lobbyID) {
     gameMode = GameMode.SPECTATOR;
+    this.ownPlayer = ownPlayer;
     ClientCompatibleGui gui = new ViewImpl(mainStage, null, this, messages);
 
     try {

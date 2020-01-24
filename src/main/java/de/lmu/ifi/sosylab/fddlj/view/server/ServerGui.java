@@ -3,6 +3,7 @@ package de.lmu.ifi.sosylab.fddlj.view.server;
 import de.lmu.ifi.sosylab.fddlj.network.LobbyRepresentation;
 import de.lmu.ifi.sosylab.fddlj.network.Server;
 import de.lmu.ifi.sosylab.fddlj.network.ServerListener;
+import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -43,6 +44,7 @@ public class ServerGui implements ServerListener {
    */
   public ServerGui(Server server) {
     this.server = server;
+    lobbies = new HashMap<>();
 
     server.addListener(this);
 
@@ -128,7 +130,12 @@ public class ServerGui implements ServerListener {
 
   @Override
   public void lobbyUpdated(int lobbyID, LobbyRepresentation lobbyRepresentation) {
-    Platform.runLater(() -> lobbies.get(lobbyID).updateLobby(lobbyRepresentation));
+    Platform.runLater(
+        () -> {
+          if (lobbies.get(lobbyID) != null) {
+            lobbies.get(lobbyID).updateLobby(lobbyRepresentation);
+          }
+        });
   }
 
   @Override

@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -64,6 +63,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   private Label numberPlayerOneDisks;
   private Label numberPlayerTwoDisks;
+  private Label lobbyID;
 
   private PropertyChangeSupport support;
 
@@ -504,9 +504,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   @Override
   public void receivedJoinRequestResponse(Response response) {
-    System.out.println(response);
+    Platform.runLater(() -> handleJoinRequestResponse(response));
+  }
+
+  private void handleJoinRequestResponse(Response response) {
     if (response.getType() == ResponseType.JOIN_SUCCESSFUL) {
-      showGame(controller.getCurrentGameMode());
+      if (lobbyID != null) {
+        lobbyID.setText(lobbyID.getText() + " " + response.getLobbyID());
+      }
     } else if (response.getType() == ResponseType.LOBBY_NOT_FOUND) {
       showAlert(
           AlertType.ERROR,
@@ -542,16 +547,21 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   @Override
   public void receivedRejectedPlacementReason(Reason rejectedPlacement) {
-    showAlert(
-        AlertType.ERROR,
-        messages.getString("ViewImpl_DiskError_Title"),
-        messages.getString("ViewImpl_DiskError_Subtitle"),
-        messages.getString("ViewImpl_DiskError_Info"));
+    Platform.runLater(
+        () ->
+            showAlert(
+                AlertType.ERROR,
+                messages.getString("ViewImpl_DiskError_Title"),
+                messages.getString("ViewImpl_DiskError_Subtitle"),
+                messages.getString("ViewImpl_DiskError_Info")));
   }
 
   @Override
   public void receivedServerNotification(ServerNotification serverNotification) {
+    Platform.runLater(() -> handleServerNotification(serverNotification));
+  }
 
+  private void handleServerNotification(ServerNotification serverNotification) {
     switch (serverNotification) {
       case SERVER_SHUTTING_DOWN:
         handleServerShuttingDown();
@@ -596,14 +606,17 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   @Override
   public void modelExchanged(Model model) {
     this.model = model;
-    support.firePropertyChange(Model.LISTENERS_CHANGED, null, model);
+    Platform.runLater(
+        () -> {
+          support.firePropertyChange(Model.LISTENERS_CHANGED, null, model);
 
-    showGame(controller.getCurrentGameMode());
+          showGame(controller.getCurrentGameMode());
+        });
   }
 
   @Override
   public void receivedSpectator(Spectators spectators) {
-    support.firePropertyChange(View.SPECTATORS_CHANGED, null, spectators);
+    Platform.runLater(() -> support.firePropertyChange(View.SPECTATORS_CHANGED, null, spectators));
   }
 
   @Override
@@ -623,6 +636,10 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     waiting.setStyle("-fx-text-fill: white");
     root.setTop(waiting);
     BorderPane.setAlignment(waiting, Pos.CENTER);
+
+    lobbyID = new Label(messages.getString("ViewImpl_LabelLobbyID"));
+    lobbyID.setStyle("-fx-text-fill: white");
+    root.setBottom(lobbyID);
 
     scene = new Scene(root);
     stage.setScene(scene);
@@ -652,23 +669,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     alert.setHeaderText(header);
     alert.setContentText(content);
 
-    ButtonType buttonTypeOne = new ButtonType("One");
-    ButtonType buttonTypeTwo = new ButtonType("Two");
-    ButtonType buttonTypeThree = new ButtonType("Three");
-    // ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-
     alert.getButtonTypes().setAll(buttonTypes);
-
-    Optional<ButtonType> result = alert.showAndWait();
-    if (result.get() == buttonTypeOne) {
-      // ... user chose "One"
-    } else if (result.get() == buttonTypeTwo) {
-      // ... user chose "Two"
-    } else if (result.get() == buttonTypeThree) {
-      // ... user chose "Three"
-    } else {
-      // ... user chose CANCEL or closed the dialog
-    }
 
     return alert;
   }
