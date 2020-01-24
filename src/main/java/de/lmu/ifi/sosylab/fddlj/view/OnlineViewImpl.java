@@ -7,18 +7,23 @@ import de.lmu.ifi.sosylab.fddlj.model.Phase;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -28,8 +33,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 /**
  * This class is a concrete implementation of the {@link OnlineView} interface.
@@ -39,28 +46,41 @@ import javafx.stage.Stage;
 public class OnlineViewImpl implements OnlineView {
 
   private MultiplayerController controller;
+  private Model model;
+
   private Stage stage;
+  private Scene scene;
   private BorderPane root;
+  private GameBoardGrid gameBoard;
 
   private Label numberPlayerOneDisks;
   private Label numberPlayerTwoDisks;
 
   private PropertyChangeSupport support;
-  private Model model;
 
-  private Scene scene;
+  private boolean playSound;
+  private boolean volumeControlShowing;
+
+  private float volume;
+
+  private ResourceBundle messages;
 
   /**
    * Public constructor of this class initialises variables, PropertyChangeSupport and the stage.
    *
    * @param controller a reference to a {@code MultiplayerController} instance
    * @param stage the stage object used for this game
+   * @param messages the ResourceBundle for the externalised strings
    */
-  public OnlineViewImpl(MultiplayerController controller, Stage stage) {
+  public OnlineViewImpl(MultiplayerController controller, Stage stage, ResourceBundle messages) {
     this.controller = controller;
     this.stage = stage;
 
+    this.messages = messages;
+
     support = new PropertyChangeSupport(this);
+    playSound = true;
+    volume = 0.6f;
 
     this.stage.setTitle("Reversi");
     this.stage.setMaximized(true);
@@ -88,7 +108,7 @@ public class OnlineViewImpl implements OnlineView {
 
       if (model.getState().getCurrentPhase() == Phase.FINISHED) {
         root.setDisable(true);
-        new GameFinishedScreen(controller, model, stage);
+        new GameFinishedScreen(controller, model, stage, messages);
       }
     }
 
@@ -160,29 +180,36 @@ public class OnlineViewImpl implements OnlineView {
     vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setPadding(new Insets(20));
 
-    DiskIndicator currentPlayer = new DiskIndicator(model, "Current player:", this, controller);
-
+    DiskIndicator currentPlayer =
+        new DiskIndicator(model, messages.getString("ViewImpl_CurrentPlayer"), this, controller);
     vbox.getChildren().add(currentPlayer);
+    stage.heightProperty().addListener(e -> currentPlayer.resizeDisk());
+    stage.widthProperty().addListener(e -> currentPlayer.resizeDisk());
+
+    Button reset = getButton(messages.getString("ViewImpl_ButtonResetGame"));
+    reset.setOnAction(e -> controller.requestGameReset());
 
     Region spacer = new Region();
     VBox.setVgrow(spacer, Priority.ALWAYS);
 
-    vbox.getChildren().addAll(new Separator(Orientation.HORIZONTAL), spacer, getDiskCounter());
+    VBox diskCounter = getDiskCounter();
+    vbox.getChildren().addAll(new Separator(Orientation.HORIZONTAL), spacer, diskCounter);
 
     Region bottomSpacer = new Region();
     VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
-    vbox.getChildren().addAll(bottomSpacer, new Separator(Orientation.HORIZONTAL), getHelpButton());
 
-    if (gameMode != GameMode.SPECTATOR) {
-      Button reset = getButton("Reset game");
-      reset.setOnAction(
-          e -> {
-            controller.resetGame(
-                gameMode,
-                model.getState().getPlayerManagement().getPlayerOne(),
-                model.getState().getPlayerManagement().getPlayerTwo());
-          });
-    }
+    vbox.getChildren()
+        .addAll(bottomSpacer, new Separator(Orientation.HORIZONTAL), getHelpButton(), reset);
+    vbox.setMinWidth(
+        (diskCounter.getMinWidth() + vbox.getPadding().getLeft() + vbox.getPadding().getRight()));
+    vbox.setMinHeight(
+        vbox.getSpacing() * 7
+            + currentPlayer.getMinHeight()
+            + reset.getPrefHeight()
+            + diskCounter.getMinHeight()
+            + getHelpButton().getMinHeight()
+            + vbox.getPadding().getTop()
+            + vbox.getPadding().getBottom());
 
     return vbox;
   }
@@ -191,7 +218,6 @@ public class OnlineViewImpl implements OnlineView {
     VBox vbox = new VBox(30);
     vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setStyle("-fx-background-color: #6e7175;");
-    vbox.setFillWidth(true);
     vbox.setMaxWidth(Double.POSITIVE_INFINITY);
 
     if (model instanceof ModelImpl) {
@@ -202,12 +228,13 @@ public class OnlineViewImpl implements OnlineView {
       playerOneInfo.setMaxWidth(Double.POSITIVE_INFINITY);
 
       ModelImpl mod = (ModelImpl) model;
+      Font labelFont = Font.font("Boulder", FontWeight.BOLD, 25);
 
-      playerOneInfo
-          .getChildren()
-          .add(buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor()));
+      VBox diskTriangle =
+          buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor());
+      playerOneInfo.getChildren().add(diskTriangle);
       numberPlayerOneDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerOne()));
-      numberPlayerOneDisks.setFont(Font.font("Boulder", FontWeight.BOLD, 25));
+      numberPlayerOneDisks.setFont(labelFont);
       numberPlayerOneDisks.setStyle("-fx-text-fill: white;");
       playerOneInfo.getChildren().add(numberPlayerOneDisks);
       vbox.getChildren().add(playerOneInfo);
@@ -220,11 +247,15 @@ public class OnlineViewImpl implements OnlineView {
           .getChildren()
           .add(buildDiskTriangle(model.getState().getPlayerManagement().getPlayerTwo().getColor()));
       numberPlayerTwoDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
-      numberPlayerTwoDisks.setFont(Font.font("Boulder", FontWeight.BOLD, 25));
+      numberPlayerTwoDisks.setFont(labelFont);
       numberPlayerTwoDisks.setStyle("-fx-text-fill: white;");
       playerTwoInfo.getChildren().add(numberPlayerTwoDisks);
 
       vbox.getChildren().add(playerTwoInfo);
+
+      vbox.setMinHeight((vbox.getSpacing() + diskTriangle.getMinHeight() * 2));
+      vbox.setMinWidth(
+          (diskTriangle.getMinWidth() + playerOneInfo.getSpacing() + labelFont.getSize() * 2));
     }
 
     return vbox;
@@ -239,34 +270,164 @@ public class OnlineViewImpl implements OnlineView {
     Button button = new Button("", imageView);
     button.setCursor(Cursor.HAND);
     button.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-    button.setOnAction(e -> new AboutWindow());
+    button.setOnAction(e -> new AboutWindow(messages));
     Tooltip helper = new Tooltip();
-    helper.setText(
-        "Display a window with additional information about this reversi game,"
-            + " such as the rules and licenses.");
+    helper.setText(messages.getString("ViewImpl_ButtonHelp_Tooltip"));
     button.setTooltip(helper);
+    button.setMinHeight(50);
 
     return button;
   }
 
-  private GridPane buildDiskTriangle(Color color) {
-    GridPane grid = new GridPane();
+  private VBox getMuteAndMainMenuButton() {
+    VBox vbox = new VBox(10);
+    vbox.setAlignment(Pos.BOTTOM_CENTER);
+    vbox.setPadding(new Insets(20));
 
-    grid.setStyle("-fx-background-color: transparent;");
+    final Image play =
+        new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker.png"));
+    final Image mute =
+        new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker_mute.png"));
+
+    ImageView imageView = new ImageView(play);
+    imageView.setPreserveRatio(true);
+    imageView.setFitHeight(30);
+    Button button = new Button("", imageView);
+    button.setCursor(Cursor.HAND);
+    button.setStyle(
+        "-fx-background-color: white; -fx-border-color: transparent; -fx-background-radius: 50");
+    button.setPrefSize(50, 50);
+    button.setOnAction(
+        e -> {
+          if (playSound) {
+            playSound = false;
+
+            imageView.setImage(mute);
+            button.setGraphic(imageView);
+            support.firePropertyChange(SOUND_MODE_CHANGED, !playSound, playSound);
+          } else {
+            playSound = true;
+
+            imageView.setImage(play);
+            button.setGraphic(imageView);
+            support.firePropertyChange(SOUND_MODE_CHANGED, !playSound, playSound);
+          }
+        });
+    button.setOnMouseClicked(
+        e -> {
+          if (e.getButton() == MouseButton.SECONDARY) {
+            showVolumeControl(button);
+            return;
+          }
+        });
+    button.setTooltip(new Tooltip(messages.getString("ViewImpl_ButtonSound_Tooltip")));
+
+    vbox.getChildren().add(button);
+
+    Button back = getButton(messages.getString("ViewImpl_ButtonBack_Text"));
+    back.setOnAction(
+        e -> {
+          stage.close();
+          if (controller instanceof ControllerImpl) {
+            ((ControllerImpl) controller).showGameModeSelector(new Stage());
+          } else {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle(messages.getString("ViewImpl_ReturnError_Title"));
+            alert.setHeaderText(messages.getString("ViewImpl_ReturnError_Subtitle"));
+            alert.setContentText(messages.getString("ViewImpl_ReturnError_Info"));
+
+            alert.showAndWait();
+            Platform.exit();
+          }
+        });
+    vbox.getChildren().add(back);
+
+    vbox.setMinWidth(
+        back.getPrefWidth() + vbox.getPadding().getRight() + vbox.getPadding().getLeft());
+    return vbox;
+  }
+
+  private void showVolumeControl(Button parent) {
+    if (!volumeControlShowing) {
+      volumeControlShowing = true;
+      final Stage dialog = new Stage();
+      dialog.initModality(Modality.NONE);
+
+      HBox dialogBox = new HBox(15);
+      dialogBox.setStyle("-fx-background-color: #dddddd");
+      dialogBox.setPadding(new Insets(10));
+
+      Slider slider = new Slider();
+      slider.setMin(0);
+      slider.setMax(100);
+      slider.setValue(volume * 100);
+      slider.setShowTickLabels(true);
+      slider.setShowTickMarks(true);
+      slider.setMajorTickUnit(50);
+      slider.setMinorTickCount(5);
+      slider.setBlockIncrement(5);
+      slider.setMinWidth(200);
+      slider.setMinHeight(35);
+      slider.setCursor(Cursor.HAND);
+
+      Label label = new Label(String.valueOf(volume * 100));
+      label.setStyle("-fx-text-file: #000000; -fx-font-size: x-large;");
+      slider
+          .valueProperty()
+          .addListener(
+              (ov, oldVal, newVal) -> {
+                volume = (float) (newVal.intValue() / 100.0);
+                label.setText(String.valueOf(newVal.intValue()));
+
+                support.firePropertyChange(VOLUME_CHANGED, null, volume);
+              });
+
+      dialogBox.getChildren().addAll(slider, label);
+      Scene dialogScene = new Scene(dialogBox, 280, 50);
+      dialog.setScene(dialogScene);
+      dialog.setX(
+          parent.localToScreen(parent.getBoundsInLocal()).getMinX() - dialogScene.getWidth() - 10);
+      dialog.setY(parent.localToScreen(parent.getBoundsInLocal()).getMinY());
+      dialog.initStyle(StageStyle.UNDECORATED);
+      dialog.show();
+      dialog
+          .focusedProperty()
+          .addListener(
+              (ov, oldVal, newVal) -> {
+                if (!newVal) {
+                  dialog.close();
+                  volumeControlShowing = false;
+                }
+              });
+    }
+  }
+
+  private VBox buildDiskTriangle(Color color) {
+    GridPane grid = new GridPane();
+    VBox vbox = new VBox(3);
+
+    vbox.setStyle("-fx-background-color: transparent;");
     grid.setGridLinesVisible(false);
-    grid.setAlignment(Pos.CENTER);
+    vbox.setAlignment(Pos.CENTER);
 
     GraphicDisk diskOne = new GraphicDisk(30, 30, 15, color);
+
+    HBox topRow = new HBox();
+    topRow.setAlignment(Pos.CENTER);
+    topRow.getChildren().add(diskOne);
     GraphicDisk diskTwo = new GraphicDisk(30, 30, 15, color);
     GraphicDisk diskThree = new GraphicDisk(30, 30, 15, color);
-    GraphicDisk diskFour = new GraphicDisk(30, 30, 15, color);
 
-    grid.add(diskOne, 1, 0);
-    grid.add(diskTwo, 0, 1);
-    grid.add(diskThree, 1, 1);
-    grid.add(diskFour, 2, 1);
+    HBox bottomRow = new HBox(3);
+    bottomRow.setAlignment(Pos.CENTER);
+    bottomRow.getChildren().addAll(diskTwo, diskThree);
 
-    return grid;
+    vbox.setMinHeight(80);
+    vbox.setMinWidth((3 * 30));
+
+    vbox.getChildren().addAll(topRow, bottomRow);
+
+    return vbox;
   }
 
   private Button getButton(String text) {

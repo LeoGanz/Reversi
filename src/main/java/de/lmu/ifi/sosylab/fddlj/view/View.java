@@ -9,6 +9,10 @@ import java.beans.PropertyChangeListener;
  */
 public interface View extends PropertyChangeListener {
 
+  static final String STAGE_RESIZED = "Stage resized";
+  static final String SOUND_MODE_CHANGED = "Sound mode changed";
+  static final String VOLUME_CHANGED = "Volume changed";
+
   /** Show the current game. */
   void showGame(GameMode gameMode);
 

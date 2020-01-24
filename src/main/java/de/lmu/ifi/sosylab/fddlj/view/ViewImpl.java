@@ -45,10 +45,6 @@ import javafx.stage.StageStyle;
  */
 public class ViewImpl implements View {
 
-  static final String STAGE_RESIZED = "Stage resized";
-  static final String SOUND_MODE_CHANGED = "Sound mode changed";
-  static final String VOLUME_CHANGED = "Volume changed";
-
   private Model model;
   private Controller controller;
 
@@ -182,7 +178,7 @@ public class ViewImpl implements View {
               gameMode,
               model.getState().getPlayerManagement().getPlayerOne(),
               model.getState().getPlayerManagement().getPlayerTwo(),
-              8 /*model.getState().getField().getSize()*/);
+              model.getState().getField().getSize());
         });
 
     Region spacer = new Region();
@@ -277,8 +273,13 @@ public class ViewImpl implements View {
 
   private VBox getMuteAndMainMenuButton() {
     VBox vbox = new VBox(10);
-    vbox.setAlignment(Pos.BOTTOM_CENTER);
+    vbox.setAlignment(Pos.CENTER);
     vbox.setPadding(new Insets(20));
+
+    if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {
+      SpectatorList spectatorList = new SpectatorList(messages);
+      addListener(spectatorList);
+    }
 
     final Image play =
         new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker.png"));

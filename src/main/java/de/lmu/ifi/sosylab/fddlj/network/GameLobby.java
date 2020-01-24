@@ -263,7 +263,7 @@ public class GameLobby {
    *
    * @return a representation of this lobby containing public information
    */
-  public LobbyRepresentation getRepresentation() {
+  public synchronized LobbyRepresentation getRepresentation() {
     Phase phase = Phase.WAITING;
     if (masterGame != null) {
       phase = masterGame.getState().getCurrentPhase();
