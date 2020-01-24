@@ -128,27 +128,23 @@ public class ClientConnection implements Runnable {
   }
 
   private void handleClientNotification(ClientNotification notification) {
+    if (lobby == null) {
+      sendMessageWith(ServerNotification.NO_LOBBY_JOINED);
+      return;
+    }
+
     switch (notification) {
       case REQUEST_RESTART:
-        if (lobby == null) {
-          sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
-        } else {
-          lobby.requestRestart(connectionID);
-        }
+        lobby.requestRestart(connectionID);
         break;
       case ACCEPT_RESTART_REQUEST:
-        if (lobby == null) {
-          sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
-        } else {
-          lobby.acceptRestart(connectionID);
-        }
+        lobby.acceptRestart(connectionID);
+        break;
+      case DENY_RESTART_REQUEST:
+        lobby.denyRestart(connectionID);
         break;
       case REQUEST_CURRENT_GAMESTATE_WITH_LAST_PLACEMENT_UUID:
-        if (lobby == null) {
-          sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);
-        } else {
-          sendMessageWith(lobby.getGameStateWithLastPlacementUuid());
-        }
+        sendMessageWith(lobby.getGameStateWithLastPlacementUuid());
         break;
 
       default:
