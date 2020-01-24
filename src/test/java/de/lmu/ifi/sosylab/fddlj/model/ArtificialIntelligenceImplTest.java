@@ -144,9 +144,9 @@ public class ArtificialIntelligenceImplTest {
     ModifiableGameState state = new GameStateImpl();
     state.setPlayerManagement(new PlayerManagementImpl(one, two));
     state.setCurrentPhase(Phase.RUNNING);
-    ModifiableGameField field = new GameFieldImpl();
-    for (int i = 0; i < GameFieldImpl.SIZE; i++) {
-      for (int j = 0; j < GameFieldImpl.SIZE; j++) {
+    ModifiableGameField field = new GameFieldImpl(8);
+    for (int i = 0; i < field.getSize(); i++) {
+      for (int j = 0; j < field.getSize(); j++) {
         field.set(new CellImpl(i, j), diskTwo);
       }
     }

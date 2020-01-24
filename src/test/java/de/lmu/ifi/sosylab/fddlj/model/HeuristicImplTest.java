@@ -1,6 +1,5 @@
 package de.lmu.ifi.sosylab.fddlj.model;
 
-import java.util.Optional;
 import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
