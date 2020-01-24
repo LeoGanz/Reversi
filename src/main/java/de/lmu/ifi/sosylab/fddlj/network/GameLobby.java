@@ -168,7 +168,9 @@ public class GameLobby {
     }
 
     // only reached if leaving connection was conn 1 or conn 2
-    masterGame.setWaiting();
+    if (masterGame != null) {
+      masterGame.setWaiting();
+    }
     publishLobbyUpdate();
     resetRestartRequests();
 
