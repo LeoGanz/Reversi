@@ -75,8 +75,9 @@ public class ClientConnection implements Runnable {
         String receivedData = in.readLine();
         if (receivedData == null) { //EOF
           terminate();
+        } else {
+          processReceivedData(receivedData);
         }
-        processReceivedData(receivedData);
       } catch (@SuppressWarnings("unused") IOException e) {
         // client probably lost connection. Clean up can be done.
         terminate();
@@ -86,6 +87,8 @@ public class ClientConnection implements Runnable {
 
   private void processReceivedData(String receivedData) {
     try {
+      System.out.println("receivedData is null: " + (receivedData == null));
+      System.out.println("receivedData: " + receivedData);
       Message<?> receivedMessage = Message.fromJson(receivedData);
       Object data = receivedMessage.getData();
       if (data instanceof DiskPlacement) {
