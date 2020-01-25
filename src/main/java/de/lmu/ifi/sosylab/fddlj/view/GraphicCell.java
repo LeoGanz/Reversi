@@ -176,8 +176,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
     }
 
     if (controller.getCurrentGameMode() == GameMode.SINGLEPLAYER
-        && model.getState().getPlayerManagement().getCurrentPlayer()
-            == model.getState().getPlayerManagement().getPlayerTwo()) {
+        && model.getState().getPlayerManagement().getCurrentPlayer() instanceof AiPlayer) {
       setCursor(Cursor.DEFAULT);
       return;
     }
@@ -332,6 +331,17 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
           && model.getState().getPlayerManagement().getCurrentPlayer() instanceof AiPlayer) {
         return;
       }
+
+      if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {
+        if (controller instanceof MultiplayerController) {
+          if (!((MultiplayerController) controller)
+              .getOwnPlayer()
+              .equals(model.getState().getPlayerManagement().getCurrentPlayer())) {
+            return;
+          }
+        }
+      }
+
       double prefRadius = (getHeight() - 30) / 2;
 
       Circle circle = new Circle(prefRadius);

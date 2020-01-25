@@ -80,7 +80,7 @@ public class ClientImpl implements Client {
               new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 
       connectionEstablished = true;
-    } catch (@SuppressWarnings("unused")IOException e) {
+    } catch (@SuppressWarnings("unused") IOException e) {
       compatibleGui.handleConnectionError();
       terminate();
     }
@@ -125,6 +125,11 @@ public class ClientImpl implements Client {
   @Override
   public void acceptGameRestart() {
     sendMessage(ClientNotification.ACCEPT_RESTART_REQUEST);
+  }
+
+  @Override
+  public void denyGameRestart() {
+    sendMessage(ClientNotification.DENY_RESTART_REQUEST);
   }
 
   /**

@@ -73,6 +73,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   private boolean guiShowing;
 
   private float volume;
+  private int lobbyId;
 
   private ResourceBundle messages;
 
@@ -302,15 +303,20 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   }
 
   private VBox getMuteAndMainMenuButton() {
-    VBox vbox = new VBox(10);
-    vbox.setAlignment(Pos.BOTTOM_CENTER);
+    VBox vbox = new VBox(30);
+    vbox.setAlignment(Pos.TOP_CENTER);
     vbox.setPadding(new Insets(20));
 
     if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {
-      SpectatorList spectatorList = new SpectatorList(messages);
+      SpectatorList spectatorList = new SpectatorList(messages, lobbyId);
       addListener(spectatorList);
+
       vbox.getChildren().add(spectatorList);
     }
+
+    Region spacer = new Region();
+    VBox.setVgrow(spacer, Priority.ALWAYS);
+    vbox.getChildren().add(spacer);
 
     final Image play =
         new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker.png"));
@@ -518,6 +524,8 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   private void handleJoinRequestResponse(Response response) {
     if (response.getType() == ResponseType.JOIN_SUCCESSFUL) {
+      lobbyId = response.getLobbyID();
+
       if (lobbyID != null) {
         lobbyID.setText(lobbyID.getText() + " " + response.getLobbyID());
       }
@@ -578,6 +586,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
         break;
       case PARTNER_ACCEPTED_RESTART:
         break;
+      case PARTNER_DENIED_RESTART:
+        showAlert(
+            AlertType.INFORMATION,
+            messages.getString("ViewImpl_ResetRequest_Denied_Title"),
+            messages.getString("ViewImpl_ResetRequest_Denied_Subtitle"),
+            messages.getString("ViewImpl_ResetRequest_Denied_Info"));
+        root.setDisable(false);
+        break;
       case PARTNER_REQUESTED_RESTART:
         handleRestartRequest();
         break;
@@ -594,6 +610,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   }
 
   private void handleServerShuttingDown() {
+    if (!stage.isShowing()) {
+      return;
+    }
     ButtonType backToMainMenu = new ButtonType(messages.getString("ViewImpl_ButtonBack_Text"));
     ButtonType continueAgainstAi =
         new ButtonType(messages.getString("ViewImpl_ButtonContinueAgainstAI_Text"));
@@ -601,7 +620,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
     ArrayList<ButtonType> buttonTypes = new ArrayList<>();
     buttonTypes.add(backToMainMenu);
-    buttonTypes.add(continueAgainstAi);
+    if (controller.getCurrentGameMode() != GameMode.SPECTATOR) {
+      buttonTypes.add(continueAgainstAi);
+    }
     buttonTypes.add(exit);
 
     Alert alert =
@@ -625,6 +646,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   }
 
   private void handleRestartRequest() {
+    if (!stage.isShowing()) {
+      return;
+    }
     ButtonType accept = new ButtonType(messages.getString("ViewImpl_ResetRequest_Accept"));
     ButtonType deny = new ButtonType(messages.getString("ViewImpl_ResetRequest_Deny"));
 
@@ -632,28 +656,35 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     buttonTypes.add(accept);
     buttonTypes.add(deny);
 
+    root.setDisable(true);
+
     Alert alert =
         showOptionDialog(
             AlertType.INFORMATION,
-            messages.getString("ViewImpl_ResetRequest_Title"),
-            messages.getString("ViewImpl_ResetRequest_Subtitle"),
-            messages.getString("ViewImpl_ResetRequest_Info"),
+            messages.getString("ViewImpl_ResetRequest_Received_Title"),
+            messages.getString("ViewImpl_ResetRequest_Received_Subtitle"),
+            messages.getString("ViewImpl_ResetRequest_Received_Info"),
             buttonTypes);
 
     Optional<ButtonType> optional = alert.showAndWait();
     if (optional.get().equals(accept)) {
       if (controller instanceof MultiplayerController) {
-        ((MultiplayerController) controller).requestGameReset();
+        ((MultiplayerController) controller).acceptGameRestart();
       }
     } else if (optional.get().equals(deny)) {
-      // TODO deny reset
-      return;
-    } else {
-      root.setDisable(false);
+      if (controller instanceof MultiplayerController) {
+        ((MultiplayerController) controller).denyGameRestart();
+      }
     }
+
+    root.setDisable(false);
   }
 
   private void handleLobbyClosed() {
+    if (!stage.isShowing()) {
+      return;
+    }
+
     ButtonType backToMainMenu = new ButtonType(messages.getString("ViewImpl_ButtonBack_Text"));
     ButtonType continueAgainstAi =
         new ButtonType(messages.getString("ViewImpl_ButtonContinueAgainstAI_Text"));
@@ -661,7 +692,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
     ArrayList<ButtonType> buttonTypes = new ArrayList<>();
     buttonTypes.add(backToMainMenu);
-    buttonTypes.add(continueAgainstAi);
+    if (controller.getCurrentGameMode() != GameMode.SPECTATOR) {
+      buttonTypes.add(continueAgainstAi);
+    }
     buttonTypes.add(exit);
 
     Alert alert =
@@ -685,17 +718,23 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   }
 
   private void handleOnePlayerLeft() {
+    if (!stage.isShowing()) {
+      return;
+    }
+    Model copyModel = model;
     ButtonType backToMainMenu = new ButtonType(messages.getString("ViewImpl_ButtonBack_Text"));
     ButtonType continueAgainstAi =
         new ButtonType(messages.getString("ViewImpl_ButtonContinueAgainstAI_Text"));
-    ButtonType exit = new ButtonType(messages.getString("ViewImpl_ButtonExit_Text"));
     ButtonType remainAndWait =
         new ButtonType(messages.getString("ViewImpl_OpponentDisconnected_Remain"));
 
     ArrayList<ButtonType> buttonTypes = new ArrayList<>();
     buttonTypes.add(backToMainMenu);
-    buttonTypes.add(continueAgainstAi);
+    if (controller.getCurrentGameMode() != GameMode.SPECTATOR) {
+      buttonTypes.add(continueAgainstAi);
+    }
     buttonTypes.add(remainAndWait);
+    ButtonType exit = new ButtonType(messages.getString("ViewImpl_ButtonExit_Text"));
     buttonTypes.add(exit);
 
     Alert alert =
@@ -710,7 +749,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     if (optional.get().equals(backToMainMenu)) {
       returnToMainMenu();
     } else if (optional.get().equals(continueAgainstAi)) {
-      controller.continueAgainstAi(model);
+      controller.continueAgainstAi(copyModel);
     } else if (optional.get().equals(exit)) {
       Platform.exit();
     } else if (optional.get().equals(remainAndWait)) {
@@ -725,6 +764,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     this.model = model;
     Platform.runLater(
         () -> {
+          if (root.isDisable()) {
+            root.setDisable(false);
+          }
           support.firePropertyChange(Model.LISTENERS_CHANGED, null, model);
 
           showGame(controller.getCurrentGameMode());
@@ -767,10 +809,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   }
 
   private void showAlert(AlertType alertType, String title, String header, String content) {
+    if (!stage.isShowing()) {
+      return;
+    }
+
     Alert alert = new Alert(alertType);
     alert.setTitle(title);
     alert.setHeaderText(header);
-    alert.setContentText(content);
+    alert.getDialogPane().setContent(new Label(content));
     alert.initOwner(stage);
     alert.showAndWait();
   }
@@ -785,7 +831,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     Alert alert = new Alert(alertType);
     alert.setTitle(title);
     alert.setHeaderText(header);
-    alert.setContentText(content);
+    alert.getDialogPane().setContent(new Label(content));
     alert.initOwner(stage);
     alert.getButtonTypes().setAll(buttonTypes);
 

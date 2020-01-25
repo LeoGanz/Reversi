@@ -104,7 +104,7 @@ public class ServerGui implements ServerListener {
     this.lobbies.clear();
 
     for (Entry<Integer, LobbyRepresentation> id : lobbies.entrySet()) {
-      LobbyRepresentation lobby = lobbies.get(id.getKey());
+      LobbyRepresentation lobby = id.getValue();
       LobbyView lobbyView = new LobbyView(lobby);
       lobbyList.getChildren().add(lobbyView);
       this.lobbies.put(lobby.getLobbyID(), lobbyView);
@@ -135,7 +135,6 @@ public class ServerGui implements ServerListener {
     Platform.runLater(
         () -> {
           if (lobbies.get(lobbyID) != null) {
-            System.out.println("Updating lobby");
             lobbies.get(lobbyID).updateLobby(lobbyRepresentation);
           }
         });

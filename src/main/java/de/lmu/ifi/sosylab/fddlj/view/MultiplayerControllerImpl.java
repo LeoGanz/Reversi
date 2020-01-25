@@ -1,5 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
+import de.lmu.ifi.sosylab.fddlj.model.AiPlayerImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.DiskImpl;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
@@ -21,6 +22,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -202,6 +204,24 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     gameMode = GameMode.SINGLEPLAYER;
     view.showGame(gameMode);
     this.model = new ModelImpl(model.getState(), gameMode);
+
+    Player aiPlayer;
+    if (ownPlayer.getColor().equals(Color.BLACK)) {
+      aiPlayer = new AiPlayerImpl(messages.getString("PlayerCreation_AIPlayer_Name"), Color.WHITE);
+    } else {
+      aiPlayer = new AiPlayerImpl();
+    }
+    this.model.substitutePlayersWith(ownPlayer, aiPlayer);
     this.model.addListener(view);
+  }
+
+  @Override
+  public void acceptGameRestart() {
+    client.acceptGameRestart();
+  }
+
+  @Override
+  public void denyGameRestart() {
+    client.denyGameRestart();
   }
 }

@@ -49,4 +49,7 @@ public interface Client {
 
   /** Accept a restart of the game, after the opponent player asked for a restart. */
   void acceptGameRestart();
+
+  /** Denies a game restart request. */
+  void denyGameRestart();
 }

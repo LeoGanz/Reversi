@@ -32,16 +32,27 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
    *
    * @param messages the ResourceBundle for the externalised strings
    */
-  public SpectatorList(ResourceBundle messages) {
+  public SpectatorList(ResourceBundle messages, int lobbyId) {
 
     this.messages = messages;
 
-    initSpectatorList();
+    initSpectatorList(lobbyId);
   }
 
-  private void initSpectatorList() {
+  private void initSpectatorList(int lobbyId) {
     getStylesheets().add("cssFiles/mainGame.css");
     setId("spectator-pane");
+
+    showLobbyId(lobbyId);
+    buildSpectatorList(new Spectators(lobbyId));
+  }
+
+  private void showLobbyId(int lobbyId) {
+    Label label =
+        new Label(messages.getString("ViewImpl_LabelLobbyID") + " " + String.valueOf(lobbyId));
+    label.getStyleClass().add("spectatorlist-label");
+    setTop(label);
+    BorderPane.setAlignment(label, Pos.CENTER);
   }
 
   private void buildSpectatorList(Spectators spectators) {
@@ -84,9 +95,11 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
     scrollPane.setContent(spectatorList);
     scrollPane.setFitToWidth(false);
     scrollPane.setFitToHeight(true);
+    scrollPane.setPrefWidth(150);
     scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
     scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
     setCenter(scrollPane);
+    setMinWidth(150);
   }
 
   @Override

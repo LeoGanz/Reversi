@@ -42,4 +42,10 @@ public interface MultiplayerController extends Controller {
    * @return the a reference to the machine's player
    */
   Player getOwnPlayer();
+
+  /** Player has accepted a game restart request. */
+  void acceptGameRestart();
+
+  /** Denies a game restart request. */
+  void denyGameRestart();
 }

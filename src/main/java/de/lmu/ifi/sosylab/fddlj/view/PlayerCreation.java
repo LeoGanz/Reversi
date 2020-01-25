@@ -468,6 +468,7 @@ public class PlayerCreation extends BorderPane {
 
           startSpectateMode(
               playername.getText(), serverAddress.getText(), Integer.parseInt(lobbyID.getText()));
+          selector.close();
         });
 
     Button back = getButton(messages.getString("PlayerCreation_ButtonBack_Text"));
