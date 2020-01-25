@@ -34,6 +34,22 @@ public class ControllerImpl extends Application implements Controller {
 
   private ResourceBundle messages;
 
+  /**
+   * Public constructor of this class takes a reference to the resource bundle containing the
+   * externalized strings.
+   *
+   * @param messages the ResourceBundle for the externalised strings
+   */
+  public ControllerImpl(ResourceBundle messages) {
+    this.messages = messages;
+  }
+
+  /** Public constructor of this class initialises the ResourceBundle. */
+  public ControllerImpl() {
+    locale = Locale.getDefault();
+    messages = ResourceBundle.getBundle("files/MessagesBundle", locale);
+  }
+
   @Override
   public void startMainView(
       GameMode gameMode, Stage stage, Player playerOne, Player playerTwo, int gameFieldSize) {
@@ -79,8 +95,6 @@ public class ControllerImpl extends Application implements Controller {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-    locale = Locale.getDefault();
-    messages = ResourceBundle.getBundle("files/MessagesBundle", locale);
 
     showGameModeSelector(primaryStage);
   }

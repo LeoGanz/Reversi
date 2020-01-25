@@ -52,4 +52,7 @@ public interface ClientCompatibleGui extends OnlineView {
    * @param spectators list of spectators watching the game
    */
   void receivedSpectator(Spectators spectators);
+
+  /** Called when the client can't connect to the server. */
+  void handleConnectionError();
 }

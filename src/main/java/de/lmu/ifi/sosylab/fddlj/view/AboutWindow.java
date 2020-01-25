@@ -60,7 +60,6 @@ public class AboutWindow extends Stage {
     root.getStylesheets().add("cssFiles/about.css");
     Scene scene = new Scene(root);
 
-    // setWidth(Screen.getPrimary().getVisualBounds().getWidth() / 4);
     setHeight(5 * Screen.getPrimary().getVisualBounds().getHeight() / 6);
 
     setScene(scene);

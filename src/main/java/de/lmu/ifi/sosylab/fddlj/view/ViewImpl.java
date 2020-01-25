@@ -544,7 +544,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     if (controller instanceof ControllerImpl) {
       ((ControllerImpl) controller).showGameModeSelector(new Stage());
     } else {
-      controller = new ControllerImpl();
+      controller = new ControllerImpl(messages);
       ((ControllerImpl) controller).showGameModeSelector(new Stage());
 
       stage.close();
@@ -790,5 +790,19 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     alert.getButtonTypes().setAll(buttonTypes);
 
     return alert;
+  }
+
+  @Override
+  public void handleConnectionError() {
+    Platform.runLater(
+        () -> {
+          showAlert(
+              AlertType.ERROR,
+              messages.getString("ViewImpl_ConnectionError_Title"),
+              messages.getString("ViewImpl_ConnectionError_Subtitle"),
+              messages.getString("ViewImpl_ConnectionError_Info"));
+
+          returnToMainMenu();
+        });
   }
 }

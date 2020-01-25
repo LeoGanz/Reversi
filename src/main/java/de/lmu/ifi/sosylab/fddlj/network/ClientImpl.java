@@ -80,7 +80,8 @@ public class ClientImpl implements Client {
               new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 
       connectionEstablished = true;
-    } catch (@SuppressWarnings("unused") IOException e) {
+    } catch (@SuppressWarnings("unused")IOException e) {
+      compatibleGui.handleConnectionError();
       terminate();
     }
   }
