@@ -410,12 +410,34 @@ public class GameFieldImplTest {
   }
 
   @Test
+  public void testEquals_SameObject() {
+    GameFieldImpl field = createTestGameField();
+    
+    Assertions.assertEquals(field, field);
+  }
+
+  @Test
   public void testEquals_NotEqual() {
     GameFieldImpl field1 = createTestGameField();
     GameFieldImpl field2 = new GameFieldImpl();
 
     Assertions.assertNotEquals(
         field1, field2, "field1 should not be equal to the empty GameField field2!");
+  }
+
+  @Test
+  public void testEquals_DifferentClass() {
+    GameField field = createTestGameField();
+    
+    Assertions.assertNotEquals(field, new Object());
+  }
+
+  @Test
+  public void testEquals_DifferentFieldSize() {
+    GameField field = createTestGameField();
+    GameField field2 = new GameFieldImpl(10);
+    
+    Assertions.assertNotEquals(field, field2);
   }
 
   @Test

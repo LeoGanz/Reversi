@@ -215,6 +215,13 @@ public class GameStateImplTest {
   }
 
   @Test
+  void testEquals_SameObject() {
+    GameState state = new GameStateImpl();
+    
+    Assertions.assertEquals(state, state);
+  }
+
+  @Test
   void testEquals_PhaseNotEqual() {
     GameStateImpl state = new GameStateImpl();
     state.setCurrentPhase(Phase.RUNNING);
@@ -266,6 +273,13 @@ public class GameStateImplTest {
         state,
         state2,
         "state and state2 should not be equal, since their PlayerManagements are not equal!");
+  }
+
+  @Test
+  void testEquals_DifferentClass() {
+    GameStateImpl state = new GameStateImpl();
+    
+    Assertions.assertNotEquals(state, new Object());
   }
 
   @Test

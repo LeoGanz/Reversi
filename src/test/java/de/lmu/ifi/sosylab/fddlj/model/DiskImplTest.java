@@ -43,6 +43,14 @@ public class DiskImplTest {
   }
 
   @Test
+  public void testEquals_SameObject() {
+    Player player = this.playerCreator();
+    Disk disk = new DiskImpl(player);
+    
+    Assertions.assertTrue(disk.equals(disk));
+  }
+
+  @Test
   public void testEquals_Unequal() {
     Player player1 = this.playerCreator();
     Disk disk1 = new DiskImpl(player1);
@@ -58,6 +66,14 @@ public class DiskImplTest {
     disk2 = new DiskImpl(player2);
 
     Assertions.assertFalse(disk1.equals(disk2), disk1 + " should not be equal to " + disk2);
+  }
+
+  @Test
+  public void testEquals_DifferentClass() {
+    Player player = this.playerCreator();
+    Disk disk = new DiskImpl(player);
+    
+    Assertions.assertFalse(disk.equals(new Object()));
   }
 
   @Test

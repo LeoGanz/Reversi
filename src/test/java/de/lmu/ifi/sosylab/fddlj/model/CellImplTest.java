@@ -167,10 +167,22 @@ public class CellImplTest {
   }
 
   @Test
+  public void testEquals_SameObject() {
+    Cell cell = new CellImpl(1, 1);
+    Assertions.assertTrue(cell.equals(cell));
+  }
+
+  @Test
   public void testEquals_Unequal() {
     Cell x = new CellImpl(5, 5);
     Cell y = new CellImpl(-5, 2 + 3);
     Assertions.assertFalse(x.equals(y), x + " should not be equal to " + y);
+  }
+
+  @Test
+  public void testEquals_DifferentClass() {
+    Cell cell = new CellImpl(1, 1);
+    Assertions.assertFalse(cell.equals(new Object()));
   }
 
   @Test

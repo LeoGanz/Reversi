@@ -115,6 +115,12 @@ public class PlayerImplTest {
   }
 
   @Test
+  public void testEquals_DifferentClass() {
+    Player player = new PlayerImpl("Max", Color.ALICEBLUE);
+    Assertions.assertFalse(player.equals(new Object()));
+  }
+
+  @Test
   public void testHashCode_Equal() {
     Player x = new PlayerImpl("Max", new Color(1.0, 1.0, 1.0, 1.0));
     Player y = new PlayerImpl("Max", new Color(1.0, 1.0, 1.0, 1.0));

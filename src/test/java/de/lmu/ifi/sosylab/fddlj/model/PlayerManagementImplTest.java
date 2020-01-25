@@ -179,11 +179,30 @@ public class PlayerManagementImplTest {
   }
 
   @Test
+  public void testSetWinner_FalsePlayer() {
+    ModifiablePlayerManagement pm = new PlayerManagementImpl(playerOne, playerTwo);
+    Player player = new PlayerImpl("Test", Color.ALICEBLUE);
+    try {
+      pm.setWinner(Optional.of(player));
+    } catch (Exception e) {
+      Assertions.assertTrue(e instanceof IllegalArgumentException);
+      return;
+    }
+    Assertions.fail();
+  }
+
+  @Test
   public void testEquals_Equal() {
     PlayerManagement pm1 = new PlayerManagementImpl(playerOne, playerTwo);
     PlayerManagement pm2 = new PlayerManagementImpl(playerOne, playerTwo);
     Assertions.assertTrue(
         pm1.equals(pm2), "Two PlayerManagements should be equal if created with same players.");
+  }
+
+  @Test
+  public void testEquals_SameObject() {
+    PlayerManagement pm = new PlayerManagementImpl(playerOne, playerTwo);
+    Assertions.assertTrue(pm.equals(pm));
   }
 
   @Test
@@ -193,6 +212,12 @@ public class PlayerManagementImplTest {
     Assertions.assertFalse(
         pm1.equals(pm2),
         "Two PlayerManagements should not be equal if created with player 1 and 2 switched.");
+  }
+
+  @Test
+  public void testEquals_DifferentClass() {
+    PlayerManagement pm = new PlayerManagementImpl(playerOne, playerTwo);
+    Assertions.assertFalse(pm.equals(new Object()));
   }
 
   @Test
