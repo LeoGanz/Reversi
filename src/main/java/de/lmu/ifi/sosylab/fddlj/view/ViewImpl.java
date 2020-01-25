@@ -152,7 +152,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
     VBox right = getMuteAndMainMenuButton();
     root.setRight(right);
-    BorderPane.setMargin(right, new Insets(0, 15, 15, 0));
+    BorderPane.setMargin(right, new Insets(0, 15, 0, 0));
 
     scene = new Scene(root);
     stage.setMinWidth(
@@ -317,6 +317,10 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     Region spacer = new Region();
     VBox.setVgrow(spacer, Priority.ALWAYS);
     vbox.getChildren().add(spacer);
+
+    if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {
+      vbox.getChildren().add(new Separator(Orientation.HORIZONTAL));
+    }
 
     final Image play =
         new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker.png"));

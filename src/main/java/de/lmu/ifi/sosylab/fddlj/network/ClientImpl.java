@@ -169,7 +169,6 @@ public class ClientImpl implements Client {
       System.out.println("Can not decode server answer: " + receivedLine);
       return;
     }
-
     if (message.getData() instanceof JoinRequest.Response) {
       processJoinRequestResponse((JoinRequest.Response) message.getData());
     } else if (message.getData() instanceof RejectedPlacement) {

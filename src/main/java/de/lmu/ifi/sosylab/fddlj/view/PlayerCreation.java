@@ -433,6 +433,25 @@ public class PlayerCreation extends BorderPane {
           selector.close();
         });
 
+    serverAddress.setOnKeyPressed(
+        e -> {
+          if (e.getCode() == KeyCode.ENTER) {
+            start.fire();
+          }
+        });
+    playerName.setOnKeyPressed(
+        e -> {
+          if (e.getCode() == KeyCode.ENTER) {
+            start.fire();
+          }
+        });
+    lobbyNumber.setOnKeyPressed(
+        e -> {
+          if (e.getCode() == KeyCode.ENTER) {
+            start.fire();
+          }
+        });
+
     Button back = getButton(messages.getString("PlayerCreation_ButtonBack_Text"));
     back.setOnAction(e -> selector.returnToMainScreen());
 
@@ -469,6 +488,25 @@ public class PlayerCreation extends BorderPane {
           startSpectateMode(
               playername.getText(), serverAddress.getText(), Integer.parseInt(lobbyID.getText()));
           selector.close();
+        });
+
+    playername.setOnKeyPressed(
+        e -> {
+          if (e.getCode() == KeyCode.ENTER) {
+            start.fire();
+          }
+        });
+    serverAddress.setOnKeyPressed(
+        e -> {
+          if (e.getCode() == KeyCode.ENTER) {
+            start.fire();
+          }
+        });
+    lobbyID.setOnKeyPressed(
+        e -> {
+          if (e.getCode() == KeyCode.ENTER) {
+            start.fire();
+          }
         });
 
     Button back = getButton(messages.getString("PlayerCreation_ButtonBack_Text"));
