@@ -5,7 +5,7 @@ import java.util.UUID;
 
 /**
  * Combination of a {@link GameState} with a {@link UUID} that references the last {@link
- * DiskPlacement} made. Used for uüdates between server and client.
+ * DiskPlacement} made. Used for updates between server and client.
  *
  * @author Leonard Ganz
  */

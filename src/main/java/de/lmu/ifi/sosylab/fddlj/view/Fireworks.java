@@ -3,6 +3,7 @@ package de.lmu.ifi.sosylab.fddlj.view;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -79,7 +80,8 @@ public class Fireworks extends Pane {
             drawFireworks(gc);
             // countdown to launching the next firework
             if (countDownTillNextFirework == 0) {
-              countDownTillNextFirework = 10 + (int) (Math.random() * 30);
+              Random random = new Random();
+              countDownTillNextFirework = 10 + random.nextInt(30);
               fireParticle();
             }
             countDownTillNextFirework--;
@@ -154,7 +156,8 @@ public class Fireworks extends Pane {
   }
 
   private void explodeCircle(Particle firework, List<Particle> newParticles) {
-    final int count = 20 + (int) (60 * Math.random());
+    Random random = new Random();
+    final int count = 20 + random.nextInt(60);
     final boolean shouldExplodeChildren = Math.random() > 0.5;
     final double angle = (Math.PI * 2) / count;
     final int color = (int) (Math.random() * colors.length);

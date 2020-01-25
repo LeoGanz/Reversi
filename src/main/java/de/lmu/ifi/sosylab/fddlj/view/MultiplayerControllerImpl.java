@@ -35,6 +35,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   private Stage mainStage;
   private Player ownPlayer;
   private View view;
+  private Model model;
 
   private GameMode gameMode;
 
@@ -200,6 +201,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
     gameMode = GameMode.SINGLEPLAYER;
     view.showGame(gameMode);
-    model = new ModelImpl(model.getState(), gameMode);
+    this.model = new ModelImpl(model.getState(), gameMode);
+    this.model.addListener(view);
   }
 }

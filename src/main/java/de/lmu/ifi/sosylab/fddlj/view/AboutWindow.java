@@ -1,7 +1,9 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 import javafx.geometry.Pos;
@@ -58,7 +60,7 @@ public class AboutWindow extends Stage {
     root.getStylesheets().add("cssFiles/about.css");
     Scene scene = new Scene(root);
 
-    setWidth(Screen.getPrimary().getVisualBounds().getWidth() / 4);
+    // setWidth(Screen.getPrimary().getVisualBounds().getWidth() / 4);
     setHeight(5 * Screen.getPrimary().getVisualBounds().getHeight() / 6);
 
     setScene(scene);
@@ -113,15 +115,24 @@ public class AboutWindow extends Stage {
   }
 
   private String readFile(String filePath) {
-    BufferedReader reader =
-        new BufferedReader(
-            new InputStreamReader(getClass().getClassLoader().getResourceAsStream(filePath)));
+    BufferedReader reader;
+    try {
+      reader =
+          new BufferedReader(
+              new InputStreamReader(
+                  getClass().getClassLoader().getResourceAsStream(filePath), "UTF-8"));
+      StringBuilder contentBuilder = new StringBuilder();
 
-    StringBuilder contentBuilder = new StringBuilder();
+      Stream<String> stream = reader.lines();
+      stream.forEach(s -> contentBuilder.append(s).append("\n"));
 
-    Stream<String> stream = reader.lines();
-    stream.forEach(s -> contentBuilder.append(s).append("\n"));
+      reader.close();
 
-    return contentBuilder.toString();
+      return contentBuilder.toString();
+    } catch (UnsupportedEncodingException e1) {
+      return messages.getString("aboutWindow_Rules_LicenseFile_ReadError");
+    } catch (IOException e) {
+      return messages.getString("aboutWindow_Rules_LicenseFile_ReadError");
+    }
   }
 }

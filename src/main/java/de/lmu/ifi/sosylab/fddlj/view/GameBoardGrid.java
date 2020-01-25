@@ -3,6 +3,7 @@ package de.lmu.ifi.sosylab.fddlj.view;
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ResourceBundle;
@@ -131,14 +132,19 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
             InputStream isAudioFile =
                 getClass().getClassLoader().getResourceAsStream("audio/placement.wav");
             Clip clip = AudioSystem.getClip();
-            AudioInputStream inputStream = AudioSystem.getAudioInputStream(isAudioFile);
+            AudioInputStream inputStream =
+                AudioSystem.getAudioInputStream(new BufferedInputStream(isAudioFile));
             clip.open(inputStream);
             FloatControl gainControl =
                 (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             gainControl.setValue(20f * (float) Math.log10(volume));
             clip.start();
+          } catch (RuntimeException e) {
+            throw e;
           } catch (Exception e) {
-            return;
+            e.printStackTrace();
+            // throw new MissingResourceException(
+            // "Missing a resource", "GameBoardGrid", "placement.wav");
           }
         })
         .start();

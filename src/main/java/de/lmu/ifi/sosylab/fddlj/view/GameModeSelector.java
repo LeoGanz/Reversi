@@ -26,7 +26,7 @@ import javafx.stage.StageStyle;
  */
 public class GameModeSelector extends Stage {
 
-  private final int diskAddition = 15;
+  private static final int DISK_ADDITION = 15;
 
   private Controller controller;
   private Scene scene;
@@ -108,9 +108,9 @@ public class GameModeSelector extends Stage {
       hbox.getChildren()
           .add(
               getDisk(
-                  i * 10 + diskAddition,
-                  i * 10 + diskAddition,
-                  (i * 10 + diskAddition) / 2,
+                  i * 10 + DISK_ADDITION,
+                  i * 10 + DISK_ADDITION,
+                  (i * 10 + DISK_ADDITION) / 2.0,
                   Color.WHITE));
     }
 
@@ -122,9 +122,9 @@ public class GameModeSelector extends Stage {
       hbox.getChildren()
           .add(
               getDisk(
-                  i * 10 + diskAddition,
-                  i * 10 + diskAddition,
-                  (i * 10 + diskAddition) / 2,
+                  i * 10 + DISK_ADDITION,
+                  i * 10 + DISK_ADDITION,
+                  (i * 10 + DISK_ADDITION) / 2.0,
                   Color.BLACK));
     }
 

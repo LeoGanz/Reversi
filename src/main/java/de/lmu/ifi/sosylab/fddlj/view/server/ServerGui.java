@@ -5,6 +5,7 @@ import de.lmu.ifi.sosylab.fddlj.network.Server;
 import de.lmu.ifi.sosylab.fddlj.network.ServerListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -101,8 +102,8 @@ public class ServerGui implements ServerListener {
 
     lobbyList.getChildren().clear();
 
-    for (int id : lobbies.keySet()) {
-      LobbyRepresentation lobby = lobbies.get(id);
+    for (Entry<Integer, LobbyRepresentation> id : lobbies.entrySet()) {
+      LobbyRepresentation lobby = lobbies.get(id.getKey());
       LobbyView lobbyView = new LobbyView(lobby);
       lobbyList.getChildren().add(lobbyView);
       this.lobbies.put(lobby.getLobbyID(), lobbyView);

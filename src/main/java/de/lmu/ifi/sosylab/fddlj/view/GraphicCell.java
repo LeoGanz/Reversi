@@ -43,7 +43,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
 
   private String cssNormal;
   private String cssHighlighted;
-  private final String cssStart =
+  private static final String CSS_START =
       "-fx-background-color: #4a4a4a; -fx-border-color: #d6d6d6;" + " -fx-border-width: 1.2;";
 
   /**
@@ -116,7 +116,7 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
    * displaying purposes.
    */
   public GraphicCell() {
-    setStyle(cssStart);
+    setStyle(CSS_START);
     double initValue = (Screen.getPrimary().getVisualBounds().getHeight() - SPACING) / 9.0;
     setPrefHeight(initValue);
     setPrefWidth(initValue);

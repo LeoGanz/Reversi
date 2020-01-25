@@ -20,8 +20,8 @@ public class StartScreenDiskGrid extends BorderPane {
 
   private ArrayList<GraphicDisk> animationStarter;
 
-  private final int animationCycle = 700;
-  private final int gridSize = 3;
+  private static final int ANIMATION_CYCLE = 700;
+  private static final int GRID_SIZE = 3;
 
   /** Public constructor of this class build a 2x2 grid with one disk placed on each cell. */
   public StartScreenDiskGrid() {
@@ -35,7 +35,7 @@ public class StartScreenDiskGrid extends BorderPane {
     VBox container = new VBox();
     container.setAlignment(Pos.CENTER);
 
-    for (int i = 0; i < gridSize; i++) {
+    for (int i = 0; i < GRID_SIZE; i++) {
       container.getChildren().add(buildRow((i % 2) == 0));
     }
 
@@ -46,12 +46,12 @@ public class StartScreenDiskGrid extends BorderPane {
             () -> {
               for (GraphicDisk disk : animationStarter) {
                 if (((Color) disk.getFill()).equals(colorOne)) {
-                  disk.changeColorInfinitely(colorTwo, animationStarter.size() * animationCycle);
+                  disk.changeColorInfinitely(colorTwo, animationStarter.size() * ANIMATION_CYCLE);
                 } else {
-                  disk.changeColorInfinitely(colorOne, animationStarter.size() * animationCycle);
+                  disk.changeColorInfinitely(colorOne, animationStarter.size() * ANIMATION_CYCLE);
                 }
                 try {
-                  Thread.sleep(animationCycle);
+                  Thread.sleep(ANIMATION_CYCLE);
                 } catch (InterruptedException e) {
                   continue;
                 }
@@ -66,7 +66,7 @@ public class StartScreenDiskGrid extends BorderPane {
     HBox hbox = new HBox();
     hbox.setAlignment(Pos.CENTER);
 
-    for (int i = 0; i < gridSize; i++) {
+    for (int i = 0; i < GRID_SIZE; i++) {
       GraphicCell cell = new GraphicCell();
       Color color;
       if (top) {
