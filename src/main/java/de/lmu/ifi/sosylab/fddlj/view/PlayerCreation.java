@@ -59,7 +59,7 @@ public class PlayerCreation extends BorderPane {
 
     this.controller = controller;
     this.primaryStage = stage;
-    setStyle("-fx-background-color: transparent");
+    getStyleClass().add("transparent");
 
     this.messages = messages;
   }
@@ -202,6 +202,7 @@ public class PlayerCreation extends BorderPane {
     textFieldLobby.setPromptText(messages.getString("PlayerCreation_TextFieldPrompt"));
     Tooltip tooltip = new Tooltip();
     tooltip.setText(messages.getString("PlayerCreation_TooltipLobbyId"));
+    tooltip.setFont(Font.font(14));
     textFieldLobby.setTooltip(tooltip);
     VBox container =
         getInputField(textFieldLobby, messages.getString("PlayerCreation_LobbyIDPrompt"));
@@ -211,8 +212,7 @@ public class PlayerCreation extends BorderPane {
     alternateText.setText(messages.getString("PlayerCreation_AlternateLobbyIDText"));
     alternateText.setMaxWidth(300);
     alternateText.setWrapText(true);
-    alternateText.setFont(Font.font(15));
-    alternateText.setStyle("-fx-text-fill: white");
+    alternateText.setId("alternateText");
 
     alignment.getChildren().add(vboxConnection);
 
@@ -222,7 +222,6 @@ public class PlayerCreation extends BorderPane {
 
     CheckBox checkbox =
         new CheckBox(messages.getString("PlayerCreation_PrivateLobbyCheckbox_Text"));
-    checkbox.setFont(Font.font(15));
     checkbox.setSelected(false);
     checkbox.setMinHeight(25);
     checkbox
@@ -245,6 +244,7 @@ public class PlayerCreation extends BorderPane {
             });
     Tooltip tooltipCheckbox = new Tooltip();
     tooltipCheckbox.setText(messages.getString("PlayerCreation_PrivateLobbyCheckbox_Tooltip"));
+    tooltipCheckbox.setFont(Font.font(14));
     checkbox.setTooltip(tooltipCheckbox);
     setCenter(checkbox);
     BorderPane.setAlignment(checkbox, Pos.TOP_CENTER);
@@ -289,7 +289,6 @@ public class PlayerCreation extends BorderPane {
 
   private Separator getSeparator() {
     Separator sep = new Separator(Orientation.VERTICAL);
-    sep.setStyle("-fx-background-color: #d4d4d4; -fx-background-radius: 0.2;");
     sep.setMaxHeight(450);
 
     return sep;

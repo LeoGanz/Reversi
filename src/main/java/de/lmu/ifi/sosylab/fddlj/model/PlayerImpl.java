@@ -9,7 +9,6 @@ import javafx.scene.paint.Color;
  *
  * @author Josef Feger
  */
-
 public class PlayerImpl implements Player, Comparable<Player> {
 
   private String name;
@@ -17,7 +16,7 @@ public class PlayerImpl implements Player, Comparable<Player> {
 
   /**
    * Create a new player with the given name and color.
-   * 
+   *
    * @param name the player's name
    * @param color the color the player wishes to use
    */
@@ -63,12 +62,10 @@ public class PlayerImpl implements Player, Comparable<Player> {
   @Override
   public int compareTo(Player o) {
     return name.compareTo(o.getName());
-
   }
 
   @Override
   public Player makeCopy() {
     return new PlayerImpl(this.name, this.color);
   }
-
 }

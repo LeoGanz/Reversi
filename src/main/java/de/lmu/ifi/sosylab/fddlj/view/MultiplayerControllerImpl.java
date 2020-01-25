@@ -3,6 +3,8 @@ package de.lmu.ifi.sosylab.fddlj.view;
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.DiskImpl;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.network.Client;
 import de.lmu.ifi.sosylab.fddlj.network.ClientCompatibleGui;
@@ -32,6 +34,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   private Client client;
   private Stage mainStage;
   private Player ownPlayer;
+  private View view;
 
   private GameMode gameMode;
 
@@ -98,6 +101,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
       Player ownPlayer, String serverAddress, int lobbyID, boolean createPrivateLobby) {
     this.ownPlayer = ownPlayer;
     ClientCompatibleGui gui = new ViewImpl(mainStage, null, this, messages);
+    view = gui;
 
     try {
       client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);
@@ -141,6 +145,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     gameMode = GameMode.SPECTATOR;
     this.ownPlayer = ownPlayer;
     ClientCompatibleGui gui = new ViewImpl(mainStage, null, this, messages);
+    view = gui;
 
     try {
       client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);
@@ -187,5 +192,14 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     alert.setContentText(content);
 
     alert.showAndWait();
+  }
+
+  @Override
+  public void continueAgainstAi(Model model) {
+    client.terminate();
+
+    gameMode = GameMode.SINGLEPLAYER;
+    view.showGame(gameMode);
+    model = new ModelImpl(model.getState(), gameMode);
   }
 }

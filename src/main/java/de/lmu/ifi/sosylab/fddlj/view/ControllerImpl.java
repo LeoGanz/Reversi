@@ -120,4 +120,9 @@ public class ControllerImpl extends Application implements Controller {
       server.addListener(view);
     }
   }
+
+  @Override
+  public void continueAgainstAi(Model model) {
+    throw new UnsupportedOperationException();
+  }
 }

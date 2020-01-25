@@ -229,7 +229,6 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
         setCursor(Cursor.DEFAULT);
         controller.placeDisk(current);
         setStyle(cssNormal);
-        setId("graphic-cell-normal");
       }
     }
   }

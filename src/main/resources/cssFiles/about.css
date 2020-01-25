@@ -23,12 +23,12 @@
 
 .text-area{
 	-fx-text-fill: #ffffff;
+	-fx-font-size: 16;
 }
 
 .tab-pane
 {
     -fx-tab-min-width:120px;
-    -fx-tab-min-height: 60px;
 }
 
 .tab{
@@ -36,6 +36,7 @@
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
 }
+
 .tab-pane .tab
 {
     -fx-background-color: #576385;
@@ -140,6 +141,8 @@
 
 .text-area .text {
      -fx-line-spacing: 4px;
+     -fx-font-size: 16;
+     -fx-font-family: 'Calibri';
 }
 
 .text-area .scroll-pane {

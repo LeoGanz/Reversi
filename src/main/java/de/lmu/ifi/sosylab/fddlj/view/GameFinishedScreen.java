@@ -76,7 +76,7 @@ public class GameFinishedScreen extends Stage {
     Scene scene = new Scene(root);
 
     setScene(scene);
-    setTitle("Reversi");
+    setTitle(messages.getString("Game_Title"));
     initStyle(StageStyle.UNDECORATED);
     setMinWidth(2 * (Screen.getPrimary().getVisualBounds().getWidth() / 3));
     setMinHeight(2 * (Screen.getPrimary().getVisualBounds().getHeight() / 3));

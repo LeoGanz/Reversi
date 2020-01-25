@@ -51,7 +51,7 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
 
     if (spectators.isEmpty()) {
       Label label = new Label(messages.getString("SpectatorList_NoSpectators"));
-      label.setStyle("-fx-font-size: x-large; -fx-text-fill: #000000;");
+      label.getStyleClass().add("spectatorList-label");
       spectatorList.getChildren().add(label);
     }
 
@@ -75,7 +75,7 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
       hbox.getChildren().add(imageView);
 
       Label name = new Label(player.getName());
-      name.setStyle("-fx-text-fill: #000000; -fx-font-weight: bold; -fx-font-size: 30;");
+      name.getStyleClass().add("spectatorList-label");
       hbox.getChildren().add(name);
       spectatorList.getChildren().add(hbox);
     }

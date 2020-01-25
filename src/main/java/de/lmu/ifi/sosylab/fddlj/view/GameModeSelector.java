@@ -26,6 +26,8 @@ import javafx.stage.StageStyle;
  */
 public class GameModeSelector extends Stage {
 
+  private final int diskAddition = 15;
+
   private Controller controller;
   private Scene scene;
   private Stage primaryStage;
@@ -66,7 +68,7 @@ public class GameModeSelector extends Stage {
     scene = new Scene(borderPane);
 
     setScene(scene);
-    setTitle("Reversi");
+    setTitle(messages.getString("Game_Title"));
     initStyle(StageStyle.UNDECORATED);
     setMinWidth(2 * (Screen.getPrimary().getVisualBounds().getWidth() / 3));
     setMinHeight(2.1 * (Screen.getPrimary().getVisualBounds().getHeight() / 3));
@@ -79,7 +81,7 @@ public class GameModeSelector extends Stage {
   private BorderPane buildTopPart() {
 
     BorderPane bp = new BorderPane();
-    bp.setStyle("-fx-background-color: transparent;");
+    bp.getStyleClass().add("transparent");
 
     Label close = new Label("X");
     close.setCursor(Cursor.HAND);
@@ -103,16 +105,27 @@ public class GameModeSelector extends Stage {
     hbox.setAlignment(Pos.CENTER);
 
     for (int i = 1; i < 4; i++) {
-      hbox.getChildren().add(getDisk(i * 10 + 15, i * 10 + 15, (i * 10 + 15) / 2, Color.WHITE));
+      hbox.getChildren()
+          .add(
+              getDisk(
+                  i * 10 + diskAddition,
+                  i * 10 + diskAddition,
+                  (i * 10 + diskAddition) / 2,
+                  Color.WHITE));
     }
 
     Label title = new Label("Reversi");
-    title.setFont(Font.font(25));
     title.setId("title-label");
     hbox.getChildren().add(title);
 
     for (int i = 3; i > 0; i--) {
-      hbox.getChildren().add(getDisk(i * 10 + 15, i * 10 + 15, (i * 10 + 15) / 2, Color.BLACK));
+      hbox.getChildren()
+          .add(
+              getDisk(
+                  i * 10 + diskAddition,
+                  i * 10 + diskAddition,
+                  (i * 10 + diskAddition) / 2,
+                  Color.BLACK));
     }
 
     return hbox;
@@ -126,7 +139,6 @@ public class GameModeSelector extends Stage {
     vbox.setPrefWidth(1.3 * (Screen.getPrimary().getVisualBounds().getWidth() / 5) + 200);
     vbox.setMaxWidth(vbox.getPrefWidth());
     vbox.setFillWidth(true);
-    vbox.setPadding(new Insets(0, 0, 20, 0));
 
     Region top = new Region();
     VBox.setVgrow(top, Priority.ALWAYS);

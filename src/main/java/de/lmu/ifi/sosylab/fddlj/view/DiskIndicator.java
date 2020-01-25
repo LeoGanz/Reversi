@@ -52,7 +52,7 @@ public class DiskIndicator extends VBox implements PropertyChangeListener {
 
   private void initLabel(String labelText) {
     titel = new Label(labelText);
-    titel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: x-large; -fx-font-family: arial;");
+    titel.setId("disk-indicator-label");
     getChildren().add(titel);
   }
 
@@ -99,7 +99,7 @@ public class DiskIndicator extends VBox implements PropertyChangeListener {
 
   private void initPlayerName() {
     name = new Label(model.getState().getPlayerManagement().getCurrentPlayer().getName());
-    name.setStyle("-fx-text-fill: #ffffff; -fx-font-size: x-large; -fx-font-family: arial;");
+    name.setId("disk-indicator-label");
     getChildren().add(name);
   }
 

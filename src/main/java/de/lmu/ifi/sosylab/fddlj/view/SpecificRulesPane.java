@@ -1,5 +1,6 @@
 package de.lmu.ifi.sosylab.fddlj.view;
 
+import java.util.ResourceBundle;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -22,55 +23,21 @@ import javafx.scene.text.TextFlow;
 public class SpecificRulesPane extends VBox {
 
   private static final int IMAGE_HEIGHT = 260;
+  private final Font textFont = Font.font("Calibri", FontWeight.NORMAL, 18);
 
-  // private ResourceBundle messages;
+  private ResourceBundle messages;
 
-  private String gameStart =
-      "In den ersten zwei Zügen setzen beide Spieler"
-          + " jeweils einen ihrer Steine auf die vier Mittelfelder."
-          + " Es können deshalb zwei 'Startaufstellungen' entstehen,"
-          + " wobei der zweite Spieler sich diese de facto aussuchen darf. "
-          + "Danach ziehen die Spieler abwechselnd. \n "
-          + "Im folgenden sehen Sie beide Startvariationen:";
-
-  private String placementRules =
-      "Man darf nur so setzen, dass ausgehend von dem gesetzten Stein "
-          + "in beliebiger Richtung (senkrecht, waagerecht oder diagonal)"
-          + " ein oder mehrere gegnerische Steine anschließen und danach"
-          + " wieder ein eigener Stein liegt. Es muss also mindestens ein"
-          + " gegnerischer Stein von dem gesetzten Stein und einem anderen"
-          + " eigenen Stein in gerader Linie eingeschlossen werden. Dabei"
-          + " müssen alle Felder zwischen den beiden eigenen Steinen von"
-          + " gegnerischen Steinen besetzt sein. Im folgenden Bild ist Spieler"
-          + " 'schwarz' am Zug und die grünen Punkte markieren die Zellen auf"
-          + " die er seinen Stein platzieren darf:";
-
-  private String possibleMovesExample =
-      "Alle gegnerischen Steine, die so eingeschlossen"
-          + " werden, wechseln die Farbe, indem sie umgedreht werden."
-          + "Dies geschieht als Teil desselben Zuges, bevor der Gegne"
-          + "r zum Zug kommt. Ein Zug kann mehrere Reihen gegnerischer"
-          + " Steine gleichzeitig einschließen, die dann alle umgedreht"
-          + " werden. Wenn aber ein gerade umgedrehter Stein weitere"
-          + " gegnerische Steine einschließt, werden diese nicht umgedreht."
-          + " Im folgenden Bild sieht man wie Spieler 'schwarz' aus dem"
-          + " obigen Bild seinen Zug getätigt hat, in dem er seinen schwarzen"
-          + " Stein rechts oben platzierte:";
-
-  private String gameEndingText =
-      "Sobald ein Spieler passen muss, wenn er also keinen Stein mehr setzen"
-          + " kann, ist das Spiel beendet. Andernfalls ist das Spiel beendet,"
-          + " sobald alle Steine auf dem Spielfeld platziert sind. \n"
-          + "Der Spieler, der am Ende die meisten Steine seiner Farbe auf dem"
-          + " Brett hat, gewinnt. Haben beide die gleiche Zahl, ist das Spiel"
-          + " unentschieden.";
-
-  /** Constructor of this class initialises the pane. */
-  public SpecificRulesPane(/*ResourceBundle messages*/) {
+  /**
+   * Constructor of this class initialises the pane.
+   *
+   * @param messages the ResourceBundle for the externalised strings
+   */
+  public SpecificRulesPane(ResourceBundle messages) {
     super(50);
-    // this.messages = messages;
+    this.messages = messages;
 
     setAlignment(Pos.TOP_CENTER);
+    getChildren().add(getGeneralRules());
     getChildren().add(getGameFieldInformation());
     getChildren().add(getFirstMovesInformation());
     getChildren().add(getGameStartInformation());
@@ -78,16 +45,29 @@ public class SpecificRulesPane extends VBox {
     getChildren().add(getGameEndingInformation());
   }
 
+  private VBox getGeneralRules() {
+    VBox vbox = new VBox(10);
+    vbox.setAlignment(Pos.CENTER);
+
+    Label heading = new Label(messages.getString("aboutWindow_Rules_General_Heading"));
+    heading.setId("heading");
+    vbox.getChildren().add(heading);
+
+    vbox.getChildren().add(getTextFlow(getText(messages.getString("aboutWindow_Rules_General"))));
+
+    return vbox;
+  }
+
   private VBox getGameFieldInformation() {
     VBox vbox = new VBox(10);
     vbox.setAlignment(Pos.CENTER);
 
-    Label heading = new Label("Spielfeld");
+    Label heading = new Label(messages.getString("aboutWindow_Rules_GameField"));
     heading.setId("heading");
     vbox.getChildren().add(heading);
 
     vbox.getChildren()
-        .add(getTextFlow(getText("Es wird auf einem Brett mit 8×8 Feldern gespielt.")));
+        .add(getTextFlow(getText(messages.getString("aboutWindow_Rules_GameField_Text"))));
 
     Image gameField =
         new Image(getClass().getClassLoader().getResourceAsStream("images/gameField.png"));
@@ -104,17 +84,12 @@ public class SpecificRulesPane extends VBox {
     VBox vbox = new VBox(10);
     vbox.setAlignment(Pos.CENTER);
 
-    Label heading = new Label("Steinanzahl");
+    Label heading = new Label(messages.getString("aboutWindow_Rules_DiskNumber"));
     heading.setId("heading");
     vbox.getChildren().add(heading);
 
     vbox.getChildren()
-        .add(
-            getTextFlow(
-                getText(
-                    "Jeder Spieler hat am Anfang einen Vorrat von 32 Steinen. "
-                        + "Dies wird während dem Spiel auf der linken Seite wie"
-                        + " folgt angezeigt:")));
+        .add(getTextFlow(getText(messages.getString("aboutWindow_Rules_DiskNumber_Text"))));
 
     Image diskIndicator =
         new Image(getClass().getClassLoader().getResourceAsStream("images/DiskIndicator.png"));
@@ -130,11 +105,11 @@ public class SpecificRulesPane extends VBox {
     VBox vbox = new VBox(10);
     vbox.setAlignment(Pos.CENTER);
 
-    Label heading = new Label("Spielbeginn");
+    Label heading = new Label(messages.getString("aboutWindow_Rules_GameStart"));
     heading.setId("heading");
     vbox.getChildren().add(heading);
 
-    vbox.getChildren().add(getTextFlow(getText(gameStart)));
+    vbox.getChildren().add(getTextFlow(getText(messages.getString("aboutWindow_Rules_GameStart"))));
 
     HBox hbox = new HBox(20);
     hbox.setAlignment(Pos.CENTER);
@@ -161,11 +136,12 @@ public class SpecificRulesPane extends VBox {
     VBox vbox = new VBox(10);
     vbox.setAlignment(Pos.CENTER);
 
-    Label heading = new Label("Platzierungsregeln");
+    Label heading = new Label(messages.getString("aboutWindow_Rules_PossibleMoves"));
     heading.setId("heading");
     vbox.getChildren().add(heading);
 
-    vbox.getChildren().add(getTextFlow(getText(placementRules)));
+    vbox.getChildren()
+        .add(getTextFlow(getText(messages.getString("aboutWindow_Rules_PossibleMoves_Text"))));
 
     Image possibleMoves =
         new Image(getClass().getClassLoader().getResourceAsStream("images/possibleMoves.png"));
@@ -174,7 +150,8 @@ public class SpecificRulesPane extends VBox {
     imageView.setFitHeight(IMAGE_HEIGHT);
     vbox.getChildren().add(imageView);
 
-    vbox.getChildren().add(getTextFlow(getText(possibleMovesExample)));
+    vbox.getChildren()
+        .add(getTextFlow(getText(messages.getString("aboutWindow_Rules_PossibleMoves_Example"))));
 
     Image moveDone =
         new Image(getClass().getClassLoader().getResourceAsStream("images/moveDone.png"));
@@ -190,11 +167,12 @@ public class SpecificRulesPane extends VBox {
     VBox vbox = new VBox(10);
     vbox.setAlignment(Pos.CENTER);
 
-    Label heading = new Label("Spielende");
+    Label heading = new Label(messages.getString("aboutWindow_Rules_GameEnding"));
     heading.setId("heading");
     vbox.getChildren().add(heading);
 
-    vbox.getChildren().add(getTextFlow(getText(gameEndingText)));
+    vbox.getChildren()
+        .add(getTextFlow(getText(messages.getString("aboutWindow_Rules_GameEnding_Text"))));
 
     return vbox;
   }
@@ -210,7 +188,7 @@ public class SpecificRulesPane extends VBox {
 
   private Text getText(String input) {
     Text text = new Text(input);
-    text.setFont(Font.font("Calibri", FontWeight.NORMAL, 18));
+    text.setFont(textFont);
     text.setFill(Color.WHITE);
 
     return text;

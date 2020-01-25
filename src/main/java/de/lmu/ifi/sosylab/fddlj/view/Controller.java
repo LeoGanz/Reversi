@@ -2,6 +2,7 @@ package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Cell;
 import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.Model;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import javafx.stage.Stage;
 
@@ -50,4 +51,7 @@ public interface Controller {
 
   /** Starts a server instance for multiplayer games. */
   void startServer();
+
+  /** Continue the current game against the Ai. */
+  void continueAgainstAi(Model model);
 }

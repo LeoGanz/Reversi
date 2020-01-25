@@ -6,14 +6,18 @@ import java.util.ResourceBundle;
 import java.util.stream.Stream;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -64,17 +68,23 @@ public class AboutWindow extends Stage {
   }
 
   private Tab getLicenseTab() {
-    TextArea textArea = new TextArea();
-    textArea.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3);
-    textArea.setWrapText(true);
-    textArea.setFont(Font.font(16));
-    textArea.setText(readFile("files/NOTICE.md"));
+
+    Text text = new Text(readFile("files/NOTICE.md"));
+    text.setFont(Font.font("Calibri", FontWeight.NORMAL, 18));
+    text.setFill(Color.WHITE);
+
+    TextFlow textFlow = new TextFlow();
+    textFlow.getChildren().add(text);
+    textFlow.setLineSpacing(4);
+    textFlow.setTextAlignment(TextAlignment.CENTER);
 
     ScrollPane scrollPane = new ScrollPane();
-    scrollPane.setContent(textArea);
+    scrollPane.setContent(textFlow);
     scrollPane.setFitToWidth(true);
     scrollPane.setFitToHeight(true);
     scrollPane.setPrefWidth(600);
+    scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+    scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
 
     Tab tab = new Tab(messages.getString("aboutWindow_Tab_Licenses_Title"), scrollPane);
     tab.setClosable(false);
@@ -86,14 +96,15 @@ public class AboutWindow extends Stage {
 
     VBox vbox = new VBox(15);
     vbox.setAlignment(Pos.CENTER);
-    vbox.getChildren().add(getGeneralRules());
-    vbox.getChildren().add(new SpecificRulesPane());
+    vbox.getChildren().add(new SpecificRulesPane(messages));
 
     ScrollPane scrollPane = new ScrollPane();
     scrollPane.setContent(vbox);
     scrollPane.setFitToWidth(true);
     scrollPane.setFitToHeight(true);
     scrollPane.setPrefWidth(600);
+    scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+    scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
 
     Tab tab = new Tab(messages.getString("aboutWindow_Tab_Rules_Title"), scrollPane);
     tab.setClosable(false);
@@ -112,23 +123,5 @@ public class AboutWindow extends Stage {
     stream.forEach(s -> contentBuilder.append(s).append("\n"));
 
     return contentBuilder.toString();
-  }
-
-  private VBox getGeneralRules() {
-    VBox vbox = new VBox(10);
-    vbox.setAlignment(Pos.CENTER);
-
-    Label heading = new Label(messages.getString("aboutWindow_Rules_General_Heading"));
-    heading.setId("heading");
-    vbox.getChildren().add(heading);
-
-    TextArea textArea = new TextArea();
-    textArea.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth() / 3);
-    textArea.setWrapText(true);
-    textArea.setFont(Font.font("Calibri", 16));
-    textArea.setText(messages.getString("aboutWindow_Rules_General"));
-    vbox.getChildren().add(textArea);
-
-    return vbox;
   }
 }

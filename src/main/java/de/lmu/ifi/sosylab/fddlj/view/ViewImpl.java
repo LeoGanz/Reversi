@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -95,7 +96,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     playSound = true;
     volume = 0.6f;
 
-    this.stage.setTitle("Reversi");
+    this.stage.setTitle(messages.getString("Game_Title"));
     this.stage.setMaximized(true);
     this.stage.setMinWidth(2 * Screen.getPrimary().getVisualBounds().getWidth() / 5.0);
     this.stage.setMinHeight(2 * Screen.getPrimary().getVisualBounds().getHeight() / 3);
@@ -198,6 +199,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
               model.getState().getPlayerManagement().getPlayerOne(),
               model.getState().getPlayerManagement().getPlayerTwo(),
               model.getState().getField().getSize());
+          if (gameMode == GameMode.MULTIPLAYER) {
+            gameBoard.setDisable(true);
+            showAlert(
+                AlertType.INFORMATION,
+                messages.getString("ViewImpl_ResetRequest_Title"),
+                messages.getString("ViewImpl_ResetRequest_Subtitle"),
+                messages.getString("ViewImpl_ResetRequest_Info"));
+          }
         });
 
     Region spacer = new Region();
@@ -209,12 +218,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     Region bottomSpacer = new Region();
     VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
 
-    vbox.getChildren()
-        .addAll(bottomSpacer, new Separator(Orientation.HORIZONTAL), getHelpButton(), reset);
+    vbox.getChildren().addAll(bottomSpacer, new Separator(Orientation.HORIZONTAL), getHelpButton());
+    if (gameMode != GameMode.SPECTATOR) {
+      vbox.getChildren().addAll(reset);
+    }
     vbox.setMinWidth(
         (diskCounter.getMinWidth() + vbox.getPadding().getLeft() + vbox.getPadding().getRight()));
     vbox.setMinHeight(
-        vbox.getSpacing() * 7
+        vbox.getSpacing() * (vbox.getChildren().size() - 1)
             + currentPlayer.getMinHeight()
             + reset.getPrefHeight()
             + diskCounter.getMinHeight()
@@ -228,14 +239,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   private VBox getDiskCounter() {
     VBox vbox = new VBox(30);
     vbox.setAlignment(Pos.TOP_CENTER);
-    vbox.setStyle("-fx-background-color: #6e7175;");
+    vbox.getStyleClass().add("transparent");
     vbox.setMaxWidth(Double.POSITIVE_INFINITY);
 
     if (model instanceof ModelImpl) {
 
       HBox playerOneInfo = new HBox(10);
       playerOneInfo.setAlignment(Pos.CENTER);
-      playerOneInfo.setStyle("-fx-background-color: #6e7175;");
+      playerOneInfo.getStyleClass().add("transparent");
       playerOneInfo.setMaxWidth(Double.POSITIVE_INFINITY);
 
       ModelImpl mod = (ModelImpl) model;
@@ -246,20 +257,20 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       playerOneInfo.getChildren().add(diskTriangle);
       numberPlayerOneDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerOne()));
       numberPlayerOneDisks.setFont(labelFont);
-      numberPlayerOneDisks.setStyle("-fx-text-fill: white;");
+      numberPlayerOneDisks.getStyleClass().add("white-label");
       playerOneInfo.getChildren().add(numberPlayerOneDisks);
       vbox.getChildren().add(playerOneInfo);
 
       HBox playerTwoInfo = new HBox(10);
       playerTwoInfo.setAlignment(Pos.CENTER);
-      playerTwoInfo.setStyle("-fx-background-color: #6e7175;");
+      playerTwoInfo.getStyleClass().add("transparent");
 
       playerTwoInfo
           .getChildren()
           .add(buildDiskTriangle(model.getState().getPlayerManagement().getPlayerTwo().getColor()));
       numberPlayerTwoDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
       numberPlayerTwoDisks.setFont(labelFont);
-      numberPlayerTwoDisks.setStyle("-fx-text-fill: white;");
+      numberPlayerTwoDisks.getStyleClass().add("white-label");
       playerTwoInfo.getChildren().add(numberPlayerTwoDisks);
 
       vbox.getChildren().add(playerTwoInfo);
@@ -311,8 +322,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     imageView.setFitHeight(30);
     Button button = new Button("", imageView);
     button.setCursor(Cursor.HAND);
-    button.setStyle(
-        "-fx-background-color: white; -fx-border-color: transparent; -fx-background-radius: 50");
+    button.setId("mute-button");
     button.setPrefSize(50, 50);
     button.setOnAction(
         e -> {
@@ -341,7 +351,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
     vbox.getChildren().add(button);
 
-    Button back = getButton("ViewImpl_ButtonBack_Text");
+    Button back = getButton(messages.getString("ViewImpl_ButtonBack_Text"));
     back.setOnAction(e -> returnToMainMenu());
     vbox.getChildren().add(back);
 
@@ -444,7 +454,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
         }
 
         this.model = (Model) event.getNewValue();
-
         support.firePropertyChange(event);
       }
     }
@@ -478,7 +487,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     GridPane grid = new GridPane();
     VBox vbox = new VBox(3);
 
-    vbox.setStyle("-fx-background-color: transparent;");
+    vbox.getStyleClass().add("transparent");
     grid.setGridLinesVisible(false);
     vbox.setAlignment(Pos.CENTER);
 
@@ -535,13 +544,10 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     if (controller instanceof ControllerImpl) {
       ((ControllerImpl) controller).showGameModeSelector(new Stage());
     } else {
-      showAlert(
-          AlertType.ERROR,
-          messages.getString("ViewImpl_ReturnError_Title"),
-          messages.getString("ViewImpl_ReturnError_Subtitle"),
-          messages.getString("ViewImpl_ReturnError_Info"));
+      controller = new ControllerImpl();
+      ((ControllerImpl) controller).showGameModeSelector(new Stage());
 
-      Platform.exit();
+      stage.close();
     }
   }
 
@@ -573,12 +579,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       case PARTNER_ACCEPTED_RESTART:
         break;
       case PARTNER_REQUESTED_RESTART:
+        handleRestartRequest();
         break;
       case PLAYER_ONE_LEFT:
-        break;
       case PLAYER_TWO_LEFT:
+        handleOnePlayerLeft();
         break;
       case LOBBY_CLOSED:
+        handleLobbyClosed();
         break;
       default:
         break;
@@ -586,21 +594,130 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   }
 
   private void handleServerShuttingDown() {
-    ButtonType backToMainMenu = new ButtonType("");
-    ButtonType continueAgainstAi = new ButtonType("");
-    ButtonType exit = new ButtonType("");
+    ButtonType backToMainMenu = new ButtonType(messages.getString("ViewImpl_ButtonBack_Text"));
+    ButtonType continueAgainstAi =
+        new ButtonType(messages.getString("ViewImpl_ButtonContinueAgainstAI_Text"));
+    ButtonType exit = new ButtonType(messages.getString("ViewImpl_ButtonExit_Text"));
 
     ArrayList<ButtonType> buttonTypes = new ArrayList<>();
     buttonTypes.add(backToMainMenu);
     buttonTypes.add(continueAgainstAi);
     buttonTypes.add(exit);
 
-    showOptionDialog(
-        AlertType.INFORMATION,
-        messages.getString("ViewImpl_ServerShutdown_Title"),
-        messages.getString("ViewImpl_ServerShutdown_Subtitle"),
-        messages.getString("ViewImpl_ServerShutdown_Info"),
-        buttonTypes);
+    Alert alert =
+        showOptionDialog(
+            AlertType.INFORMATION,
+            messages.getString("ViewImpl_ServerShutdown_Title"),
+            messages.getString("ViewImpl_ServerShutdown_Subtitle"),
+            messages.getString("ViewImpl_ServerShutdown_Info"),
+            buttonTypes);
+
+    Optional<ButtonType> optional = alert.showAndWait();
+    if (optional.get().equals(backToMainMenu)) {
+      returnToMainMenu();
+    } else if (optional.get().equals(continueAgainstAi)) {
+      controller.continueAgainstAi(model);
+    } else if (optional.get().equals(exit)) {
+      Platform.exit();
+    } else {
+      returnToMainMenu();
+    }
+  }
+
+  private void handleRestartRequest() {
+    ButtonType accept = new ButtonType(messages.getString("ViewImpl_ResetRequest_Accept"));
+    ButtonType deny = new ButtonType(messages.getString("ViewImpl_ResetRequest_Deny"));
+
+    ArrayList<ButtonType> buttonTypes = new ArrayList<>();
+    buttonTypes.add(accept);
+    buttonTypes.add(deny);
+
+    Alert alert =
+        showOptionDialog(
+            AlertType.INFORMATION,
+            messages.getString("ViewImpl_ResetRequest_Title"),
+            messages.getString("ViewImpl_ResetRequest_Subtitle"),
+            messages.getString("ViewImpl_ResetRequest_Info"),
+            buttonTypes);
+
+    Optional<ButtonType> optional = alert.showAndWait();
+    if (optional.get().equals(accept)) {
+      if (controller instanceof MultiplayerController) {
+        ((MultiplayerController) controller).requestGameReset();
+      }
+    } else if (optional.get().equals(deny)) {
+      // TODO deny reset
+      return;
+    } else {
+      root.setDisable(false);
+    }
+  }
+
+  private void handleLobbyClosed() {
+    ButtonType backToMainMenu = new ButtonType(messages.getString("ViewImpl_ButtonBack_Text"));
+    ButtonType continueAgainstAi =
+        new ButtonType(messages.getString("ViewImpl_ButtonContinueAgainstAI_Text"));
+    ButtonType exit = new ButtonType(messages.getString("ViewImpl_ButtonExit_Text"));
+
+    ArrayList<ButtonType> buttonTypes = new ArrayList<>();
+    buttonTypes.add(backToMainMenu);
+    buttonTypes.add(continueAgainstAi);
+    buttonTypes.add(exit);
+
+    Alert alert =
+        showOptionDialog(
+            AlertType.INFORMATION,
+            messages.getString("ViewImpl_ServerShutdown_Title"),
+            messages.getString("ViewImpl_ServerShutdown_Subtitle"),
+            messages.getString("ViewImpl_ServerShutdown_Info"),
+            buttonTypes);
+
+    Optional<ButtonType> optional = alert.showAndWait();
+    if (optional.get().equals(backToMainMenu)) {
+      returnToMainMenu();
+    } else if (optional.get().equals(continueAgainstAi)) {
+      controller.continueAgainstAi(model);
+    } else if (optional.get().equals(exit)) {
+      Platform.exit();
+    } else {
+      returnToMainMenu();
+    }
+  }
+
+  private void handleOnePlayerLeft() {
+    ButtonType backToMainMenu = new ButtonType(messages.getString("ViewImpl_ButtonBack_Text"));
+    ButtonType continueAgainstAi =
+        new ButtonType(messages.getString("ViewImpl_ButtonContinueAgainstAI_Text"));
+    ButtonType exit = new ButtonType(messages.getString("ViewImpl_ButtonExit_Text"));
+    ButtonType remainAndWait =
+        new ButtonType(messages.getString("ViewImpl_OpponentDisconnected_Remain"));
+
+    ArrayList<ButtonType> buttonTypes = new ArrayList<>();
+    buttonTypes.add(backToMainMenu);
+    buttonTypes.add(continueAgainstAi);
+    buttonTypes.add(remainAndWait);
+    buttonTypes.add(exit);
+
+    Alert alert =
+        showOptionDialog(
+            AlertType.INFORMATION,
+            messages.getString("ViewImpl_OpponentDisconnected_Title"),
+            messages.getString("ViewImpl_OpponentDisconnected_Subtitle"),
+            messages.getString("ViewImpl_OpponentDisconnected_Info"),
+            buttonTypes);
+
+    Optional<ButtonType> optional = alert.showAndWait();
+    if (optional.get().equals(backToMainMenu)) {
+      returnToMainMenu();
+    } else if (optional.get().equals(continueAgainstAi)) {
+      controller.continueAgainstAi(model);
+    } else if (optional.get().equals(exit)) {
+      Platform.exit();
+    } else if (optional.get().equals(remainAndWait)) {
+      return;
+    } else {
+      returnToMainMenu();
+    }
   }
 
   @Override
@@ -640,6 +757,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     lobbyID = new Label(messages.getString("ViewImpl_LabelLobbyID"));
     lobbyID.setStyle("-fx-text-fill: white");
     root.setBottom(lobbyID);
+    BorderPane.setAlignment(lobbyID, Pos.CENTER);
 
     scene = new Scene(root);
     stage.setScene(scene);
@@ -653,7 +771,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     alert.setTitle(title);
     alert.setHeaderText(header);
     alert.setContentText(content);
-
+    alert.initOwner(stage);
     alert.showAndWait();
   }
 
@@ -668,7 +786,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     alert.setTitle(title);
     alert.setHeaderText(header);
     alert.setContentText(content);
-
+    alert.initOwner(stage);
     alert.getButtonTypes().setAll(buttonTypes);
 
     return alert;

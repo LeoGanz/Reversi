@@ -62,7 +62,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     view.addListener(this);
     this.messages = messages;
 
-    setStyle("-fx-background-color: transparent;");
+    getStyleClass().add("transparent");
     initToggleSwitch();
     initGameBoard(stage, view);
     setMinWidth(model.getState().getField().getSize() * GraphicCell.MIN_WIDTH);
@@ -115,7 +115,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
 
   private Label getLabel(String text) {
     Label label = new Label(text);
-    label.setStyle("-fx-text-fill: white; -fx-font-size: 18;");
+    label.setId("gameBoardGrid-label");
     return label;
   }
 
