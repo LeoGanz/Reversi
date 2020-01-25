@@ -620,4 +620,34 @@ public class ModelImplTest {
           Assertions.assertEquals(Phase.FINISHED, game.getState().getCurrentPhase());
         });
   }
+
+  @Test
+  public void createModelCopy_WithAi() {
+    AiPlayer ai = new AiPlayerImpl();
+    Model game = new ModelImpl(GameStateUtility.earlyGame_PlayerOnesTurn(playerOne, ai),
+        GameMode.SINGLEPLAYER);
+    game.placeDisk(new DiskImpl(playerOne), new CellImpl(3,1));
+    Assertions.assertEquals(playerOne, game.getState().getPlayerManagement().getCurrentPlayer());
+  }
+  
+  @Test
+  public void testPlaceDiskDraw() {
+    ModifiableGameField field = new GameFieldImpl(6);
+    field.set(new CellImpl(1, 1), new DiskImpl(playerTwo));
+    field.set(new CellImpl(1, 2), new DiskImpl(playerTwo));
+    field.set(new CellImpl(1, 3), new DiskImpl(playerTwo));
+    field.set(new CellImpl(3, 1), new DiskImpl(playerOne));
+    field.set(new CellImpl(3, 2), new DiskImpl(playerTwo));
+    
+    ModifiableGameState state = new GameStateImpl();
+    state.setCurrentPhase(Phase.RUNNING);
+    state.setGameField(field);
+    state.setPlayerManagement(new PlayerManagementImpl(playerOne, playerTwo));
+    
+    Model game = new ModelImpl(state, GameMode.HOTSEAT);
+    game.placeDisk(new DiskImpl(playerOne), new CellImpl(3, 3));
+    
+    Assertions.assertEquals(game.getState().getCurrentPhase(), Phase.FINISHED);
+    Assertions.assertFalse(game.getState().getPlayerManagement().getWinner().isPresent());
+  }
 }
