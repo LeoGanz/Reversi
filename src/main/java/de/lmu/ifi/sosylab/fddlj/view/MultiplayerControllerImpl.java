@@ -91,7 +91,11 @@ public class MultiplayerControllerImpl implements MultiplayerController {
 
   @Override
   public void placeDisk(Cell on) {
-    client.placeDisk(new DiskImpl(ownPlayer), on);
+    if (gameMode == GameMode.MULTIPLAYER) {
+      client.placeDisk(new DiskImpl(ownPlayer), on);
+    } else {
+      model.placeDisk(new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer()), on);
+    }
   }
 
   @Override
@@ -212,7 +216,11 @@ public class MultiplayerControllerImpl implements MultiplayerController {
       aiPlayer = new AiPlayerImpl();
     }
     this.model.substitutePlayersWith(ownPlayer, aiPlayer);
+    this.model.unsetWaiting();
     this.model.addListener(view);
+    if (view instanceof ClientCompatibleGui) {
+      ((ClientCompatibleGui) view).modelExchanged(this.model);
+    }
   }
 
   @Override
