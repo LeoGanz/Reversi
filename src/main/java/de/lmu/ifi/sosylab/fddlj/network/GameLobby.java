@@ -123,6 +123,7 @@ public class GameLobby {
     lastPlacementID = null;
     masterGame.substitutePlayersWith(playerOne, playerTwo);
     masterGame.unsetWaiting();
+    resetRestartRequests();
     broadcast(getGameStateWithLastPlacementUuid());
   }
 
@@ -154,12 +155,12 @@ public class GameLobby {
       leavingConn.setLobby(null);
     }
 
-    if (connOne.getConnectionID() == connectionID) {
+    if ((connOne != null) && (connOne.getConnectionID() == connectionID)) {
       connOne = null;
       if (server.isRunning()) { // reduce spam on server shutdown
         broadcast(ServerNotification.PLAYER_ONE_LEFT);
       }
-    } else if (connTwo.getConnectionID() == connectionID) {
+    } else if ((connTwo != null) && (connTwo.getConnectionID() == connectionID)) {
       connTwo = null;
       if (server.isRunning()) { // reduce spam on server shutdown
         broadcast(ServerNotification.PLAYER_TWO_LEFT);
@@ -200,12 +201,16 @@ public class GameLobby {
    * @param connectionID integer to reference the connection making the request
    */
   public synchronized void requestRestart(int connectionID) {
-    if (connOne.getConnectionID() == connectionID) {
+    if ((connOne != null) && (connOne.getConnectionID() == connectionID)) {
       restartRequestOne = true;
-      connTwo.sendMessageWith(ServerNotification.PARTNER_REQUESTED_RESTART);
-    } else if (connTwo.getConnectionID() == connectionID) {
+      if (connTwo != null) {
+        connTwo.sendMessageWith(ServerNotification.PARTNER_REQUESTED_RESTART);
+      }
+    } else if ((connTwo != null) && (connTwo.getConnectionID() == connectionID)) {
       restartRequestTwo = true;
-      connOne.sendMessageWith(ServerNotification.PARTNER_REQUESTED_RESTART);
+      if (connOne != null) {
+        connOne.sendMessageWith(ServerNotification.PARTNER_REQUESTED_RESTART);
+      }
     }
   }
 
@@ -216,11 +221,13 @@ public class GameLobby {
    * @param connectionID integer to reference the connection accepting the request
    */
   public synchronized void acceptRestart(int connectionID) {
-    if ((connOne.getConnectionID() == connectionID) && restartRequestTwo) {
+    if ((connOne != null) && (connOne.getConnectionID() == connectionID) && restartRequestTwo) {
       connTwo.sendMessageWith(ServerNotification.PARTNER_ACCEPTED_RESTART);
       restartRequestOne = true; // needed for not firing "partner denied" when resetting
       restartGame();
-    } else if ((connTwo.getConnectionID() == connectionID) && restartRequestOne) {
+    } else if ((connTwo != null)
+        && (connTwo.getConnectionID() == connectionID)
+        && restartRequestOne) {
       connOne.sendMessageWith(ServerNotification.PARTNER_ACCEPTED_RESTART);
       restartRequestTwo = true; // needed for not firing "partner denied" when resetting
       restartGame();
@@ -234,8 +241,9 @@ public class GameLobby {
    * @param connectionID integer to reference the connection denying the request
    */
   public synchronized void denyRestart(int connectionID) {
-    if (((connOne.getConnectionID() == connectionID) && restartRequestTwo)
-        || ((connTwo.getConnectionID() == connectionID) && restartRequestOne)) {
+    if ((((connOne != null) && (connOne.getConnectionID() == connectionID)) && restartRequestTwo)
+        || (((connTwo != null) && (connTwo.getConnectionID() == connectionID))
+            && restartRequestOne)) {
       resetRestartRequests();
     }
   }
