@@ -85,7 +85,7 @@ public class ServerGui implements ServerListener {
     scrollPane.setPrefWidth(600);
     scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
     scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
-    root.setCenter(scrollPane);
+    root.setCenter(lobbyList);
     BorderPane.setMargin(scrollPane, new Insets(0, 0, 0, 20));
 
     Scene scene = new Scene(root);
@@ -101,6 +101,7 @@ public class ServerGui implements ServerListener {
   private void buildLobbies(Map<Integer, LobbyRepresentation> lobbies) {
 
     lobbyList.getChildren().clear();
+    this.lobbies.clear();
 
     for (Entry<Integer, LobbyRepresentation> id : lobbies.entrySet()) {
       LobbyRepresentation lobby = lobbies.get(id.getKey());
@@ -134,6 +135,7 @@ public class ServerGui implements ServerListener {
     Platform.runLater(
         () -> {
           if (lobbies.get(lobbyID) != null) {
+            System.out.println("Updating lobby");
             lobbies.get(lobbyID).updateLobby(lobbyRepresentation);
           }
         });
