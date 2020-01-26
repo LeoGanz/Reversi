@@ -550,6 +550,13 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
           messages.getString("ViewImpl_JoinError_NoPlayerNeeded_Subtitle"),
           messages.getString("ViewImpl_JoinError_NoPlayerNeeded_Info"));
       returnToMainMenu();
+    } else if (response.getType() == ResponseType.NO_LOBBY_AVAILABLE) {
+      showAlert(
+          AlertType.ERROR,
+          messages.getString("ViewImpl_NoLobbyAvailable_Title"),
+          messages.getString("ViewImpl_NoLobbyAvailable_Subtitle"),
+          messages.getString("ViewImpl_NoLobbyAvailable_Info"));
+      returnToMainMenu();
     }
   }
 
