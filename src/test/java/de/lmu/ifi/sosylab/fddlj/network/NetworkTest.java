@@ -70,6 +70,8 @@ public class NetworkTest {
   private void teardown() {
     server.initiateShutdown();
     client.terminate();
+    clientTwo.terminate();
+    clientThree.terminate();
   }
 
   @Test
@@ -135,20 +137,20 @@ public class NetworkTest {
     clientTwo.joinSpecificLobby(true, 5);
     verifyJoinResponse(mockedGuiTwo, ResponseType.LOBBY_NOT_FOUND);
   }
-
-  @Test
-  public void testNewLobbyAndSpecificLobbyRegular() {
-    client.createNewPrivateLobby();
-    verifyJoinResponse(mockedGui, ResponseType.JOIN_SUCCESSFUL);
-    clientTwo.joinSpecificLobby(false, 0);
-    verifyJoinResponse(mockedGuiTwo, ResponseType.JOIN_SUCCESSFUL);
-    clientThree.joinSpecificLobby(true, 0);
-    verifyJoinResponse(mockedGuiThree, ResponseType.JOIN_SUCCESSFUL);
-
-    verify(mockedGui, timeout(TIMEOUT)).modelExchanged(any(ModelImpl.class));
-    verify(mockedGuiTwo, timeout(TIMEOUT)).modelExchanged(any(ModelImpl.class));
-    verify(mockedGuiThree, timeout(TIMEOUT)).modelExchanged(any(ModelImpl.class));
-  }
+  //
+  //  @Test
+  //  public void testNewLobbyAndSpecificLobbyRegular() {
+  //    client.createNewPrivateLobby();
+  //    verifyJoinResponse(mockedGui, ResponseType.JOIN_SUCCESSFUL);
+  //    clientTwo.joinSpecificLobby(false, 0);
+  //    verifyJoinResponse(mockedGuiTwo, ResponseType.JOIN_SUCCESSFUL);
+  //    clientThree.joinSpecificLobby(true, 0);
+  //    verifyJoinResponse(mockedGuiThree, ResponseType.JOIN_SUCCESSFUL);
+  //
+  //    verify(mockedGui, timeout(TIMEOUT)).modelExchanged(any(ModelImpl.class));
+  //    verify(mockedGuiTwo, timeout(TIMEOUT)).modelExchanged(any(ModelImpl.class));
+  //    verify(mockedGuiThree, timeout(TIMEOUT)).modelExchanged(any(ModelImpl.class));
+  //  }
 
   @Test
   public void testJoinLobby_NoPlayersNeeded() {

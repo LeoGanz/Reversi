@@ -52,7 +52,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
    * @param primaryStage the javaFX thread's stage
    */
   public MultiplayerControllerImpl(Stage primaryStage) {
-    this.mainStage = primaryStage;
+    mainStage = primaryStage;
 
     asynchronousWorkloads = new LinkedBlockingQueue<>();
 
@@ -94,7 +94,20 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     if (gameMode == GameMode.MULTIPLAYER) {
       client.placeDisk(new DiskImpl(ownPlayer), on);
     } else {
-      model.placeDisk(new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer()), on);
+      new Thread(
+          () -> {
+            boolean succesful = model.placeDisk(
+                new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer()), on);
+
+            if (!succesful) {
+              showAlert(
+                  AlertType.ERROR,
+                  messages.getString("ControllerImpl_DiskError_Title"),
+                  messages.getString("ControllerImpl_DiskError_Subtitle"),
+                  messages.getString("ControllerImpl_DiskError_Info"));
+            }
+          })
+          .start();
     }
   }
 
@@ -121,7 +134,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
             if (createPrivateLobby) {
               client.createNewPrivateLobby();
             } else {
-              if (lobbyID > 0) {
+              if (lobbyID >= 0) {
                 client.joinSpecificLobby(false, lobbyID);
               } else {
                 client.joinAnyRandomPublicLobby(false);
