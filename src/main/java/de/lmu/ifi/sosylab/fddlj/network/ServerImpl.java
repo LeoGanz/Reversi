@@ -248,7 +248,9 @@ public class ServerImpl implements Server {
   public void lobbyUpdated(int lobbyID) {
     GameLobby gameLobby = lobbies.get(lobbyID);
     if (gameLobby != null) {
-      lobbyRepresentations.put(lobbyID, gameLobby.getRepresentation());
+      LobbyRepresentation lobbyRepresentation = gameLobby.getRepresentation();
+      lobbyRepresentations.put(lobbyID, lobbyRepresentation);
+      notifyListenersOfLobbyUpdate(lobbyID, lobbyRepresentation);
     }
   }
 
