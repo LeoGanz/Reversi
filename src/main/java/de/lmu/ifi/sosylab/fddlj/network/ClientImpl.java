@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -211,7 +212,7 @@ public class ClientImpl implements Client {
   }
 
   private void processDiskPlacement(DiskPlacement diskPlacement) {
-    if (lastDiskPlacement != diskPlacement.getPrevious()) {
+    if (!Objects.equals(lastDiskPlacement, diskPlacement.getPrevious())) {
       requestGameStateWithLastPlacementUuid();
       return;
     }

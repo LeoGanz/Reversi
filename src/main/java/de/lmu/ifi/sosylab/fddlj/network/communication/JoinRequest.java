@@ -59,7 +59,7 @@ public class JoinRequest {
    * @return the request that can be sent to the {@link Server}
    */
   public static JoinRequest generateJoinNewPrivateLobbyRequest(Player player) {
-    return new JoinRequest(player, JoinType.SPECIFIC_LOBBY, false, -1);
+    return new JoinRequest(player, JoinType.NEW_PRIVATE_LOBBY, false, -1);
   }
 
   /**
@@ -107,7 +107,7 @@ public class JoinRequest {
    */
   public enum JoinType {
     ANY_PUBLIC_LOBBY, // random match making
-    SPECIFIC_LOBBY,   // lobby by ID
+    SPECIFIC_LOBBY, // lobby by ID
     NEW_PRIVATE_LOBBY // new lobby not included in random matchmaking
   }
 
