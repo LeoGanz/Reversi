@@ -138,7 +138,9 @@ public class GameLobby {
     spectatorsPlayers.put(conn.getConnectionID(), player);
     broadcast(getSpectators());
     conn.setLobby(this);
-    conn.sendMessageWith(getGameStateWithLastPlacementUuid());
+    if (masterGame != null) {
+      conn.sendMessageWith(getGameStateWithLastPlacementUuid());
+    }
   }
 
   /**
