@@ -1,6 +1,6 @@
 # Reversi game
 
-This project contains a implementation of the Reversi game. A detailed description on playing Reversi can be found on [Wikipedia](https://en.wikipedia.org/wiki/Reversi).
+This project contains a implementation of the Reversi game. A detailed description on playing Reversi can be found on [Wikipedia](https://en.wikipedia.org/wiki/Reversi) as well as inside the game.
 
 Our features:
 - play against our AI
