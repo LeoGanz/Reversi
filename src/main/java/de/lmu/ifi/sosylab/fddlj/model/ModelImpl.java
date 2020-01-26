@@ -6,6 +6,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -16,6 +17,8 @@ import java.util.Set;
 public class ModelImpl implements Model {
 
   private final PropertyChangeSupport support;
+  private static final int AI_MOVE_OFFSET = 750;
+  private static final int AI_MAX_SLEEP_AMOUNT = 1700;
 
   private ModifiableGameState state;
   private GameMode mode;
@@ -130,6 +133,13 @@ public class ModelImpl implements Model {
       if (mode.equals(GameMode.SINGLEPLAYER)
           && (state.getPlayerManagement().getCurrentPlayer() instanceof AiPlayer)
           && state.getCurrentPhase().equals(Phase.RUNNING)) {
+        long sleepAmount =
+            new Random().nextInt(AI_MAX_SLEEP_AMOUNT - AI_MOVE_OFFSET) + AI_MOVE_OFFSET;
+        try {
+          Thread.sleep(sleepAmount);
+        } catch (InterruptedException e) {
+          // Doesn't matter
+        }
         Cell bestMove = ai.calculateBestMove(state);
         placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), bestMove);
       }
@@ -195,6 +205,21 @@ public class ModelImpl implements Model {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public void substitutePlayersWith(Player newPlayerOne, Player newPlayerTwo) {
+    Set<Cell> cellsPlayerOne =
+        state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerOne());
+    Set<Cell> cellsPlayerTwo =
+        state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerTwo());
+
+    cellsPlayerOne.stream().forEach(c -> state.getField().set(c, new DiskImpl(newPlayerOne)));
+    cellsPlayerTwo.stream().forEach(c -> state.getField().set(c, new DiskImpl(newPlayerTwo)));
+
+    state.getPlayerManagement().setPlayerOne(newPlayerOne);
+    state.getPlayerManagement().setPlayerTwo(newPlayerTwo);
+    notifyListenersOfChangedState();
   }
 
   /**
@@ -344,5 +369,23 @@ public class ModelImpl implements Model {
     } else {
       manager.setWinner(Optional.of(manager.getPlayerTwo()));
     }
+  }
+
+  /**
+   * Returns the number of disks player one still has left.
+   *
+   * @return the remaining number of disks of player one
+   */
+  public int getNumberOfDisksPlayerOne() {
+    return numberOfPlayerOneDisks;
+  }
+
+  /**
+   * Returns the number of disks player two still has left.
+   *
+   * @return the remaining number of disks of player two
+   */
+  public int getNumberOfDisksPlayerTwo() {
+    return numberOfPlayerTwoDisks;
   }
 }

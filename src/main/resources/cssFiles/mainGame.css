@@ -1,0 +1,103 @@
+#main-background{
+	-fx-background-color: #6e7175;
+}
+
+#button{
+	-fx-background-color: #46729c;
+	-fx-text-fill: #ffffff;
+}
+
+.separator .line {
+    -fx-border-color: white;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;  
+}
+
+#borderpane-spacer {
+	-fx-background-color: #576385;
+}
+
+.scroll-bar:horizontal ,
+.scroll-bar:vertical{
+    -fx-background-color:transparent;
+}
+ 
+
+.scroll-bar .increment-button ,.scroll-bar .decrement-button {
+    -fx-background-color:transparent;
+	-fx-border-color:derive(black,80%);
+}
+ 
+.scroll-bar:horizontal .track ,
+.scroll-bar:vertical .track{
+     -fx-background-color: transparent;
+	 -fx-border-color:derive(black,80%);
+	 -fx-background-radius: 0em;
+}
+ 
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color:derive(#3a3a3a,90%);
+	-fx-background-insets: 0, 0, 0;
+	-fx-background-radius: 0em;
+ 
+}
+ 
+ 
+ 
+.scroll-bar:horizontal:hover .track ,
+.scroll-bar:horizontal:pressed .track ,
+.scroll-bar:vertical:hover .track,
+.scroll-bar:vertical:pressed .track{
+     -fx-background-color: derive(#434343,20%);
+ 	 -fx-opacity: 0.2;
+	 -fx-background-radius: 0em;
+ 
+}
+ 
+.scroll-bar .thumb:hover,
+.scroll-bar .thumb:pressed{
+    -fx-background-color: derive(black,50%);
+}
+ 
+.scroll-bar .increment-button:hover ,.scroll-bar .decrement-button:hover {
+    -fx-background-color:derive(gray,100%);
+	-fx-border-color:derive(gray,80%);	
+	-fx-padding:10px;
+}
+
+#spectator-pane{
+	-fx-background-color: rgba(150,150,150,0.6);
+	-fx-padding: 10;
+}
+
+#disk-indicator-label{
+	-fx-text-fill: #ffffff;
+	-fx-font-size: x-large;
+	-fx-font-family: 'Calibri';
+	
+}
+
+.transparent{
+	-fx-backtround-color: transparent;
+}
+
+#gameBoardGrid-label{
+	-fx-text-fill: #ffffff;
+	-fx-font-size: 18;
+}
+
+.spectatorlist-label{
+	-fx-font-size: x-large;
+	-fx-text-fill: #000000;
+}
+
+.white-label {
+	-fx-text-fill: #ffffff;
+}
+
+#mute-button {
+	-fx-background-color: #ffffff;
+	-fx-border-color: transparent;
+	-fx-background-radius: 50;
+}
