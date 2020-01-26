@@ -441,6 +441,8 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     if (event.getPropertyName().equals(Model.STATE_CHANGED)) {
       support.firePropertyChange(event.getPropertyName(), event.getOldValue(), event.getNewValue());
 
+      System.out.println(model instanceof ModelImpl);
+
       if (model instanceof ModelImpl) {
         ModelImpl mod = (ModelImpl) model;
 
@@ -448,6 +450,8 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
         numberPlayerTwoDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
       }
+
+      System.out.println(model.getState().getCurrentPhase());
 
       if (model.getState().getCurrentPhase() == Phase.FINISHED) {
 
@@ -565,7 +569,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   @Override
   public void receivedRejectedPlacementReason(Reason rejectedPlacement) {
-    System.out.println(rejectedPlacement);
     Platform.runLater(
         () ->
             showAlert(
@@ -766,6 +769,8 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   @Override
   public void modelExchanged(Model model) {
+    System.out.println("Model exchanged");
+    model.addListener(this);
     this.model = model;
     Platform.runLater(
         () -> {
@@ -773,6 +778,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
             root.setDisable(false);
           }
           support.firePropertyChange(Model.LISTENERS_CHANGED, null, model);
+          support.firePropertyChange(Model.STATE_CHANGED, null, model.getState());
 
           showGame(controller.getCurrentGameMode());
         });

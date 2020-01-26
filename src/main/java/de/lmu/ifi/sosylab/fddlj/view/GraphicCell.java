@@ -329,6 +329,10 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
 
       if (controller.getCurrentGameMode() == GameMode.SINGLEPLAYER
           && model.getState().getPlayerManagement().getCurrentPlayer() instanceof AiPlayer) {
+        if (diskOnCell == null) {
+          setCenter(null);
+          setStyle(cssNormal);
+        }
         return;
       }
 
@@ -337,6 +341,10 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
           if (!((MultiplayerController) controller)
               .getOwnPlayer()
               .equals(model.getState().getPlayerManagement().getCurrentPlayer())) {
+            if (diskOnCell == null) {
+              setCenter(null);
+              setStyle(cssNormal);
+            }
             return;
           }
         }
