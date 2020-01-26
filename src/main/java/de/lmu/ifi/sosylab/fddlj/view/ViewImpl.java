@@ -899,4 +899,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
     stage.close();
   }
+
+  @Override
+  public void displayAlert(AlertType alertType, String title, String subtitle, String content) {
+    showAlert(alertType, title, subtitle, content);
+  }
 }

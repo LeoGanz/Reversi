@@ -130,8 +130,14 @@ public class MultiplayerControllerImpl implements MultiplayerController {
           });
 
     } catch (UnknownHostException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      showAlert(
+          AlertType.ERROR,
+          messages.getString("ControllerImpl_ConnectionError_Title"),
+          messages.getString("ControllerImpl_ConnectionError_Subtitle"),
+          messages.getString("ControllerImpl_ConnectionError_Info"));
+
+      Controller controller = new ControllerImpl(messages);
+      ((ControllerImpl) controller).showGameModeSelector(new Stage());
     }
 
     gameMode = GameMode.MULTIPLAYER;
@@ -169,7 +175,14 @@ public class MultiplayerControllerImpl implements MultiplayerController {
             }
           });
     } catch (UnknownHostException e) {
-      e.printStackTrace();
+      showAlert(
+          AlertType.ERROR,
+          messages.getString("ControllerImpl_ConnectionError_Title"),
+          messages.getString("ControllerImpl_ConnectionError_Subtitle"),
+          messages.getString("ControllerImpl_ConnectionError_Info"));
+
+      Controller controller = new ControllerImpl(messages);
+      ((ControllerImpl) controller).showGameModeSelector(new Stage());
     }
   }
 

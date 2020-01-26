@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.BorderPane;
@@ -36,6 +37,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
 
   private Model model;
   private Controller controller;
+  private View view;
 
   private SwitchButton switchButton;
 
@@ -59,6 +61,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
 
     this.model = model;
     this.controller = controller;
+    this.view = view;
 
     this.playSound = true;
     this.volume = 0.6f;
@@ -147,9 +150,11 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
           } catch (RuntimeException e) {
             throw e;
           } catch (Exception e) {
-            e.printStackTrace();
-            // throw new MissingResourceException(
-            // "Missing a resource", "GameBoardGrid", "placement.wav");
+            view.displayAlert(
+                AlertType.ERROR,
+                messages.getString("GameBoardGrid_SoundError_Title"),
+                messages.getString("GameBoardGrid_SoundError_Subtitle"),
+                messages.getString("GameBoardGrid_SoundError_Info"));
           }
         })
         .start();
@@ -168,11 +173,23 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
       AudioInputStream inputStream = AudioSystem.getAudioInputStream(isAudioFile);
       clip.open(inputStream);
     } catch (LineUnavailableException e) {
-      return;
+      view.displayAlert(
+          AlertType.ERROR,
+          messages.getString("GameBoardGrid_SoundInitialisationError_Title"),
+          messages.getString("GameBoardGrid_SoundInitialisationError_Subtitle"),
+          messages.getString("GameBoardGrid_SoundInitialisationError_Info"));
     } catch (UnsupportedAudioFileException e) {
-      return;
+      view.displayAlert(
+          AlertType.ERROR,
+          messages.getString("GameBoardGrid_SoundInitialisationError_Title"),
+          messages.getString("GameBoardGrid_SoundInitialisationError_Subtitle"),
+          messages.getString("GameBoardGrid_SoundInitialisationError_Info"));
     } catch (IOException e) {
-      return;
+      view.displayAlert(
+          AlertType.ERROR,
+          messages.getString("GameBoardGrid_SoundInitialisationError_Title"),
+          messages.getString("GameBoardGrid_SoundInitialisationError_Subtitle"),
+          messages.getString("GameBoardGrid_SoundInitialisationError_Info"));
     }
   }
 
