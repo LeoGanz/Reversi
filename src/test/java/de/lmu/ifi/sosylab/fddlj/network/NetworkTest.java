@@ -143,7 +143,7 @@ public class NetworkTest {
     clientTwo.joinSpecificLobby(false, 0);
     verifyJoinResponse(mockedGuiTwo, ResponseType.JOIN_SUCCESSFUL);
     clientThree.joinSpecificLobby(true, 0);
-    verifyJoinResponse(mockedGuiTwo, ResponseType.JOIN_SUCCESSFUL);
+    verifyJoinResponse(mockedGuiThree, ResponseType.JOIN_SUCCESSFUL);
 
     verify(mockedGui, timeout(TIMEOUT)).modelExchanged(any(ModelImpl.class));
     verify(mockedGuiTwo, timeout(TIMEOUT)).modelExchanged(any(ModelImpl.class));
