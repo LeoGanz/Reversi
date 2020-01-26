@@ -35,4 +35,9 @@ public class AiPlayerImpl extends PlayerImpl implements AiPlayer {
   public AiPlayerImpl() {
     this("AI", Color.BLACK);
   }
+  
+  @Override
+  public Player makeCopy() {
+    return new AiPlayerImpl(super.getName(), super.getColor());
+  }
 }
