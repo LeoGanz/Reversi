@@ -85,7 +85,9 @@ public class ServerImpl implements Server {
           }
         }
       }
-    } catch (@SuppressWarnings("unused") IOException e) {
+    } catch (
+        @SuppressWarnings("unused")
+        IOException e) {
       initiateShutdown();
     }
   }
@@ -204,14 +206,18 @@ public class ServerImpl implements Server {
     // Trigger accept(), so that the main while loop stops
     try (Socket connection = new Socket(InetAddress.getLocalHost(), PORT)) {
       assert true; // conform with checkstyle
-    } catch (@SuppressWarnings("unused") IOException e) {
+    } catch (
+        @SuppressWarnings("unused")
+        IOException e) {
       // do nothing as server is already trying to shutdown
     }
     try {
       if (serverSocket != null) {
         serverSocket.close();
       }
-    } catch (@SuppressWarnings("unused") IOException e) {
+    } catch (
+        @SuppressWarnings("unused")
+        IOException e) {
       // do nothing as server is already trying to shutdown
     }
   }
@@ -248,7 +254,9 @@ public class ServerImpl implements Server {
   public void lobbyUpdated(int lobbyID) {
     GameLobby gameLobby = lobbies.get(lobbyID);
     if (gameLobby != null) {
-      lobbyRepresentations.put(lobbyID, gameLobby.getRepresentation());
+      LobbyRepresentation lobbyRepresentation = gameLobby.getRepresentation();
+      lobbyRepresentations.put(lobbyID, lobbyRepresentation);
+      notifyListenersOfLobbyUpdate(lobbyID, lobbyRepresentation);
     }
   }
 
