@@ -64,8 +64,9 @@ public class GameLobby {
     if (!Objects.equals(requestedDiskPlacement.getPrevious(), lastPlacementID)) {
       return new RejectedPlacement(uuid, Reason.INVALID_PREVIOUS_UUID);
     }
-    if (requestedDiskPlacement.getDisk().getPlayer()
-        != masterGame.getState().getPlayerManagement().getCurrentPlayer()) {
+    if (Objects.equals(
+        requestedDiskPlacement.getDisk().getPlayer(),
+        masterGame.getState().getPlayerManagement().getCurrentPlayer())) {
       return new RejectedPlacement(uuid, Reason.NOT_YOUR_TURN);
     }
 

@@ -565,6 +565,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   @Override
   public void receivedRejectedPlacementReason(Reason rejectedPlacement) {
+    System.out.println(rejectedPlacement);
     Platform.runLater(
         () ->
             showAlert(
