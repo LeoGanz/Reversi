@@ -48,6 +48,11 @@ run all checks and create an executable jar:
 If the command succeeds, the jar is found in `build/libs/reversi-fddlj.jar`.
 This jar can be executed with `java -jar build/libs/reversi-fddlj.jar`
 
+## Running the pre-built jar
+
+If you want to run our pre-built jar you can do so by navigating to the repositorie's main directory and calling
+`java -jar releases/reversi-fddlj.jar`
+
 
 ## Running the Program
 
