@@ -4,7 +4,7 @@ The format is based on Keep a Changelog,
 and this project adheres to Semantic Versioning.
 
 [1.0.0] 2020-01-26
-###Added
+### Added
 - Network functionality
 - A graphical user interface
 
