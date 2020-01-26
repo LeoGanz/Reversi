@@ -10,7 +10,7 @@ and this project adheres to Semantic Versioning.
 
 [0.4.0] 2020-01-24
 ### Changed
--The gamefield size is now variable
+- The gamefield size is now variable
 
 [0.3.0] 2020-01-23
 ### Added
