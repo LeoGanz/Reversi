@@ -25,9 +25,12 @@ public class NetworkTest {
 
   private static final int TIMEOUT = 1000;
   private final Player dummy = new PlayerImpl("Dummy", Color.BLUEVIOLET);
+  private final Player dummyTwo = new PlayerImpl("DummyTwo", Color.ALICEBLUE);
   private Server server;
   private Client client;
+  private Client clientTwo;
   private ClientCompatibleGui mockedGui;
+  private ClientCompatibleGui mockedGuiTwo;
 
   @BeforeEach
   private void setup() throws IOException {
@@ -35,9 +38,13 @@ public class NetworkTest {
     server.startServer();
 
     mockedGui = mock(ClientCompatibleGui.class);
+    mockedGuiTwo = mock(ClientCompatibleGui.class);
 
     client = new ClientImpl(mockedGui, InetAddress.getLocalHost(), dummy);
     client.startClient();
+
+    clientTwo = new ClientImpl(mockedGuiTwo, InetAddress.getLocalHost(), dummyTwo);
+    clientTwo.startClient();
   }
 
   @AfterEach
@@ -56,22 +63,29 @@ public class NetworkTest {
   @Test
   public void testJoinAnyRandomPublicLobby_asPlayer() {
     client.joinAnyRandomPublicLobby(false);
-    verifySuccessfulJoin();
+    verifyJoinResponse(ResponseType.JOIN_SUCCESSFUL);
   }
 
   @Test
-  public void testJoinAnyRandomPublicLobby_asSpectator() {
+  public void testJoinAnyRandomPublicLobby_asSpectator_NoLobby() {
     client.joinAnyRandomPublicLobby(true);
-    verifySuccessfulJoin();
+    verifyJoinResponse(ResponseType.NO_LOBBY_AVAILABLE);
+  }
+
+  @Test
+  public void testJoinAnyRandomPublicLobby_asSpectator_Regular() {
+    clientTwo.joinAnyRandomPublicLobby(false);
+    client.joinAnyRandomPublicLobby(true);
+    verifyJoinResponse(ResponseType.JOIN_SUCCESSFUL);
 
     verify(mockedGui, timeout(TIMEOUT)).receivedSpectator(any(Spectators.class));
 
     verify(mockedGui, timeout(TIMEOUT)).modelExchanged(any(ModelImpl.class));
   }
 
-  private void verifySuccessfulJoin() {
+  private void verifyJoinResponse(ResponseType type) {
     ArgumentCaptor<Response> responseCaptor = ArgumentCaptor.forClass(Response.class);
     verify(mockedGui, timeout(TIMEOUT)).receivedJoinRequestResponse(responseCaptor.capture());
-    Assertions.assertEquals(ResponseType.JOIN_SUCCESSFUL, responseCaptor.getValue().getType());
+    Assertions.assertEquals(type, responseCaptor.getValue().getType());
   }
 }
