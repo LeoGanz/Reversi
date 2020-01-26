@@ -1,6 +1,23 @@
 # Reversi game
 
-This project is going to contain our version of the reversi game.
+This project contains a implementation of the Reversi game. A detailed description on playing Reversi can be found on [Wikipedia](https://en.wikipedia.org/wiki/Reversi).
+
+Our features:
+- play against our AI
+- hotseat modus
+- multiplayer via TCP/IP
+- server with multiple private and public lobbies 
+- simple JSON protocol - (_feel free to create your own client ;)_)
+- spectator view for multiplayer games 
+- own coloured disks
+- beautiful UI
+
+## Our AI
+Our AI got improved mutliple times by playing against itself. So after some rounds we came up with a simple and competitive AI.
+
+## JSON for Multiplayer
+Our Server uses simple `JSON` messages via TCP/IP. So feel free to create your own client. 
+
 
 ## Dependencies
 
