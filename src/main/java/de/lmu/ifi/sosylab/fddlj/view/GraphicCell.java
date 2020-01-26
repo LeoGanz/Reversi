@@ -26,8 +26,8 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
 
   private GraphicDisk diskOnCell;
 
-  static final int MIN_WIDTH = 60;
-  static final int MIN_HEIGHT = 60;
+  static final int MIN_WIDTH = 40;
+  static final int MIN_HEIGHT = 40;
 
   private Model model;
   private GameBoardGrid gameBoardGrid;

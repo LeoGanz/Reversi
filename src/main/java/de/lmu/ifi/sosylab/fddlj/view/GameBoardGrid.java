@@ -31,6 +31,9 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public class GameBoardGrid extends BorderPane implements PropertyChangeListener {
 
+  private static final int MARGIN_TOGGLEBUTTON = 30;
+  private static final int TOGGLEBUTTON_PREF_HEIGHT = 15;
+
   private Model model;
   private Controller controller;
 
@@ -68,7 +71,9 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     initGameBoard(stage, view);
     setMinWidth(model.getState().getField().getSize() * GraphicCell.MIN_WIDTH);
     setMinHeight(
-        model.getState().getField().getSize() * GraphicCell.MIN_HEIGHT + switchButton.getHeight());
+        model.getState().getField().getSize() * GraphicCell.MIN_HEIGHT
+            + TOGGLEBUTTON_PREF_HEIGHT * 2
+            + MARGIN_TOGGLEBUTTON);
 
     new Thread(() -> initialiseAudioSystem()).start();
   }
@@ -103,7 +108,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     hbox.setAlignment(Pos.CENTER);
 
     Label hints = getLabel(messages.getString("GameBoardGrid_ShowHints_Label"));
-    switchButton = new SwitchButton(100, 15);
+    switchButton = new SwitchButton(100, TOGGLEBUTTON_PREF_HEIGHT);
 
     hbox.getChildren().addAll(hints, switchButton);
     BorderPane borderPane = new BorderPane();
@@ -111,7 +116,7 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
     BorderPane.setAlignment(hbox, Pos.CENTER);
 
     setBottom(borderPane);
-    BorderPane.setMargin(borderPane, new Insets(30, 0, 0, 0));
+    BorderPane.setMargin(borderPane, new Insets(MARGIN_TOGGLEBUTTON, 0, 0, 0));
   }
 
   private Label getLabel(String text) {

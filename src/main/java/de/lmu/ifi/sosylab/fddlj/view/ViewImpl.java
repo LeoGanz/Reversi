@@ -168,7 +168,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     double minHeightLeft =
         left.getMinHeight() + spacerBottom.getMinHeight() + spacerTop.getMinHeight();
     double minHeightBoard =
-        gameBoard.getMinHeight() + spacerBottom.getMinHeight() + spacerTop.getMinHeight();
+        gameBoard.getMinHeight()
+            + spacerBottom.getMinHeight()
+            + spacerTop.getMinHeight()
+            + BorderPane.getMargin(gameBoard).getTop()
+            + BorderPane.getMargin(gameBoard).getBottom();
+
+    System.out.println(minHeightLeft);
+    System.out.println(minHeightBoard);
 
     if (minHeightLeft > minHeightBoard) {
       stage.setMinHeight(minHeightLeft);
@@ -176,6 +183,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       stage.setMinHeight(minHeightBoard);
     }
 
+    System.out.println(stage.getMinHeight());
     stage.setScene(scene);
     if (!stage.isShowing()) {
       stage.show();
