@@ -73,15 +73,19 @@ public class ControllerImpl extends Application implements Controller {
   @Override
   public void placeDisk(Cell on) {
     Disk disk = new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer());
-    boolean succesful = model.placeDisk(disk, on);
+    new Thread(
+        () -> {
+          boolean succesful = model.placeDisk(disk, on);
 
-    if (!succesful) {
-      showAlert(
-          AlertType.ERROR,
-          messages.getString("ControllerImpl_DiskError_Title"),
-          messages.getString("ControllerImpl_DiskError_Subtitle"),
-          messages.getString("ControllerImpl_DiskError_Info"));
-    }
+          if (!succesful) {
+            showAlert(
+                AlertType.ERROR,
+                messages.getString("ControllerImpl_DiskError_Title"),
+                messages.getString("ControllerImpl_DiskError_Subtitle"),
+                messages.getString("ControllerImpl_DiskError_Info"));
+          }
+        })
+        .start();
   }
 
   private void showAlert(AlertType alertType, String title, String header, String content) {

@@ -133,19 +133,15 @@ public class ModelImpl implements Model {
       if (mode.equals(GameMode.SINGLEPLAYER)
           && (state.getPlayerManagement().getCurrentPlayer() instanceof AiPlayer)
           && state.getCurrentPhase().equals(Phase.RUNNING)) {
-        new Thread(
-            () -> {
-              long sleepAmount =
-                  new Random().nextInt(AI_MAX_SLEEP_AMOUNT - AI_MOVE_OFFSET) + AI_MOVE_OFFSET;
-              try {
-                Thread.sleep(sleepAmount);
-              } catch (InterruptedException e) {
-                // Doesn't matter
-              }
-              Cell bestMove = ai.calculateBestMove(state);
-              placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), bestMove);
-            })
-            .start();
+        long sleepAmount =
+            new Random().nextInt(AI_MAX_SLEEP_AMOUNT - AI_MOVE_OFFSET) + AI_MOVE_OFFSET;
+        try {
+          Thread.sleep(sleepAmount);
+        } catch (InterruptedException e) {
+          // Doesn't matter
+        }
+        Cell bestMove = ai.calculateBestMove(state);
+        placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), bestMove);
       }
       return true;
 
@@ -322,8 +318,8 @@ public class ModelImpl implements Model {
     return false;
   }
 
-  /** 
-   * Notifies all Listeners of a changed {@link GameState}. 
+  /**
+   * Notifies all Listeners of a changed {@link GameState}.
    */
   private void notifyListenersOfChangedState() {
     support.firePropertyChange(Model.STATE_CHANGED, null, state);

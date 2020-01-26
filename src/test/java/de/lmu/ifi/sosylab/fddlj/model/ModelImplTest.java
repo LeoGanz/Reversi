@@ -2,10 +2,8 @@ package de.lmu.ifi.sosylab.fddlj.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Assertions;
@@ -596,27 +594,4 @@ public class ModelImplTest {
             new CellImpl(4, 4)));
   }
 
-  @Test
-  public void testGame_PlayerTwoIsAi() {
-    Assertions.assertTimeout(
-        Duration.ofSeconds(10),
-        () -> {
-          Random r = new Random();
-          AiPlayer ai = new AiPlayerImpl();
-          ModelImpl game = new ModelImpl(GameMode.SINGLEPLAYER, playerOne, ai);
-
-          while (game.getState().getCurrentPhase().equals(Phase.RUNNING)) {
-            Set<Cell> moves = game.getPossibleMovesForPlayer(playerOne);
-            int elem = r.nextInt(moves.size());
-            for (Cell c : moves) {
-              elem -= 1;
-              if (elem <= 0) {
-                game.placeDisk(new DiskImpl(playerOne), c);
-                break;
-              }
-            }
-          }
-          Assertions.assertEquals(Phase.FINISHED, game.getState().getCurrentPhase());
-        });
-  }
 }
