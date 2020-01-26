@@ -6,6 +6,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -16,6 +17,8 @@ import java.util.Set;
 public class ModelImpl implements Model {
 
   private final PropertyChangeSupport support;
+  private static final int AI_MOVE_OFFSET = 750;
+  private static final int AI_MAX_SLEEP_AMOUNT = 2500;
 
   private ModifiableGameState state;
   private GameMode mode;
@@ -130,8 +133,19 @@ public class ModelImpl implements Model {
       if (mode.equals(GameMode.SINGLEPLAYER)
           && (state.getPlayerManagement().getCurrentPlayer() instanceof AiPlayer)
           && state.getCurrentPhase().equals(Phase.RUNNING)) {
-        Cell bestMove = ai.calculateBestMove(state);
-        placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), bestMove);
+        new Thread(
+            () -> {
+              long sleepAmount =
+                  new Random().nextInt(AI_MAX_SLEEP_AMOUNT - AI_MOVE_OFFSET) + AI_MOVE_OFFSET;
+              try {
+                Thread.sleep(sleepAmount);
+              } catch (InterruptedException e) {
+                // Doesn't matter
+              }
+              Cell bestMove = ai.calculateBestMove(state);
+              placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), bestMove);
+            })
+            .start();
       }
       return true;
 
