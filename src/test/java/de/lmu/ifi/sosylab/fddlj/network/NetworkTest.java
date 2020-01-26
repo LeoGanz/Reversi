@@ -165,8 +165,7 @@ public class NetworkTest {
 
   @Test
   public void testServerShutdown() {
-    client.joinAnyRandomPublicLobby(false);
-    clientTwo.joinAnyRandomPublicLobby(false);
+    letOneAndTwoJoinLobby0();
     server.initiateShutdown();
     verify(mockedGui, timeout(TIMEOUT))
         .receivedServerNotification(ServerNotification.SERVER_SHUTTING_DOWN);
