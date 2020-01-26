@@ -76,6 +76,8 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   private int lobbyId;
 
   private ResourceBundle messages;
+  private GameFinishedScreen gameFinishedScreen;
+  private AboutWindow aboutWindow;
 
   /**
    * Constructor of this class initialises the main frame of the game.
@@ -293,7 +295,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     Button button = new Button("", imageView);
     button.setCursor(Cursor.HAND);
     button.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-    button.setOnAction(e -> new AboutWindow(messages));
+    button.setOnAction(e -> aboutWindow = new AboutWindow(messages));
     Tooltip helper = new Tooltip();
     helper.setText(messages.getString("ViewImpl_ButtonHelp_Tooltip"));
     button.setTooltip(helper);
@@ -309,6 +311,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
     if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {
       SpectatorList spectatorList = new SpectatorList(messages, lobbyId);
+      support.addPropertyChangeListener(spectatorList);
       addListener(spectatorList);
 
       vbox.getChildren().add(spectatorList);
@@ -441,22 +444,12 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     if (event.getPropertyName().equals(Model.STATE_CHANGED)) {
       support.firePropertyChange(event.getPropertyName(), event.getOldValue(), event.getNewValue());
 
-      System.out.println(model instanceof ModelImpl);
-
-      if (model instanceof ModelImpl) {
-        ModelImpl mod = (ModelImpl) model;
-
-        numberPlayerOneDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerOne()));
-
-        numberPlayerTwoDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
-      }
-
-      System.out.println(model.getState().getCurrentPhase());
+      changePlayerDiskNumber();
 
       if (model.getState().getCurrentPhase() == Phase.FINISHED) {
 
         root.setDisable(true);
-        new GameFinishedScreen(controller, model, stage, messages);
+        gameFinishedScreen = new GameFinishedScreen(controller, model, stage, messages);
       }
     }
 
@@ -556,15 +549,22 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   }
 
   private void returnToMainMenu() {
-    stage.close();
     if (controller instanceof ControllerImpl) {
       ((ControllerImpl) controller).showGameModeSelector(new Stage());
     } else {
       controller = new ControllerImpl(messages);
       ((ControllerImpl) controller).showGameModeSelector(new Stage());
-
-      stage.close();
     }
+
+    if (aboutWindow != null && aboutWindow.isShowing()) {
+      aboutWindow.close();
+    }
+
+    if (gameFinishedScreen != null && gameFinishedScreen.isShowing()) {
+      gameFinishedScreen.close();
+    }
+
+    stage.close();
   }
 
   @Override
@@ -647,7 +647,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     } else if (optional.get().equals(continueAgainstAi)) {
       controller.continueAgainstAi(model);
     } else if (optional.get().equals(exit)) {
-      Platform.exit();
+      controller.close();
     } else {
       returnToMainMenu();
     }
@@ -719,7 +719,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     } else if (optional.get().equals(continueAgainstAi)) {
       controller.continueAgainstAi(model);
     } else if (optional.get().equals(exit)) {
-      Platform.exit();
+      controller.close();
     } else {
       returnToMainMenu();
     }
@@ -738,10 +738,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
     ArrayList<ButtonType> buttonTypes = new ArrayList<>();
     buttonTypes.add(backToMainMenu);
-    if (controller.getCurrentGameMode() != GameMode.SPECTATOR) {
+    if (controller.getCurrentGameMode() != GameMode.SPECTATOR
+        && model.getState().getCurrentPhase() != Phase.FINISHED) {
       buttonTypes.add(continueAgainstAi);
     }
-    buttonTypes.add(remainAndWait);
+    if (model.getState().getCurrentPhase() != Phase.FINISHED) {
+      buttonTypes.add(remainAndWait);
+    }
+
     ButtonType exit = new ButtonType(messages.getString("ViewImpl_ButtonExit_Text"));
     buttonTypes.add(exit);
 
@@ -759,7 +763,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     } else if (optional.get().equals(continueAgainstAi)) {
       controller.continueAgainstAi(copyModel);
     } else if (optional.get().equals(exit)) {
-      Platform.exit();
+      controller.close();
     } else if (optional.get().equals(remainAndWait)) {
       return;
     } else {
@@ -769,7 +773,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   @Override
   public void modelExchanged(Model model) {
-    System.out.println("Model exchanged");
     model.addListener(this);
     this.model = model;
     Platform.runLater(
@@ -780,12 +783,15 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
           support.firePropertyChange(Model.LISTENERS_CHANGED, null, model);
           support.firePropertyChange(Model.STATE_CHANGED, null, model.getState());
 
+          changePlayerDiskNumber();
+
           showGame(controller.getCurrentGameMode());
         });
   }
 
   @Override
   public void receivedSpectator(Spectators spectators) {
+    System.out.println(spectators.size());
     Platform.runLater(() -> support.firePropertyChange(View.SPECTATORS_CHANGED, null, spectators));
   }
 
@@ -861,5 +867,28 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
           returnToMainMenu();
         });
+  }
+
+  private void changePlayerDiskNumber() {
+    if (model instanceof ModelImpl && guiShowing) {
+      ModelImpl mod = (ModelImpl) model;
+
+      numberPlayerOneDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerOne()));
+
+      numberPlayerTwoDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
+    }
+  }
+
+  @Override
+  public void close() {
+    if (aboutWindow != null && aboutWindow.isShowing()) {
+      aboutWindow.close();
+    }
+
+    if (gameFinishedScreen != null && gameFinishedScreen.isShowing()) {
+      gameFinishedScreen.close();
+    }
+
+    stage.close();
   }
 }

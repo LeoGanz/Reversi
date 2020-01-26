@@ -30,4 +30,7 @@ public interface View extends PropertyChangeListener {
    * @param listener the listener to remove
    */
   void removeListener(PropertyChangeListener listener);
+
+  /** Closes the view. */
+  void close();
 }

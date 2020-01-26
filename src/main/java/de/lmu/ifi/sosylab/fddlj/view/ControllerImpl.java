@@ -139,4 +139,9 @@ public class ControllerImpl extends Application implements Controller {
   public void continueAgainstAi(Model model) {
     throw new UnsupportedOperationException();
   }
+
+  @Override
+  public void close() {
+    view.close();
+  }
 }

@@ -2,7 +2,6 @@ package de.lmu.ifi.sosylab.fddlj.view;
 
 import de.lmu.ifi.sosylab.fddlj.model.Model;
 import java.util.ResourceBundle;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -94,7 +93,7 @@ public class GameFinishedScreen extends Stage {
     hbox.setPadding(new Insets(20));
 
     Button exit = getButton(messages.getString("GameFinishedScreen_ExitButton_Text"));
-    exit.setOnAction(e -> Platform.exit());
+    exit.setOnAction(e -> controller.close());
 
     Button restart = getButton(messages.getString("GameFinishedScreen_RestartButton_Text"));
     restart.setOnAction(
@@ -122,7 +121,7 @@ public class GameFinishedScreen extends Stage {
             alert.setContentText(messages.getString("GameFinishedScreen_ReturnError_Info"));
 
             alert.showAndWait();
-            Platform.exit();
+            controller.close();
           }
         });
 

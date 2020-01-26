@@ -104,6 +104,7 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
 
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
+    System.out.println(evt.getPropertyName());
     if (evt.getPropertyName() == View.SPECTATORS_CHANGED) {
       if (evt.getNewValue() instanceof Spectators) {
         buildSpectatorList((Spectators) evt.getNewValue());

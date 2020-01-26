@@ -232,4 +232,12 @@ public class MultiplayerControllerImpl implements MultiplayerController {
   public void denyGameRestart() {
     client.denyGameRestart();
   }
+
+  @Override
+  public void close() {
+    if (client != null) {
+      client.terminate();
+    }
+    view.close();
+  }
 }

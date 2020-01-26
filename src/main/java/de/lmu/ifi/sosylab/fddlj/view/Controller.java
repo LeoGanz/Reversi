@@ -54,4 +54,7 @@ public interface Controller {
 
   /** Continue the current game against the Ai. */
   void continueAgainstAi(Model model);
+
+  /** Closes the game. */
+  void close();
 }
