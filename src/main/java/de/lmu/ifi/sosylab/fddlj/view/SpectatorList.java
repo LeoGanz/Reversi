@@ -27,6 +27,14 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
 
   private ResourceBundle messages;
 
+  private static final int SPACING_VBOX_SPECTATORLIST = 15;
+  private static final int SPACING_HBOX_PLAYER = 20;
+  private static final Insets PADDING_HBOX_PLAYER = new Insets(15);
+  private static final int PREFWIDTH_HBOX_PLAYER = 150;
+
+  private static final String CSS_PROFILEIMAGE =
+      "-fx-border-color: #000000; -fx-border-radius: 8; -fx-background-radius: 8;";
+
   /**
    * Public constructor of this class initialises variables and builds pane.
    *
@@ -57,7 +65,7 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
 
   private void buildSpectatorList(Spectators spectators) {
 
-    VBox spectatorList = new VBox(15);
+    VBox spectatorList = new VBox(SPACING_VBOX_SPECTATORLIST);
     spectatorList.setAlignment(Pos.CENTER);
 
     if (spectators.isEmpty()) {
@@ -67,9 +75,10 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
     }
 
     for (Player player : spectators) {
-      HBox hbox = new HBox(20);
+      HBox hbox = new HBox(SPACING_HBOX_PLAYER);
       hbox.setAlignment(Pos.CENTER_LEFT);
-      hbox.setPadding(new Insets(15));
+      hbox.setPadding(PADDING_HBOX_PLAYER);
+      hbox.setPrefWidth(PREFWIDTH_HBOX_PLAYER);
       hbox.setStyle(
           "-fx-border-color: "
               + toHexString(player.getColor())
@@ -80,8 +89,7 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
       ImageView imageView = new ImageView(profile);
       imageView.setPreserveRatio(true);
       imageView.setFitHeight(40);
-      imageView.setStyle(
-          "-fx-border-color: #000000; -fx-border-radius: 8; -fx-background-radius: 8;");
+      imageView.setStyle(CSS_PROFILEIMAGE);
 
       hbox.getChildren().add(imageView);
 
@@ -95,11 +103,11 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
     scrollPane.setContent(spectatorList);
     scrollPane.setFitToWidth(false);
     scrollPane.setFitToHeight(true);
-    scrollPane.setPrefWidth(150);
+    scrollPane.setPrefWidth(PREFWIDTH_HBOX_PLAYER);
     scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
     scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
     setCenter(scrollPane);
-    setMinWidth(150);
+    setMinWidth(PREFWIDTH_HBOX_PLAYER);
   }
 
   @Override

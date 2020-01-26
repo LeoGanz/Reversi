@@ -25,6 +25,20 @@ import javafx.stage.StageStyle;
  */
 public class GameFinishedScreen extends Stage {
 
+  private static final Insets INSETS_ROOTPANE = new Insets(30);
+  private static final Insets PADDING_OPTIONSPANE = new Insets(20);
+  private static final int SPACING_OPTIONSPANE = 30;
+
+  private static final Font FONT_BUTTON = Font.font(18);
+  private static final Cursor CURSOR_BUTTON = Cursor.HAND;
+  private static final int MINWIDTH_BUTTON = 200;
+  private static final int MAXWIDTH_BUTTON = 500;
+  private static final int MINHEIGHT_BUTTON = 50;
+
+  private static final Font FONT_WINNERLABEL = Font.font("Serif");
+  private static final String CSS_WINNERLABEL =
+      "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 30;";
+
   private Model model;
   private Controller controller;
 
@@ -53,7 +67,7 @@ public class GameFinishedScreen extends Stage {
     BorderPane root = new BorderPane();
     root.getStylesheets().add("cssFiles/gameModeSelector.css");
     root.setId("main-pane");
-    root.setPadding(new Insets(30));
+    root.setPadding(INSETS_ROOTPANE);
 
     Label title = new Label(messages.getString("GameFinishedScreen_Title"));
     title.setId("title-label");
@@ -88,9 +102,9 @@ public class GameFinishedScreen extends Stage {
   }
 
   private HBox getOptions(Stage mainStage) {
-    HBox hbox = new HBox(30);
+    HBox hbox = new HBox(SPACING_OPTIONSPANE);
     hbox.setAlignment(Pos.CENTER);
-    hbox.setPadding(new Insets(20));
+    hbox.setPadding(PADDING_OPTIONSPANE);
 
     Button exit = getButton(messages.getString("GameFinishedScreen_ExitButton_Text"));
     exit.setOnAction(e -> controller.close());
@@ -132,11 +146,11 @@ public class GameFinishedScreen extends Stage {
   private Button getButton(String text) {
     Button button = new Button(text);
     button.setId("button");
-    button.setMinHeight(50);
-    button.setMaxWidth(500);
-    button.setMinWidth(200);
-    button.setCursor(Cursor.HAND);
-    button.setFont(Font.font(18));
+    button.setMinHeight(MINHEIGHT_BUTTON);
+    button.setMaxWidth(MAXWIDTH_BUTTON);
+    button.setMinWidth(MINWIDTH_BUTTON);
+    button.setCursor(CURSOR_BUTTON);
+    button.setFont(FONT_BUTTON);
 
     return button;
   }
@@ -156,8 +170,8 @@ public class GameFinishedScreen extends Stage {
     }
 
     Label label = new Label(text);
-    label.setFont(Font.font("Serif"));
-    label.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 30;");
+    label.setFont(FONT_WINNERLABEL);
+    label.setStyle(CSS_WINNERLABEL);
 
     return label;
   }

@@ -33,6 +33,11 @@ public class AboutWindow extends Stage {
 
   private ResourceBundle messages;
 
+  private static final int PREFWIDTH_SCROLLPANE = 600;
+  private static final int SPACING_VBOX_RULES = 15;
+  private static final int LINESPACING_TEXTFLOW = 4;
+  private static final Font FONT_TEXT_RULES = Font.font("Calibri", FontWeight.NORMAL, 18);
+
   /**
    * Public constructor of this class initialises stage and content.
    *
@@ -71,19 +76,19 @@ public class AboutWindow extends Stage {
   private Tab getLicenseTab() {
 
     Text text = new Text(readFile("files/NOTICE.md"));
-    text.setFont(Font.font("Calibri", FontWeight.NORMAL, 18));
+    text.setFont(FONT_TEXT_RULES);
     text.setFill(Color.WHITE);
 
     TextFlow textFlow = new TextFlow();
     textFlow.getChildren().add(text);
-    textFlow.setLineSpacing(4);
+    textFlow.setLineSpacing(LINESPACING_TEXTFLOW);
     textFlow.setTextAlignment(TextAlignment.CENTER);
 
     ScrollPane scrollPane = new ScrollPane();
     scrollPane.setContent(textFlow);
     scrollPane.setFitToWidth(true);
     scrollPane.setFitToHeight(true);
-    scrollPane.setPrefWidth(600);
+    scrollPane.setPrefWidth(PREFWIDTH_SCROLLPANE);
     scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
     scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
 
@@ -95,7 +100,7 @@ public class AboutWindow extends Stage {
 
   private Tab getRulesTab() {
 
-    VBox vbox = new VBox(15);
+    VBox vbox = new VBox(SPACING_VBOX_RULES);
     vbox.setAlignment(Pos.CENTER);
     vbox.getChildren().add(new SpecificRulesPane(messages));
 
@@ -103,7 +108,7 @@ public class AboutWindow extends Stage {
     scrollPane.setContent(vbox);
     scrollPane.setFitToWidth(true);
     scrollPane.setFitToHeight(true);
-    scrollPane.setPrefWidth(600);
+    scrollPane.setPrefWidth(PREFWIDTH_SCROLLPANE);
     scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
     scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
 

@@ -19,6 +19,9 @@ public class DiskIndicator extends VBox implements PropertyChangeListener {
   private static final int DISK_RADIUS = 40;
   private static final int MAX_RADIUS = 80;
 
+  private static final int MARGIN = 30;
+  private static final double SIMILARITY_DISTANCE = 0.25;
+
   private Label titel;
   private Label name;
 
@@ -43,7 +46,7 @@ public class DiskIndicator extends VBox implements PropertyChangeListener {
     this.controller = controller;
     view.addListener(this);
 
-    setMinHeight(30 + getSpacing() + DISK_RADIUS + getSpacing() + 30);
+    setMinHeight(2 * MARGIN + 2 * getSpacing() + DISK_RADIUS);
 
     initLabel(labelText);
     initCanvas();
@@ -128,7 +131,7 @@ public class DiskIndicator extends VBox implements PropertyChangeListener {
                 + (c.getGreen() - v.getGreen()) * (c.getGreen() - v.getGreen())
                 + (c.getBlue() - v.getBlue()) * (c.getBlue() - v.getBlue()));
 
-    if (distance < 0.25) {
+    if (distance < SIMILARITY_DISTANCE) {
       return true;
     } else {
       return false;

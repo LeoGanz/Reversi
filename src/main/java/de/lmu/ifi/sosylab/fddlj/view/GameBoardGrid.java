@@ -34,6 +34,8 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
 
   private static final int MARGIN_TOGGLEBUTTON = 30;
   private static final int TOGGLEBUTTON_PREF_HEIGHT = 15;
+  private static final int TOGGLEBUTTON_PREF_WIDTH = 100;
+  private static final int SPACING_HBOX_TOGGLEBUTTON = 15;
 
   private Model model;
   private Controller controller;
@@ -107,11 +109,11 @@ public class GameBoardGrid extends BorderPane implements PropertyChangeListener 
 
   private void initToggleSwitch() {
 
-    HBox hbox = new HBox(15);
+    HBox hbox = new HBox(SPACING_HBOX_TOGGLEBUTTON);
     hbox.setAlignment(Pos.CENTER);
 
     Label hints = getLabel(messages.getString("GameBoardGrid_ShowHints_Label"));
-    switchButton = new SwitchButton(100, TOGGLEBUTTON_PREF_HEIGHT);
+    switchButton = new SwitchButton(TOGGLEBUTTON_PREF_WIDTH, TOGGLEBUTTON_PREF_HEIGHT);
 
     hbox.getChildren().addAll(hints, switchButton);
     BorderPane borderPane = new BorderPane();

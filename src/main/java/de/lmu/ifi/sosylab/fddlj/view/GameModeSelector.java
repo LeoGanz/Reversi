@@ -26,7 +26,18 @@ import javafx.stage.StageStyle;
  */
 public class GameModeSelector extends Stage {
 
+  private static final String CSS_CLOSELABEL_NORMAL = "-fx-text-fill: white; -fx-font-size: 35;";
+  private static final String CSS_CLOSELABEL_SELECTED = "-fx-text-fill: red; -fx-font-size: 35;";
+
+  private static final Insets TOP_INSETS = new Insets(15, 15, 0, 0);
   private static final int DISK_ADDITION = 15;
+  private static final int DISK_SCALING = 10;
+
+  private static final Font FONT_BUTTON = Font.font(18);
+  private static final Cursor CURSOR_BUTTON = Cursor.HAND;
+  private static final int MINWIDTH_BUTTON = 200;
+  private static final int MAXWIDTH_BUTTON = 500;
+  private static final int MINHEIGHT_BUTTON = 50;
 
   private Controller controller;
   private Scene scene;
@@ -85,17 +96,18 @@ public class GameModeSelector extends Stage {
 
     Label close = new Label("X");
     close.setCursor(Cursor.HAND);
-    close.setStyle("-fx-text-fill: white; -fx-font-size: 35;");
-    close.setOnMouseEntered(e -> close.setStyle("-fx-text-fill: red; -fx-font-size: 35;"));
-    close.setOnMouseExited(e -> close.setStyle("fx-text-fill: white; -fx-font-size: 35;"));
+    close.setStyle(CSS_CLOSELABEL_NORMAL);
+    close.setOnMouseEntered(e -> close.setStyle(CSS_CLOSELABEL_SELECTED));
+    close.setOnMouseExited(e -> close.setStyle(CSS_CLOSELABEL_NORMAL));
     close.setOnMouseClicked(e -> close());
     bp.setRight(close);
     BorderPane.setAlignment(close, Pos.TOP_RIGHT);
-    BorderPane.setMargin(close, new Insets(15, 15, 0, 0));
+    BorderPane.setMargin(close, TOP_INSETS);
 
     HBox title = getTitleWithDisks();
     bp.setCenter(title);
-    BorderPane.setMargin(title, new Insets(15, 0, 0, 0));
+    BorderPane.setAlignment(title, Pos.CENTER);
+    BorderPane.setMargin(title, TOP_INSETS);
 
     return bp;
   }
@@ -108,13 +120,13 @@ public class GameModeSelector extends Stage {
       hbox.getChildren()
           .add(
               getDisk(
-                  i * 10 + DISK_ADDITION,
-                  i * 10 + DISK_ADDITION,
-                  (i * 10 + DISK_ADDITION) / 2.0,
+                  i * DISK_SCALING + DISK_ADDITION,
+                  i * DISK_SCALING + DISK_ADDITION,
+                  (i * DISK_SCALING + DISK_ADDITION) / 2.0,
                   Color.WHITE));
     }
 
-    Label title = new Label("Reversi");
+    Label title = new Label(messages.getString("Game_Title"));
     title.setId("title-label");
     hbox.getChildren().add(title);
 
@@ -122,9 +134,9 @@ public class GameModeSelector extends Stage {
       hbox.getChildren()
           .add(
               getDisk(
-                  i * 10 + DISK_ADDITION,
-                  i * 10 + DISK_ADDITION,
-                  (i * 10 + DISK_ADDITION) / 2.0,
+                  i * DISK_SCALING + DISK_ADDITION,
+                  i * DISK_SCALING + DISK_ADDITION,
+                  (i * DISK_SCALING + DISK_ADDITION) / 2.0,
                   Color.BLACK));
     }
 
@@ -136,7 +148,7 @@ public class GameModeSelector extends Stage {
     VBox vbox = new VBox(35);
     vbox.setId("selection-pane");
     vbox.setAlignment(Pos.CENTER);
-    vbox.setPrefWidth(1.3 * (Screen.getPrimary().getVisualBounds().getWidth() / 5) + 200);
+    vbox.setPrefWidth(1.3 * (Screen.getPrimary().getVisualBounds().getWidth() / 5));
     vbox.setMaxWidth(vbox.getPrefWidth());
     vbox.setFillWidth(true);
 
@@ -202,11 +214,11 @@ public class GameModeSelector extends Stage {
   private Button getButton(String text) {
     Button button = new Button(text);
     button.setId("button");
-    button.setMinHeight(50);
-    button.setMaxWidth(350);
-    button.setMinWidth(150);
-    button.setCursor(Cursor.HAND);
-    button.setFont(Font.font(18));
+    button.setMinHeight(MINHEIGHT_BUTTON);
+    button.setMaxWidth(MAXWIDTH_BUTTON);
+    button.setMinWidth(MINWIDTH_BUTTON);
+    button.setCursor(CURSOR_BUTTON);
+    button.setFont(FONT_BUTTON);
     button.setEffect(new DropShadow(4, Color.DARKGRAY));
 
     return button;

@@ -118,6 +118,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
               support.firePropertyChange(
                   new PropertyChangeEvent(this, STAGE_RESIZED, null, support));
             });
+    this.stage.setOnCloseRequest(e -> controller.close());
   }
 
   @Override
@@ -589,9 +590,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   private void handleServerNotification(ServerNotification serverNotification) {
 
-    System.out.println(
-        ((MultiplayerController) controller).getOwnPlayer() + " received " + serverNotification);
-
     switch (serverNotification) {
       case SERVER_SHUTTING_DOWN:
         handleServerShuttingDown();
@@ -798,7 +796,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
   @Override
   public void receivedSpectator(Spectators spectators) {
-    System.out.println(spectators.size());
     Platform.runLater(() -> support.firePropertyChange(View.SPECTATORS_CHANGED, null, spectators));
   }
 
