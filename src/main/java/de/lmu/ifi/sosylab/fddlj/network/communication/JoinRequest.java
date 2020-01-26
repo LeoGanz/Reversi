@@ -126,6 +126,7 @@ public class JoinRequest {
     public enum ResponseType {
       JOIN_SUCCESSFUL,
       LOBBY_NOT_FOUND,
+      NO_LOBBY_AVAILABLE,
       NO_PLAYERS_NEEDED;
     }
 
