@@ -10,28 +10,19 @@ repositories {
   jcenter()
 }
 
-def currentOS = org.gradle.internal.os.OperatingSystem.current()
-def platform
-if (currentOS.isWindows()) {
-	platform = 'win'
-} else if (currentOS.isLinux()) {
-	platform = 'linux'
-} else if (currentOS.isMacOsX()) {
-	platform = 'mac'
-}
-
 dependencies {
 	implementation "org.openjfx:javafx-base:11.0.2"
 	implementation "org.openjfx:javafx-controls:11.0.2"
 	implementation "org.openjfx:javafx-graphics:11.0.2"
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+	testImplementation 'org.mockito:mockito-core:3.2.4'
 	testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.11'
 	implementation 'com.google.code.gson:gson:2.8.6'
 	implementation 'org.hildan.fxgson:fx-gson:3.1.2'
 }
 
 javafx {
-    modules = [ 'javafx.controls', 'javafx.graphics', 'javafx.media']
+    modules = [ 'javafx.controls', 'javafx.graphics']
     version = '11.0.2'
 }
 
@@ -55,7 +46,6 @@ run {
 jar {
   manifest {
     attributes(
-//      'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '), 
       'Main-Class': "$mainClassName"
     )
   }

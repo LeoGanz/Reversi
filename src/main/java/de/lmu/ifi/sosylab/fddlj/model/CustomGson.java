@@ -26,22 +26,21 @@ public class CustomGson {
    */
   public static Gson createGson() {
     if (INSTANCE == null) {
-      INSTANCE =
-          new GsonBuilder()
-              .registerTypeAdapter(Message.class, MessageJsonDeserializer.getDeserializer())
-              .registerTypeAdapter(Player.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(GameState.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(GameState.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(ModifiableGameState.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(Cell.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(Disk.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(GameField.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(ModifiableGameField.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(PlayerManagement.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(ModifiablePlayerManagement.class, InterfaceAdapter.getAdapter())
-              .registerTypeAdapter(Color.class, ColorTypeAdapter.getAdapter())
-              .registerTypeAdapter(Spectators.class, SpectatorsTypeAdapter.getAdapter())
-              .create();
+      INSTANCE = new GsonBuilder()
+          .registerTypeAdapter(Message.class, MessageJsonDeserializer.getDeserializer())
+          .registerTypeAdapter(Player.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(GameState.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(GameState.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(ModifiableGameState.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(Cell.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(Disk.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(GameField.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(ModifiableGameField.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(PlayerManagement.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(ModifiablePlayerManagement.class, InterfaceAdapter.getAdapter())
+          .registerTypeAdapter(Color.class, ColorTypeAdapter.getAdapter())
+          .registerTypeAdapter(Spectators.class, SpectatorsTypeAdapter.getAdapter())
+          .create();
     }
     return INSTANCE;
   }
