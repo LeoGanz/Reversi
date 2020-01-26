@@ -171,6 +171,9 @@ public class ServerImpl implements Server {
   }
 
   private void handleLobbyJoinAsPlayer(GameLobby lobby, ClientConnection conn, Player player) {
+    if (!serverRunning) {
+      return;
+    }
     boolean joinSuccessful = lobby.joinAsPlayer(conn, player);
     if (joinSuccessful) {
       conn.sendMessageWith(
@@ -181,6 +184,9 @@ public class ServerImpl implements Server {
   }
 
   private void handleLobbyJoinAsSpectator(GameLobby lobby, ClientConnection conn, Player player) {
+    if (!serverRunning) {
+      return;
+    }
     lobby.joinAsSpectator(conn, player);
     conn.sendMessageWith(
         new JoinRequest.Response(ResponseType.JOIN_SUCCESSFUL, lobby.getLobbyID()));
