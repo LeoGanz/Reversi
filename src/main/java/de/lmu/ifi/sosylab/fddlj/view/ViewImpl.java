@@ -518,6 +518,11 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     root.setBottom(lobbyID);
     BorderPane.setAlignment(lobbyID, Pos.CENTER);
 
+    Button returnToMainScreen = getButton(messages.getString("ViewImpl_ButtonBack_Text"));
+    returnToMainScreen.setOnAction(e -> returnToMainMenu());
+    root.setRight(returnToMainScreen);
+    BorderPane.setAlignment(returnToMainScreen, Pos.BOTTOM_CENTER);
+
     scene = new Scene(root);
     stage.setScene(scene);
     if (!stage.isShowing()) {
