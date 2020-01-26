@@ -61,7 +61,7 @@ public class GameLobby {
    */
   public synchronized RejectedPlacement tryDiskPlacement(DiskPlacement requestedDiskPlacement) {
     UUID uuid = requestedDiskPlacement.getUuid();
-    if (!requestedDiskPlacement.getPrevious().equals(lastPlacementID)) {
+    if (!Objects.equals(requestedDiskPlacement.getPrevious(), lastPlacementID)) {
       return new RejectedPlacement(uuid, Reason.INVALID_PREVIOUS_UUID);
     }
     if (requestedDiskPlacement.getDisk().getPlayer()

@@ -26,18 +26,17 @@ public class CustomGson {
     if (INSTANCE == null) {
       INSTANCE =
           new GsonBuilder()
-              .registerTypeAdapter(
-                  Message.class, MessageJsonDeserializer.getContentJsonDeserializer())
-              .registerTypeAdapter(Player.class, new InterfaceAdapter<>())
-              .registerTypeAdapter(GameState.class, new InterfaceAdapter<>())
-              .registerTypeAdapter(GameState.class, new InterfaceAdapter<>())
-              .registerTypeAdapter(ModifiableGameState.class, new InterfaceAdapter<>())
-              .registerTypeAdapter(Cell.class, new InterfaceAdapter<>())
-              .registerTypeAdapter(Disk.class, new InterfaceAdapter<>())
-              .registerTypeAdapter(GameField.class, new InterfaceAdapter<>())
-              .registerTypeAdapter(ModifiableGameField.class, new InterfaceAdapter<>())
-              .registerTypeAdapter(PlayerManagement.class, new InterfaceAdapter<>())
-              .registerTypeAdapter(ModifiablePlayerManagement.class, new InterfaceAdapter<>())
+              .registerTypeAdapter(Message.class, MessageJsonDeserializer.getDeserializer())
+              .registerTypeAdapter(Player.class, InterfaceAdapter.getAdapter())
+              .registerTypeAdapter(GameState.class, InterfaceAdapter.getAdapter())
+              .registerTypeAdapter(GameState.class, InterfaceAdapter.getAdapter())
+              .registerTypeAdapter(ModifiableGameState.class, InterfaceAdapter.getAdapter())
+              .registerTypeAdapter(Cell.class, InterfaceAdapter.getAdapter())
+              .registerTypeAdapter(Disk.class, InterfaceAdapter.getAdapter())
+              .registerTypeAdapter(GameField.class, InterfaceAdapter.getAdapter())
+              .registerTypeAdapter(ModifiableGameField.class, InterfaceAdapter.getAdapter())
+              .registerTypeAdapter(PlayerManagement.class, InterfaceAdapter.getAdapter())
+              .registerTypeAdapter(ModifiablePlayerManagement.class, InterfaceAdapter.getAdapter())
               .registerTypeAdapter(Color.class, ColorTypeAdapter.getAdapter())
               .create();
     }
