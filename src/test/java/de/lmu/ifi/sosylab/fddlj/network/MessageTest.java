@@ -8,10 +8,12 @@ import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
 import de.lmu.ifi.sosylab.fddlj.model.Player;
 import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
 import de.lmu.ifi.sosylab.fddlj.network.communication.Message;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javafx.scene.paint.Color;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Assertions;
@@ -31,6 +33,8 @@ public class MessageTest {
   private final Message<Boolean> trueMessage = new Message<>(true);
   private final Message<Message<Message<Player>>> nestedMessage =
       new Message<>(new Message<>(dummyMessage));
+  private final Message<Spectators> spectatorMessage =
+      new Message<>(new Spectators(4, Arrays.asList(dummy, otherDummy)));
 
   @Test
   public void testMessage_null() {
@@ -73,6 +77,7 @@ public class MessageTest {
     messages.add(nestedMessage);
     Model model = new ModelImpl(GameMode.HOTSEAT, dummy, otherDummy);
     messages.add(new Message<>(model.getState()));
+    messages.add(spectatorMessage);
 
     for (Message<?> message : messages) {
       testToJson(message);

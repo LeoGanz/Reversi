@@ -27,7 +27,7 @@ public class LobbyView extends BorderPane {
    * @param lobby the lobby for which to initialise the view
    */
   public LobbyView(LobbyRepresentation lobby) {
-    setStyle("-fx-background-color: rgba(180,180,180,160); -fx-padding: 20;");
+    setStyle("-fx-background-color: rgba(60,60,60); -fx-padding: 20;");
 
     initView(lobby);
   }
@@ -50,7 +50,7 @@ public class LobbyView extends BorderPane {
     BorderPane.setAlignment(imageView, Pos.CENTER);
 
     Label title = new Label("Lobby #" + lobby.getLobbyID());
-    title.setStyle("-fx-text-fill: #000000; -fx-font-weight: bold; -fx-font-size: x-large;");
+    title.setStyle("-fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-font-size: x-large;");
     setTop(title);
     BorderPane.setAlignment(title, Pos.CENTER);
 
@@ -59,20 +59,24 @@ public class LobbyView extends BorderPane {
     opponents.getChildren().add(getPlayerView(lobby.getPlayerOne()));
 
     Label vs = new Label("vs.");
-    vs.setStyle("-fx-text-fill: #000000; -fx-font-weight: bold; -fx-font-size: x-large;");
+    vs.setStyle("-fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-font-size: x-large;");
     opponents.getChildren().add(vs);
     opponents.getChildren().add(getPlayerView(lobby.getPlayerTwo()));
     setCenter(opponents);
   }
 
   private HBox getPlayerView(Player player) {
+    if (player == null) {
+      return new HBox(new Label("?"));
+    }
+
     HBox hbox = new HBox(20);
     hbox.setAlignment(Pos.CENTER_LEFT);
     hbox.setPadding(new Insets(15));
     hbox.setStyle(
         "-fx-border-color: "
             + toHexString(player.getColor())
-            + "; -fx-border-width: 2; -fx-background-color: rgba(160,160,160,200);");
+            + "; -fx-border-width: 4; -fx-background-color: rgb(235,235,235);");
 
     Image profile =
         new Image(getClass().getClassLoader().getResourceAsStream("images/profile.png"));

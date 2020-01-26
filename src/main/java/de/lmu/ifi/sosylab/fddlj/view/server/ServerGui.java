@@ -134,8 +134,17 @@ public class ServerGui implements ServerListener {
   public void lobbyUpdated(int lobbyID, LobbyRepresentation lobbyRepresentation) {
     Platform.runLater(
         () -> {
+          if (lobbyRepresentation == null) {
+            lobbyList.getChildren().remove(lobbies.get(lobbyID));
+            return;
+          }
+
           if (lobbies.get(lobbyID) != null) {
             lobbies.get(lobbyID).updateLobby(lobbyRepresentation);
+          } else {
+            LobbyView lobbyView = new LobbyView(lobbyRepresentation);
+            lobbies.put(lobbyRepresentation.getLobbyID(), lobbyView);
+            lobbyList.getChildren().add(lobbyView);
           }
         });
   }

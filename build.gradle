@@ -25,7 +25,6 @@ dependencies {
 	implementation "org.openjfx:javafx-controls:11:${platform}"
 	implementation "org.openjfx:javafx-graphics:11:${platform}"
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
 	testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.11'
 	implementation 'com.google.code.gson:gson:2.8.6'
 	implementation 'org.hildan.fxgson:fx-gson:3.1.2'

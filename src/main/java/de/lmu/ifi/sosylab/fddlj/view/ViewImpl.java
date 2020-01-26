@@ -174,16 +174,12 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
             + BorderPane.getMargin(gameBoard).getTop()
             + BorderPane.getMargin(gameBoard).getBottom();
 
-    System.out.println(minHeightLeft);
-    System.out.println(minHeightBoard);
-
     if (minHeightLeft > minHeightBoard) {
       stage.setMinHeight(minHeightLeft);
     } else {
       stage.setMinHeight(minHeightBoard);
     }
 
-    System.out.println(stage.getMinHeight());
     stage.setScene(scene);
     if (!stage.isShowing()) {
       stage.show();
@@ -592,6 +588,10 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   }
 
   private void handleServerNotification(ServerNotification serverNotification) {
+
+    System.out.println(
+        ((MultiplayerController) controller).getOwnPlayer() + " received " + serverNotification);
+
     switch (serverNotification) {
       case SERVER_SHUTTING_DOWN:
         handleServerShuttingDown();
@@ -764,7 +764,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
             messages.getString("ViewImpl_OpponentDisconnected_Subtitle"),
             messages.getString("ViewImpl_OpponentDisconnected_Info"),
             buttonTypes);
-
     Optional<ButtonType> optional = alert.showAndWait();
     if (optional.get().equals(backToMainMenu)) {
       returnToMainMenu();

@@ -73,7 +73,7 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
       hbox.setStyle(
           "-fx-border-color: "
               + toHexString(player.getColor())
-              + "; -fx-border-width: 2; -fx-background-color: rgba(160,160,160,0.8);");
+              + "; -fx-border-width: 2; -fx-background-color: rgb(235,235,235);");
 
       Image profile =
           new Image(getClass().getClassLoader().getResourceAsStream("images/profile.png"));
@@ -104,7 +104,6 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
 
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
-    System.out.println(evt.getPropertyName());
     if (evt.getPropertyName() == View.SPECTATORS_CHANGED) {
       if (evt.getNewValue() instanceof Spectators) {
         buildSpectatorList((Spectators) evt.getNewValue());

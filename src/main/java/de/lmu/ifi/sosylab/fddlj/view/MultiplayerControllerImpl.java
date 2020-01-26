@@ -231,9 +231,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     this.model.substitutePlayersWith(ownPlayer, aiPlayer);
     this.model.unsetWaiting();
     this.model.addListener(view);
-    if (view instanceof ClientCompatibleGui) {
-      ((ClientCompatibleGui) view).modelExchanged(this.model);
-    }
+    ((ClientCompatibleGui) view).modelExchanged(this.model);
   }
 
   @Override
