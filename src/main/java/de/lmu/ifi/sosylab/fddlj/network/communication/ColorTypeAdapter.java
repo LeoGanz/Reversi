@@ -1,7 +1,5 @@
 package de.lmu.ifi.sosylab.fddlj.network.communication;
 
-import java.lang.reflect.Type;
-
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -11,14 +9,13 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.TypeAdapter;
-
+import java.lang.reflect.Type;
 import javafx.scene.paint.Color;
 
 /**
  * Custom Gson serializer and deserializer for Java FX {@link Color}s.
  *
- * @author Leonard
- *
+ * @author Leonard Ganz
  */
 public class ColorTypeAdapter implements JsonSerializer<Color>, JsonDeserializer<Color> {
   private static final Object INSTANCE = new ColorTypeAdapter();
@@ -27,21 +24,19 @@ public class ColorTypeAdapter implements JsonSerializer<Color>, JsonDeserializer
   }
 
   /**
-   * Get deserializer instance for the {@link Color} class. Add this as a
-   * {@link TypeAdapter} to your {@link GsonBuilder}:
+   * Get (de)serializer instance for the {@link Color} class. Add this as a {@link TypeAdapter} to
+   * your {@link GsonBuilder}:
    *
-   * <pre>
-   * {@code
+   * <pre>{@code
    * GsonBuilder gsonBuilder = new GsonBuilder;
    * gsonBuilder.
    *     .registerTypeAdapter(Color.class,
-   *     ColorTypeAdapter.getContentJsonDeserializer());
+   *     ColorTypeAdapter.getAdapter());
    * Gson gson = gsonBuilder.create();
-   * }
-   * </pre>
+   * }</pre>
    *
-   * @return a (de)serializer for colors that implements {@link JsonSerializer}
-   *         and {@link JsonDeserializer}
+   * @return a (de)serializer for colors that implements {@link JsonSerializer} and {@link
+   *     JsonDeserializer}
    */
   public static Object getAdapter() {
     return INSTANCE;
@@ -72,5 +67,4 @@ public class ColorTypeAdapter implements JsonSerializer<Color>, JsonDeserializer
     jsonColor.addProperty(OPACITY, src.getOpacity());
     return context.serialize(jsonColor);
   }
-
 }

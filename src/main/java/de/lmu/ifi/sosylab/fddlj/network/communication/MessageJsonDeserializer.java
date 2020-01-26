@@ -36,18 +36,16 @@ public class MessageJsonDeserializer<T> implements JsonDeserializer<Message<T>> 
    * GsonBuilder gsonBuilder = new GsonBuilder;
    * gsonBuilder.
    *     .registerTypeAdapter(Message.class,
-   *     MessageJsonDeserializer.getContentJsonDeserializer());
+   *     MessageJsonDeserializer.getDeserializer());
    * Gson gson = gsonBuilder.create();
    * }</pre>
    *
    * @param <T> generic type of the message data
    * @return a deserializer for messages with generic data types
    */
-  public static <T> JsonDeserializer<T> getContentJsonDeserializer() {
-    @SuppressWarnings("unchecked")
-    final JsonDeserializer<T> messageJsonDeserializer =
-        (JsonDeserializer<T>) MessageJsonDeserializer.INSTANCE;
-    return messageJsonDeserializer;
+  @SuppressWarnings("unchecked")
+  public static <T> JsonDeserializer<T> getDeserializer() {
+    return (JsonDeserializer<T>) MessageJsonDeserializer.INSTANCE;
   }
 
   @Override
