@@ -96,9 +96,10 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     } else {
       new Thread(
           () -> {
-            boolean succesful = model.placeDisk(
-                new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer()), on);
-
+            boolean succesful =
+                model.placeDisk(
+                    new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer()),
+                    on);
             if (!succesful) {
               showAlert(
                   AlertType.ERROR,
@@ -243,6 +244,7 @@ public class MultiplayerControllerImpl implements MultiplayerController {
     }
     this.model.substitutePlayersWith(ownPlayer, aiPlayer);
     this.model.unsetWaiting();
+    this.model.triggerAiMove();
     this.model.addListener(view);
     ((ClientCompatibleGui) view).modelExchanged(this.model);
   }

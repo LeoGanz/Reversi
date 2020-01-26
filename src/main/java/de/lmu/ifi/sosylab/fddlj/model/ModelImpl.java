@@ -129,20 +129,8 @@ public class ModelImpl implements Model {
       }
 
       notifyListenersOfChangedState();
+      triggerAiMove();
 
-      if (mode.equals(GameMode.SINGLEPLAYER)
-          && (state.getPlayerManagement().getCurrentPlayer() instanceof AiPlayer)
-          && state.getCurrentPhase().equals(Phase.RUNNING)) {
-        long sleepAmount =
-            new Random().nextInt(AI_MAX_SLEEP_AMOUNT - AI_MOVE_OFFSET) + AI_MOVE_OFFSET;
-        try {
-          Thread.sleep(sleepAmount);
-        } catch (InterruptedException e) {
-          // Doesn't matter
-        }
-        Cell bestMove = ai.calculateBestMove(state);
-        placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), bestMove);
-      }
       return true;
 
     } else {
@@ -318,8 +306,8 @@ public class ModelImpl implements Model {
     return false;
   }
 
-  /**
-   * Notifies all Listeners of a changed {@link GameState}.
+  /** 
+   * Notifies all Listeners of a changed {@link GameState}. 
    */
   private void notifyListenersOfChangedState() {
     support.firePropertyChange(Model.STATE_CHANGED, null, state);
@@ -387,5 +375,22 @@ public class ModelImpl implements Model {
    */
   public int getNumberOfDisksPlayerTwo() {
     return numberOfPlayerTwoDisks;
+  }
+
+  @Override
+  public void triggerAiMove() {
+    if (mode.equals(GameMode.SINGLEPLAYER)
+        && (state.getPlayerManagement().getCurrentPlayer() instanceof AiPlayer)
+        && state.getCurrentPhase().equals(Phase.RUNNING)) {
+      long sleepAmount =
+          new Random().nextInt(AI_MAX_SLEEP_AMOUNT - AI_MOVE_OFFSET) + AI_MOVE_OFFSET;
+      try {
+        Thread.sleep(sleepAmount);
+      } catch (InterruptedException e) {
+        // Doesn't matter
+      }
+      Cell bestMove = ai.calculateBestMove(state);
+      placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), bestMove);
+    }
   }
 }

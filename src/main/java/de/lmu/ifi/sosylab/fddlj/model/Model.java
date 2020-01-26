@@ -88,4 +88,7 @@ public interface Model {
    * @author Leonard Ganz
    */
   void substitutePlayersWith(Player newPlayerOne, Player newPlayerTwo);
+
+  /** Causes the AI to calculate and do a move. */
+  void triggerAiMove();
 }
