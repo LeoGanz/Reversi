@@ -18,7 +18,7 @@ public class ModelImpl implements Model {
 
   private final PropertyChangeSupport support;
   private static final int AI_MOVE_OFFSET = 750;
-  private static final int AI_MAX_SLEEP_AMOUNT = 2500;
+  private static final int AI_MAX_SLEEP_AMOUNT = 1700;
 
   private ModifiableGameState state;
   private GameMode mode;

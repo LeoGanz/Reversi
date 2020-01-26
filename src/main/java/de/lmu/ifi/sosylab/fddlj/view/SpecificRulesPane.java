@@ -24,6 +24,9 @@ public class SpecificRulesPane extends VBox {
 
   private static final int IMAGE_HEIGHT = 260;
   private final Font textFont = Font.font("Calibri", FontWeight.NORMAL, 18);
+  private static final int VBOX_SPACING = 10;
+  private static final int HBOX_SPACING = 20;
+  private static final int LINESPACING_TEXTFLOW = 4;
 
   private ResourceBundle messages;
 
@@ -46,7 +49,7 @@ public class SpecificRulesPane extends VBox {
   }
 
   private VBox getGeneralRules() {
-    VBox vbox = new VBox(10);
+    VBox vbox = new VBox(VBOX_SPACING);
     vbox.setAlignment(Pos.CENTER);
 
     Label heading = new Label(messages.getString("aboutWindow_Rules_General_Heading"));
@@ -59,7 +62,7 @@ public class SpecificRulesPane extends VBox {
   }
 
   private VBox getGameFieldInformation() {
-    VBox vbox = new VBox(10);
+    VBox vbox = new VBox(VBOX_SPACING);
     vbox.setAlignment(Pos.CENTER);
 
     Label heading = new Label(messages.getString("aboutWindow_Rules_GameField"));
@@ -81,7 +84,7 @@ public class SpecificRulesPane extends VBox {
 
   private VBox getFirstMovesInformation() {
 
-    VBox vbox = new VBox(10);
+    VBox vbox = new VBox(VBOX_SPACING);
     vbox.setAlignment(Pos.CENTER);
 
     Label heading = new Label(messages.getString("aboutWindow_Rules_DiskNumber"));
@@ -102,7 +105,7 @@ public class SpecificRulesPane extends VBox {
   }
 
   private VBox getGameStartInformation() {
-    VBox vbox = new VBox(10);
+    VBox vbox = new VBox(VBOX_SPACING);
     vbox.setAlignment(Pos.CENTER);
 
     Label heading = new Label(messages.getString("aboutWindow_Rules_GameStart"));
@@ -111,7 +114,7 @@ public class SpecificRulesPane extends VBox {
 
     vbox.getChildren().add(getTextFlow(getText(messages.getString("aboutWindow_Rules_GameStart"))));
 
-    HBox hbox = new HBox(20);
+    HBox hbox = new HBox(HBOX_SPACING);
     hbox.setAlignment(Pos.CENTER);
 
     Image versOne =
@@ -133,7 +136,7 @@ public class SpecificRulesPane extends VBox {
   }
 
   private VBox getPlacementRulesInformation() {
-    VBox vbox = new VBox(10);
+    VBox vbox = new VBox(VBOX_SPACING);
     vbox.setAlignment(Pos.CENTER);
 
     Label heading = new Label(messages.getString("aboutWindow_Rules_PossibleMoves"));
@@ -164,7 +167,7 @@ public class SpecificRulesPane extends VBox {
   }
 
   private VBox getGameEndingInformation() {
-    VBox vbox = new VBox(10);
+    VBox vbox = new VBox(VBOX_SPACING);
     vbox.setAlignment(Pos.CENTER);
 
     Label heading = new Label(messages.getString("aboutWindow_Rules_GameEnding"));
@@ -180,7 +183,7 @@ public class SpecificRulesPane extends VBox {
   private TextFlow getTextFlow(Text text) {
     TextFlow textFlow = new TextFlow();
     textFlow.getChildren().add(text);
-    textFlow.setLineSpacing(4);
+    textFlow.setLineSpacing(LINESPACING_TEXTFLOW);
     textFlow.setTextAlignment(TextAlignment.CENTER);
 
     return textFlow;

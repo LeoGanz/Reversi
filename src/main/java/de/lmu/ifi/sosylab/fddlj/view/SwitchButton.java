@@ -33,32 +33,6 @@ public class SwitchButton extends StackPane {
           + " -fx-background-color: #00893d;";
   private boolean state;
 
-  private void init(double width, double height) {
-
-    back = new Rectangle(width, height, Color.RED);
-    getChildren().addAll(back, button);
-    setMinSize(width, height);
-    back.maxWidth(width);
-    back.minWidth(width);
-    back.prefWidth(width);
-    back.maxHeight(height);
-    back.minHeight(height);
-    back.prefHeight(height);
-    back.setArcHeight(back.getHeight());
-    back.setArcWidth(back.getHeight());
-    Double r = 2 * height;
-    button.setShape(new Circle(r));
-    setAlignment(button, Pos.CENTER_LEFT);
-    button.setMaxSize(2 * height, 2 * height);
-    button.setMinSize(2 * height, 2 * height);
-    button.setCursor(Cursor.HAND);
-
-    button.setStyle(buttonStyleOn);
-    back.setFill(Color.valueOf("#80C49E"));
-    setAlignment(button, Pos.CENTER_RIGHT);
-    state = true;
-  }
-
   /**
    * Constructor of the class initialises the button and adds the necessary functionality.
    *
@@ -94,6 +68,32 @@ public class SwitchButton extends StackPane {
     button.setFocusTraversable(false);
     setOnMouseClicked(click);
     button.setOnMouseClicked(click);
+  }
+
+  private void init(double width, double height) {
+
+    back = new Rectangle(width, height, Color.RED);
+    getChildren().addAll(back, button);
+    setMinSize(width, height);
+    back.maxWidth(width);
+    back.minWidth(width);
+    back.prefWidth(width);
+    back.maxHeight(height);
+    back.minHeight(height);
+    back.prefHeight(height);
+    back.setArcHeight(back.getHeight());
+    back.setArcWidth(back.getHeight());
+    Double r = 2 * height;
+    button.setShape(new Circle(r));
+    setAlignment(button, Pos.CENTER_LEFT);
+    button.setMaxSize(2 * height, 2 * height);
+    button.setMinSize(2 * height, 2 * height);
+    button.setCursor(Cursor.HAND);
+
+    button.setStyle(buttonStyleOn);
+    back.setFill(Color.valueOf("#80C49E"));
+    setAlignment(button, Pos.CENTER_RIGHT);
+    state = true;
   }
 
   /**

@@ -98,16 +98,21 @@ public class SpectatorInformationPane extends BorderPane {
             return;
           }
 
-          if (!lobbyID.getText().trim().matches("(?<=\\s|^)\\d+(?=\\s|$)")) {
-            lobbyID.setStyle("-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
-            return;
+          if (!lobbyID.getText().isEmpty()) {
+            if (!lobbyID.getText().trim().matches("(?<=\\s|^)\\d+(?=\\s|$)")) {
+              lobbyID.setStyle(
+                  "-fx-border-color: transparent transparent rgb(255,0,0) transparent;");
+              return;
+            }
           }
 
-          startSpectateMode(
-              playername.getText(),
-              serverAddress.getText(),
-              Integer.parseInt(lobbyID.getText()),
-              primaryStage);
+          int lobbyId;
+          if (!lobbyID.getText().isEmpty()) {
+            lobbyId = Integer.parseInt(lobbyID.getText());
+          } else {
+            lobbyId = -1;
+          }
+          startSpectateMode(playername.getText(), serverAddress.getText(), lobbyId, primaryStage);
           selector.close();
         });
 

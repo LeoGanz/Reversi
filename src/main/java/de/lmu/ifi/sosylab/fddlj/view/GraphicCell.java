@@ -165,7 +165,6 @@ public class GraphicCell extends BorderPane implements PropertyChangeListener {
   }
 
   private void handleMouseMoved(MouseEvent e) {
-
     if (controller.getCurrentGameMode() == GameMode.SPECTATOR) {
       return;
     }

@@ -116,6 +116,10 @@ public class SpectatorList extends BorderPane implements PropertyChangeListener 
       if (evt.getNewValue() instanceof Spectators) {
         buildSpectatorList((Spectators) evt.getNewValue());
       }
+    } else if (evt.getPropertyName() == ViewImpl.LOBBYID_CHANGED) {
+      if (evt.getNewValue() instanceof Integer) {
+        showLobbyId((int) evt.getNewValue());
+      }
     }
   }
 

@@ -54,6 +54,26 @@ import javafx.stage.StageStyle;
  */
 public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
+  static final String LOBBYID_CHANGED = "Lobby id changed";
+
+  private static final int MINHEIGHT_SPACER = 40;
+  private static final int MAXHEIGHT_SPACER = 80;
+  private static final Insets GAMEBOARD_INSETS = new Insets(30, 50, 30, 50);
+  private static final Insets INSETS_PANERIGHT = new Insets(0, 15, 0, 0);
+
+  private static final Font FONT_BUTTON = Font.font(18);
+  private static final Cursor CURSOR_BUTTON = Cursor.HAND;
+  private static final int MINWIDTH_BUTTON = 100;
+  private static final int MAXWIDTH_BUTTON = 250;
+  private static final int MINHEIGHT_BUTTON = 40;
+  private static final int PREFWIDTH_BUTTON = 170;
+  private static final int PREFHEIGHT_BUTTON = 50;
+
+  final Image play =
+      new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker.png"));
+  final Image mute =
+      new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker_mute.png"));
+
   private Model model;
   private Controller controller;
 
@@ -65,6 +85,8 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   private Label numberPlayerOneDisks;
   private Label numberPlayerTwoDisks;
   private Label lobbyID;
+  private VBox diskTrianglePlayerOne;
+  private VBox diskTrianglePlayerTwo;
 
   private PropertyChangeSupport support;
 
@@ -133,14 +155,14 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     root.setId("main-background");
 
     HBox spacerTop = new HBox();
-    spacerTop.setMinHeight(40);
-    spacerTop.setMaxHeight(80);
+    spacerTop.setMinHeight(MINHEIGHT_SPACER);
+    spacerTop.setMaxHeight(MAXHEIGHT_SPACER);
     spacerTop.setId("borderpane-spacer");
     root.setTop(spacerTop);
 
     HBox spacerBottom = new HBox();
-    spacerBottom.setMinHeight(40);
-    spacerBottom.setMaxHeight(80);
+    spacerBottom.setMinHeight(MINHEIGHT_SPACER);
+    spacerBottom.setMaxHeight(MAXHEIGHT_SPACER);
     spacerBottom.setId("borderpane-spacer");
     root.setBottom(spacerBottom);
 
@@ -151,11 +173,11 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     gameBoard = new GameBoardGrid(model, controller, stage, this, messages);
     root.setCenter(gameBoard);
     BorderPane.setAlignment(root, Pos.CENTER);
-    BorderPane.setMargin(gameBoard, new Insets(30, 50, 30, 50));
+    BorderPane.setMargin(gameBoard, GAMEBOARD_INSETS);
 
     VBox right = getMuteAndMainMenuButton();
     root.setRight(right);
-    BorderPane.setMargin(right, new Insets(0, 15, 0, 0));
+    BorderPane.setMargin(right, INSETS_PANERIGHT);
 
     scene = new Scene(root);
     stage.setMinWidth(
@@ -207,6 +229,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
               model.getState().getPlayerManagement().getPlayerOne(),
               model.getState().getPlayerManagement().getPlayerTwo(),
               model.getState().getField().getSize());
+
           if (gameMode == GameMode.MULTIPLAYER) {
             gameBoard.setDisable(true);
             showAlert(
@@ -258,12 +281,12 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       playerOneInfo.setMaxWidth(Double.POSITIVE_INFINITY);
 
       ModelImpl mod = (ModelImpl) model;
-      Font labelFont = Font.font("Boulder", FontWeight.BOLD, 25);
 
-      VBox diskTriangle =
+      diskTrianglePlayerOne =
           buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor());
-      playerOneInfo.getChildren().add(diskTriangle);
+      playerOneInfo.getChildren().add(diskTrianglePlayerOne);
       numberPlayerOneDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerOne()));
+      Font labelFont = Font.font("Boulder", FontWeight.BOLD, 25);
       numberPlayerOneDisks.setFont(labelFont);
       numberPlayerOneDisks.getStyleClass().add("white-label");
       playerOneInfo.getChildren().add(numberPlayerOneDisks);
@@ -273,9 +296,9 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       playerTwoInfo.setAlignment(Pos.CENTER);
       playerTwoInfo.getStyleClass().add("transparent");
 
-      playerTwoInfo
-          .getChildren()
-          .add(buildDiskTriangle(model.getState().getPlayerManagement().getPlayerTwo().getColor()));
+      diskTrianglePlayerTwo =
+          buildDiskTriangle(model.getState().getPlayerManagement().getPlayerTwo().getColor());
+      playerTwoInfo.getChildren().add(diskTrianglePlayerTwo);
       numberPlayerTwoDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
       numberPlayerTwoDisks.setFont(labelFont);
       numberPlayerTwoDisks.getStyleClass().add("white-label");
@@ -283,10 +306,40 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
 
       vbox.getChildren().add(playerTwoInfo);
 
-      vbox.setMinHeight((vbox.getSpacing() + diskTriangle.getMinHeight() * 2));
+      vbox.setMinHeight((vbox.getSpacing() + diskTrianglePlayerOne.getMinHeight() * 2));
       vbox.setMinWidth(
-          (diskTriangle.getMinWidth() + playerOneInfo.getSpacing() + labelFont.getSize() * 2));
+          (diskTrianglePlayerOne.getMinWidth()
+              + playerOneInfo.getSpacing()
+              + labelFont.getSize() * 2));
     }
+
+    return vbox;
+  }
+
+  private VBox buildDiskTriangle(Color color) {
+    GridPane grid = new GridPane();
+    VBox vbox = new VBox(3);
+
+    vbox.getStyleClass().add("transparent");
+    grid.setGridLinesVisible(false);
+    vbox.setAlignment(Pos.CENTER);
+
+    GraphicDisk diskOne = new GraphicDisk(30, 30, 15, color);
+
+    HBox topRow = new HBox();
+    topRow.setAlignment(Pos.CENTER);
+    topRow.getChildren().add(diskOne);
+    GraphicDisk diskTwo = new GraphicDisk(30, 30, 15, color);
+    GraphicDisk diskThree = new GraphicDisk(30, 30, 15, color);
+
+    HBox bottomRow = new HBox(3);
+    bottomRow.setAlignment(Pos.CENTER);
+    bottomRow.getChildren().addAll(diskTwo, diskThree);
+
+    vbox.setMinHeight(80);
+    vbox.setMinWidth((3 * 30));
+
+    vbox.getChildren().addAll(topRow, bottomRow);
 
     return vbox;
   }
@@ -329,11 +382,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {
       vbox.getChildren().add(new Separator(Orientation.HORIZONTAL));
     }
-
-    final Image play =
-        new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker.png"));
-    final Image mute =
-        new Image(getClass().getClassLoader().getResourceAsStream("images/loudspeaker_mute.png"));
 
     ImageView imageView = new ImageView(play);
     imageView.setPreserveRatio(true);
@@ -402,7 +450,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       slider.setCursor(Cursor.HAND);
 
       Label label = new Label(String.valueOf(volume * 100));
-      label.setStyle("-fx-text-file: #000000; -fx-font-size: x-large;");
+      label.getStyleClass().add("spectatorlist-label");
       slider
           .valueProperty()
           .addListener(
@@ -430,6 +478,50 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
                   volumeControlShowing = false;
                 }
               });
+    }
+  }
+
+  private Button getButton(String text) {
+    Button button = new Button(text);
+    button.setId("button");
+    button.setMinHeight(MINHEIGHT_BUTTON);
+    button.setPrefHeight(PREFHEIGHT_BUTTON);
+    button.setMaxWidth(MAXWIDTH_BUTTON);
+    button.setMinWidth(MINWIDTH_BUTTON);
+    button.setPrefWidth(PREFWIDTH_BUTTON);
+    button.setCursor(CURSOR_BUTTON);
+    button.setFont(FONT_BUTTON);
+
+    return button;
+  }
+
+  @Override
+  public void showWaitingScreen() {
+    root = new BorderPane();
+    root.getStylesheets().add("cssFiles/mainGame.css");
+    root.setId("main-background");
+    root.setPadding(new Insets(50));
+
+    Image loadingGif =
+        new Image(getClass().getClassLoader().getResourceAsStream("images/LoadingGif.gif"));
+    ImageView imageView = new ImageView(loadingGif);
+    root.setCenter(imageView);
+
+    Label waiting = new Label(messages.getString("ViewImpl_WaitForOpponent"));
+    waiting.setFont(Font.font(20));
+    waiting.setStyle("-fx-text-fill: white");
+    root.setTop(waiting);
+    BorderPane.setAlignment(waiting, Pos.CENTER);
+
+    lobbyID = new Label(messages.getString("ViewImpl_LabelLobbyID"));
+    lobbyID.setStyle("-fx-text-fill: white");
+    root.setBottom(lobbyID);
+    BorderPane.setAlignment(lobbyID, Pos.CENTER);
+
+    scene = new Scene(root);
+    stage.setScene(scene);
+    if (!stage.isShowing()) {
+      stage.show();
     }
   }
 
@@ -471,20 +563,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     }
   }
 
-  private Button getButton(String text) {
-    Button button = new Button(text);
-    button.setId("button");
-    button.setMinHeight(40);
-    button.setPrefHeight(50);
-    button.setMaxWidth(250);
-    button.setMinWidth(100);
-    button.setPrefWidth(170);
-    button.setCursor(Cursor.HAND);
-    button.setFont(Font.font(18));
-
-    return button;
-  }
-
   @Override
   public void addListener(PropertyChangeListener listener) {
     support.addPropertyChangeListener(listener);
@@ -495,34 +573,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     support.removePropertyChangeListener(listener);
   }
 
-  private VBox buildDiskTriangle(Color color) {
-    GridPane grid = new GridPane();
-    VBox vbox = new VBox(3);
-
-    vbox.getStyleClass().add("transparent");
-    grid.setGridLinesVisible(false);
-    vbox.setAlignment(Pos.CENTER);
-
-    GraphicDisk diskOne = new GraphicDisk(30, 30, 15, color);
-
-    HBox topRow = new HBox();
-    topRow.setAlignment(Pos.CENTER);
-    topRow.getChildren().add(diskOne);
-    GraphicDisk diskTwo = new GraphicDisk(30, 30, 15, color);
-    GraphicDisk diskThree = new GraphicDisk(30, 30, 15, color);
-
-    HBox bottomRow = new HBox(3);
-    bottomRow.setAlignment(Pos.CENTER);
-    bottomRow.getChildren().addAll(diskTwo, diskThree);
-
-    vbox.setMinHeight(80);
-    vbox.setMinWidth((3 * 30));
-
-    vbox.getChildren().addAll(topRow, bottomRow);
-
-    return vbox;
-  }
-
   @Override
   public void receivedJoinRequestResponse(Response response) {
     Platform.runLater(() -> handleJoinRequestResponse(response));
@@ -531,7 +581,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   private void handleJoinRequestResponse(Response response) {
     if (response.getType() == ResponseType.JOIN_SUCCESSFUL) {
       lobbyId = response.getLobbyID();
-
+      support.firePropertyChange(LOBBYID_CHANGED, null, lobbyId);
       if (lobbyID != null) {
         lobbyID.setText(lobbyID.getText() + " " + response.getLobbyID());
       }
@@ -568,13 +618,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       ((ControllerImpl) controller).showGameModeSelector(new Stage());
     }
 
-    if (aboutWindow != null && aboutWindow.isShowing()) {
-      aboutWindow.close();
-    }
-
-    if (gameFinishedScreen != null && gameFinishedScreen.isShowing()) {
-      gameFinishedScreen.close();
-    }
+    closeOpenWindows();
 
     stage.close();
   }
@@ -606,6 +650,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       case RECEIVED_INVALID_DATA:
         break;
       case PARTNER_ACCEPTED_RESTART:
+        gameBoard.setDisable(false);
         break;
       case PARTNER_DENIED_RESTART:
         showAlert(
@@ -742,7 +787,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     if (!stage.isShowing()) {
       return;
     }
-    Model copyModel = model;
     ButtonType backToMainMenu = new ButtonType(messages.getString("ViewImpl_ButtonBack_Text"));
     ButtonType continueAgainstAi =
         new ButtonType(messages.getString("ViewImpl_ButtonContinueAgainstAI_Text"));
@@ -773,7 +817,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
     if (optional.get().equals(backToMainMenu)) {
       returnToMainMenu();
     } else if (optional.get().equals(continueAgainstAi)) {
-      controller.continueAgainstAi(copyModel);
+      controller.continueAgainstAi(model);
     } else if (optional.get().equals(exit)) {
       controller.close();
     } else if (optional.get().equals(remainAndWait)) {
@@ -796,7 +840,7 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
           support.firePropertyChange(Model.STATE_CHANGED, null, model.getState());
 
           changePlayerDiskNumber();
-
+          closeOpenWindows();
           showGame(controller.getCurrentGameMode());
         });
   }
@@ -804,36 +848,6 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   @Override
   public void receivedSpectator(Spectators spectators) {
     Platform.runLater(() -> support.firePropertyChange(View.SPECTATORS_CHANGED, null, spectators));
-  }
-
-  @Override
-  public void showWaitingScreen() {
-    root = new BorderPane();
-    root.getStylesheets().add("cssFiles/mainGame.css");
-    root.setId("main-background");
-    root.setPadding(new Insets(50));
-
-    Image loadingGif =
-        new Image(getClass().getClassLoader().getResourceAsStream("images/LoadingGif.gif"));
-    ImageView imageView = new ImageView(loadingGif);
-    root.setCenter(imageView);
-
-    Label waiting = new Label(messages.getString("ViewImpl_WaitForOpponent"));
-    waiting.setFont(Font.font(20));
-    waiting.setStyle("-fx-text-fill: white");
-    root.setTop(waiting);
-    BorderPane.setAlignment(waiting, Pos.CENTER);
-
-    lobbyID = new Label(messages.getString("ViewImpl_LabelLobbyID"));
-    lobbyID.setStyle("-fx-text-fill: white");
-    root.setBottom(lobbyID);
-    BorderPane.setAlignment(lobbyID, Pos.CENTER);
-
-    scene = new Scene(root);
-    stage.setScene(scene);
-    if (!stage.isShowing()) {
-      stage.show();
-    }
   }
 
   private void showAlert(AlertType alertType, String title, String header, String content) {
@@ -885,8 +899,11 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
       ModelImpl mod = (ModelImpl) model;
 
       numberPlayerOneDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerOne()));
-
       numberPlayerTwoDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerTwo()));
+      diskTrianglePlayerOne =
+          buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor());
+      diskTrianglePlayerTwo =
+          buildDiskTriangle(model.getState().getPlayerManagement().getPlayerTwo().getColor());
     }
   }
 
@@ -906,5 +923,15 @@ public class ViewImpl implements OnlineView, ClientCompatibleGui {
   @Override
   public void displayAlert(AlertType alertType, String title, String subtitle, String content) {
     showAlert(alertType, title, subtitle, content);
+  }
+
+  private void closeOpenWindows() {
+    if (aboutWindow != null && aboutWindow.isShowing()) {
+      aboutWindow.close();
+    }
+
+    if (gameFinishedScreen != null && gameFinishedScreen.isShowing()) {
+      gameFinishedScreen.close();
+    }
   }
 }
