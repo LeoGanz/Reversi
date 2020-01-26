@@ -129,6 +129,10 @@ public class ServerImpl implements Server {
 
   private void handlePublicJoin(ClientConnection conn, Player player, boolean asSpectator) {
     if (asSpectator) {
+      if (lobbies.isEmpty()) {
+        conn.sendMessageWith(new JoinRequest.Response(ResponseType.NO_LOBBY_AVAILABLE));
+        return;
+      }
       GameLobby[] lobbiesArray = lobbies.values().toArray(new GameLobby[0]);
       GameLobby randomLobby = lobbiesArray[new Random().nextInt(lobbiesArray.length)];
       handleLobbyJoinAsSpectator(randomLobby, conn, player);

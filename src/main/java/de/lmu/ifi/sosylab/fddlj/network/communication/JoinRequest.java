@@ -107,7 +107,7 @@ public class JoinRequest {
    */
   public enum JoinType {
     ANY_PUBLIC_LOBBY, // random match making
-    SPECIFIC_LOBBY, // lobby by ID
+    SPECIFIC_LOBBY,   // lobby by ID
     NEW_PRIVATE_LOBBY // new lobby not included in random matchmaking
   }
 
@@ -126,6 +126,7 @@ public class JoinRequest {
     public enum ResponseType {
       JOIN_SUCCESSFUL,
       LOBBY_NOT_FOUND,
+      NO_LOBBY_AVAILABLE,
       NO_PLAYERS_NEEDED;
     }
 
