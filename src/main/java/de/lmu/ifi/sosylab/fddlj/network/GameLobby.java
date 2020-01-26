@@ -316,7 +316,7 @@ public class GameLobby {
         .forEach(conn -> conn.sendMessageWith(objectToBrodcast));
   }
 
-  private Object getSpectators() {
+  private Spectators getSpectators() {
     return new Spectators(lobbyID, spectatorsPlayers.values());
   }
 
