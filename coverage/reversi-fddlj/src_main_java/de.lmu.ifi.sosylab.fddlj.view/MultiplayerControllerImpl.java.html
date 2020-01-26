@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>MultiplayerControllerImpl.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">MultiplayerControllerImpl.java</span></div><h1>MultiplayerControllerImpl.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.AiPlayerImpl;
+import de.lmu.ifi.sosylab.fddlj.model.Cell;
+import de.lmu.ifi.sosylab.fddlj.model.DiskImpl;
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.network.Client;
+import de.lmu.ifi.sosylab.fddlj.network.ClientCompatibleGui;
+import de.lmu.ifi.sosylab.fddlj.network.ClientImpl;
+import de.lmu.ifi.sosylab.fddlj.network.Server;
+import de.lmu.ifi.sosylab.fddlj.network.ServerImpl;
+import de.lmu.ifi.sosylab.fddlj.view.server.ServerGui;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+/**
+ * This class represents the implementation of the {@link MultiplayerController} interface and is
+ * responsible for setting up and managing an online game.
+ *
+ * @author Josef Feger
+ */
+public class MultiplayerControllerImpl implements MultiplayerController {
+
+  private Client client;
+  private Stage mainStage;
+  private Player ownPlayer;
+  private View view;
+  private Model model;
+
+  private GameMode gameMode;
+
+  private ResourceBundle messages;
+
+  private BlockingQueue&lt;Runnable&gt; asynchronousWorkloads;
+
+  /**
+   * Public constructor of this class takes the stage created by the JavaFX thread that is used to
+   * display the game.
+   *
+   * @param primaryStage the javaFX thread's stage
+   */
+<span class="nc" id="L54">  public MultiplayerControllerImpl(Stage primaryStage) {</span>
+<span class="nc" id="L55">    mainStage = primaryStage;</span>
+
+<span class="nc" id="L57">    asynchronousWorkloads = new LinkedBlockingQueue&lt;&gt;();</span>
+
+<span class="nc" id="L59">    Locale locale = Locale.getDefault();</span>
+<span class="nc" id="L60">    messages = ResourceBundle.getBundle(&quot;files/MessagesBundle&quot;, locale);</span>
+
+<span class="nc" id="L62">    initWorkerThread();</span>
+<span class="nc" id="L63">  }</span>
+
+  private void initWorkerThread() {
+<span class="nc" id="L66">    Thread worker =</span>
+<span class="nc" id="L67">        new Thread(</span>
+<span class="nc" id="L68">            () -&gt; {</span>
+<span class="nc" id="L69">              while (true) {</span>
+                try {
+<span class="nc" id="L71">                  asynchronousWorkloads.take().run();</span>
+<span class="nc" id="L72">                } catch (InterruptedException e) {</span>
+                  continue;
+                }
+              }
+            });
+<span class="nc" id="L77">    worker.setDaemon(true);</span>
+<span class="nc" id="L78">    worker.start();</span>
+<span class="nc" id="L79">  }</span>
+
+  @Override
+  public void startMainView(
+      GameMode gameMode, Stage stage, Player playerOne, Player playerTwo, int gameFieldSize) {
+<span class="nc" id="L84">    throw new UnsupportedOperationException();</span>
+  }
+
+  @Override
+  public void resetGame(GameMode gameMode, Player playerOne, Player playerTwo, int gameFieldSize) {
+<span class="nc" id="L89">    requestGameReset();</span>
+<span class="nc" id="L90">  }</span>
+
+  @Override
+  public void placeDisk(Cell on) {
+<span class="nc bnc" id="L94" title="All 2 branches missed.">    if (gameMode == GameMode.MULTIPLAYER) {</span>
+<span class="nc" id="L95">      client.placeDisk(new DiskImpl(ownPlayer), on);</span>
+<span class="nc" id="L96">    } else {</span>
+<span class="nc" id="L97">      new Thread(</span>
+<span class="nc" id="L98">          () -&gt; {</span>
+<span class="nc" id="L99">            boolean succesful =</span>
+<span class="nc" id="L100">                model.placeDisk(</span>
+<span class="nc" id="L101">                    new DiskImpl(model.getState().getPlayerManagement().getCurrentPlayer()),</span>
+<span class="nc" id="L102">                    on);</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">            if (!succesful) {</span>
+<span class="nc" id="L104">              showAlert(</span>
+<span class="nc" id="L105">                  AlertType.ERROR,</span>
+<span class="nc" id="L106">                  messages.getString(&quot;ControllerImpl_DiskError_Title&quot;),</span>
+<span class="nc" id="L107">                  messages.getString(&quot;ControllerImpl_DiskError_Subtitle&quot;),</span>
+<span class="nc" id="L108">                  messages.getString(&quot;ControllerImpl_DiskError_Info&quot;));</span>
+            }
+<span class="nc" id="L110">          })</span>
+<span class="nc" id="L111">          .start();</span>
+    }
+<span class="nc" id="L113">  }</span>
+
+  @Override
+  public GameMode getCurrentGameMode() {
+<span class="nc" id="L117">    return gameMode;</span>
+  }
+
+  @Override
+  public void startOnlineGame(
+      Player ownPlayer, String serverAddress, int lobbyID, boolean createPrivateLobby) {
+<span class="nc" id="L123">    this.ownPlayer = ownPlayer;</span>
+<span class="nc" id="L124">    ClientCompatibleGui gui = new ViewImpl(mainStage, null, this, messages);</span>
+<span class="nc" id="L125">    view = gui;</span>
+
+    try {
+<span class="nc" id="L128">      client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);</span>
+<span class="nc" id="L129">      gui.showWaitingScreen();</span>
+
+<span class="nc" id="L131">      asynchronousWorkloads.add(</span>
+<span class="nc" id="L132">          () -&gt; {</span>
+<span class="nc" id="L133">            client.startClient();</span>
+
+<span class="nc bnc" id="L135" title="All 2 branches missed.">            if (createPrivateLobby) {</span>
+<span class="nc" id="L136">              client.createNewPrivateLobby();</span>
+<span class="nc" id="L137">            } else {</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">              if (lobbyID &gt;= 0) {</span>
+<span class="nc" id="L139">                client.joinSpecificLobby(false, lobbyID);</span>
+<span class="nc" id="L140">              } else {</span>
+<span class="nc" id="L141">                client.joinAnyRandomPublicLobby(false);</span>
+              }
+            }
+<span class="nc" id="L144">          });</span>
+
+<span class="nc" id="L146">    } catch (UnknownHostException e) {</span>
+<span class="nc" id="L147">      showAlert(</span>
+<span class="nc" id="L148">          AlertType.ERROR,</span>
+<span class="nc" id="L149">          messages.getString(&quot;ControllerImpl_ConnectionError_Title&quot;),</span>
+<span class="nc" id="L150">          messages.getString(&quot;ControllerImpl_ConnectionError_Subtitle&quot;),</span>
+<span class="nc" id="L151">          messages.getString(&quot;ControllerImpl_ConnectionError_Info&quot;));</span>
+
+<span class="nc" id="L153">      Controller controller = new ControllerImpl(messages);</span>
+<span class="nc" id="L154">      ((ControllerImpl) controller).showGameModeSelector(new Stage());</span>
+    }
+
+<span class="nc" id="L157">    gameMode = GameMode.MULTIPLAYER;</span>
+<span class="nc" id="L158">  }</span>
+
+  @Override
+  public void requestGameReset() {
+<span class="nc" id="L162">    client.requestGameRestart();</span>
+<span class="nc" id="L163">  }</span>
+
+  @Override
+  public Player getOwnPlayer() {
+<span class="nc" id="L167">    return ownPlayer;</span>
+  }
+
+  @Override
+  public void startSpectateGame(Player ownPlayer, String serverAddress, int lobbyID) {
+<span class="nc" id="L172">    gameMode = GameMode.SPECTATOR;</span>
+<span class="nc" id="L173">    this.ownPlayer = ownPlayer;</span>
+<span class="nc" id="L174">    ClientCompatibleGui gui = new ViewImpl(mainStage, null, this, messages);</span>
+<span class="nc" id="L175">    view = gui;</span>
+
+    try {
+<span class="nc" id="L178">      client = new ClientImpl(gui, InetAddress.getByName(serverAddress), ownPlayer);</span>
+<span class="nc" id="L179">      gui.showWaitingScreen();</span>
+
+<span class="nc" id="L181">      asynchronousWorkloads.add(</span>
+<span class="nc" id="L182">          () -&gt; {</span>
+<span class="nc" id="L183">            client.startClient();</span>
+
+<span class="nc bnc" id="L185" title="All 2 branches missed.">            if (lobbyID &gt; 0) {</span>
+<span class="nc" id="L186">              client.joinSpecificLobby(true, lobbyID);</span>
+<span class="nc" id="L187">            } else {</span>
+<span class="nc" id="L188">              client.joinAnyRandomPublicLobby(true);</span>
+            }
+<span class="nc" id="L190">          });</span>
+<span class="nc" id="L191">    } catch (UnknownHostException e) {</span>
+<span class="nc" id="L192">      showAlert(</span>
+<span class="nc" id="L193">          AlertType.ERROR,</span>
+<span class="nc" id="L194">          messages.getString(&quot;ControllerImpl_ConnectionError_Title&quot;),</span>
+<span class="nc" id="L195">          messages.getString(&quot;ControllerImpl_ConnectionError_Subtitle&quot;),</span>
+<span class="nc" id="L196">          messages.getString(&quot;ControllerImpl_ConnectionError_Info&quot;));</span>
+
+<span class="nc" id="L198">      Controller controller = new ControllerImpl(messages);</span>
+<span class="nc" id="L199">      ((ControllerImpl) controller).showGameModeSelector(new Stage());</span>
+    }
+<span class="nc" id="L201">  }</span>
+
+  @Override
+  public void startServer() {
+    Server server;
+    try {
+<span class="nc" id="L207">      server = new ServerImpl();</span>
+<span class="nc" id="L208">      server.startServer();</span>
+<span class="nc" id="L209">    } catch (IOException e) {</span>
+<span class="nc" id="L210">      showAlert(</span>
+<span class="nc" id="L211">          AlertType.ERROR,</span>
+<span class="nc" id="L212">          messages.getString(&quot;ControllerImpl_ServerError_Title&quot;),</span>
+<span class="nc" id="L213">          messages.getString(&quot;ControllerImpl_ServerError_Subtitle&quot;),</span>
+<span class="nc" id="L214">          messages.getString(&quot;ControllerImpl_ServerError_Info&quot;));</span>
+<span class="nc" id="L215">      return;</span>
+    }
+
+<span class="nc" id="L218">    ServerGui view = new ServerGui(server);</span>
+<span class="nc" id="L219">    server.addListener(view);</span>
+<span class="nc" id="L220">  }</span>
+
+  private void showAlert(AlertType alertType, String title, String header, String content) {
+<span class="nc" id="L223">    Alert alert = new Alert(alertType);</span>
+<span class="nc" id="L224">    alert.setTitle(title);</span>
+<span class="nc" id="L225">    alert.setHeaderText(header);</span>
+<span class="nc" id="L226">    alert.setContentText(content);</span>
+
+<span class="nc" id="L228">    alert.showAndWait();</span>
+<span class="nc" id="L229">  }</span>
+
+  @Override
+  public void continueAgainstAi(Model model) {
+<span class="nc" id="L233">    client.terminate();</span>
+
+<span class="nc" id="L235">    gameMode = GameMode.SINGLEPLAYER;</span>
+<span class="nc" id="L236">    view.showGame(gameMode);</span>
+<span class="nc" id="L237">    this.model = new ModelImpl(model.getState(), gameMode);</span>
+
+    Player aiPlayer;
+<span class="nc bnc" id="L240" title="All 2 branches missed.">    if (ownPlayer.getColor().equals(Color.BLACK)) {</span>
+<span class="nc" id="L241">      aiPlayer = new AiPlayerImpl(messages.getString(&quot;PlayerCreation_AIPlayer_Name&quot;), Color.WHITE);</span>
+<span class="nc" id="L242">    } else {</span>
+<span class="nc" id="L243">      aiPlayer = new AiPlayerImpl();</span>
+    }
+<span class="nc" id="L245">    this.model.substitutePlayersWith(ownPlayer, aiPlayer);</span>
+<span class="nc" id="L246">    this.model.unsetWaiting();</span>
+<span class="nc" id="L247">    this.model.triggerAiMove();</span>
+<span class="nc" id="L248">    this.model.addListener(view);</span>
+<span class="nc" id="L249">    ((ClientCompatibleGui) view).modelExchanged(this.model);</span>
+<span class="nc" id="L250">  }</span>
+
+  @Override
+  public void acceptGameRestart() {
+<span class="nc" id="L254">    client.acceptGameRestart();</span>
+<span class="nc" id="L255">  }</span>
+
+  @Override
+  public void denyGameRestart() {
+<span class="nc" id="L259">    client.denyGameRestart();</span>
+<span class="nc" id="L260">  }</span>
+
+  @Override
+  public void close() {
+<span class="nc bnc" id="L264" title="All 2 branches missed.">    if (client != null) {</span>
+<span class="nc" id="L265">      client.terminate();</span>
+    }
+<span class="nc" id="L267">    view.close();</span>
+<span class="nc" id="L268">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

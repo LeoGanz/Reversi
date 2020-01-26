@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ColorTypeAdapter.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network.communication</a> &gt; <span class="el_source">ColorTypeAdapter.java</span></div><h1>ColorTypeAdapter.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network.communication;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.TypeAdapter;
+import java.lang.reflect.Type;
+import javafx.scene.paint.Color;
+
+/**
+ * Custom Gson serializer and deserializer for Java FX {@link Color}s.
+ *
+ * @author Leonard Ganz
+ */
+public class ColorTypeAdapter implements JsonSerializer&lt;Color&gt;, JsonDeserializer&lt;Color&gt; {
+<span class="fc" id="L21">  private static final Object INSTANCE = new ColorTypeAdapter();</span>
+
+  private ColorTypeAdapter() {
+      
+  }
+
+  /**
+   * Get (de)serializer instance for the {@link Color} class. Add this as a {@link TypeAdapter} to
+   * your {@link GsonBuilder}:
+   *
+   * &lt;pre&gt;{@code
+   * GsonBuilder gsonBuilder = new GsonBuilder;
+   * gsonBuilder.
+   *     .registerTypeAdapter(Color.class,
+   *     ColorTypeAdapter.getAdapter());
+   * Gson gson = gsonBuilder.create();
+   * }&lt;/pre&gt;
+   *
+   * @return a (de)serializer for colors that implements {@link JsonSerializer} and {@link
+   *     JsonDeserializer}
+   */
+  public static Object getAdapter() {
+<span class="fc" id="L43">    return INSTANCE;</span>
+  }
+
+  private static final String RED = &quot;red&quot;;
+  private static final String GREEN = &quot;green&quot;;
+  private static final String BLUE = &quot;blue&quot;;
+<span class="fc" id="L49">  private static final String OPACITY = &quot;opacity&quot;;</span>
+
+  @Override
+  public Color deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+      throws JsonParseException {
+<span class="fc" id="L54">    JsonObject jsonColor = json.getAsJsonObject();</span>
+<span class="fc" id="L55">    double red = jsonColor.get(RED).getAsDouble();</span>
+<span class="fc" id="L56">    double green = jsonColor.get(GREEN).getAsDouble();</span>
+<span class="fc" id="L57">    double blue = jsonColor.get(BLUE).getAsDouble();</span>
+<span class="fc" id="L58">    double opacity = jsonColor.get(OPACITY).getAsDouble();</span>
+<span class="fc" id="L59">    return new Color(red, green, blue, opacity);</span>
+  }
+
+  @Override
+  public JsonElement serialize(Color src, Type typeOfSrc, JsonSerializationContext context) {
+<span class="fc" id="L64">    JsonObject jsonColor = new JsonObject();</span>
+<span class="fc" id="L65">    jsonColor.addProperty(RED, src.getRed());</span>
+<span class="fc" id="L66">    jsonColor.addProperty(GREEN, src.getGreen());</span>
+<span class="fc" id="L67">    jsonColor.addProperty(BLUE, src.getBlue());</span>
+<span class="fc" id="L68">    jsonColor.addProperty(OPACITY, src.getOpacity());</span>
+<span class="fc" id="L69">    return context.serialize(jsonColor);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

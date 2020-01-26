@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>SpectatorList.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">SpectatorList.java</span></div><h1>SpectatorList.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ResourceBundle;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+
+/**
+ * This class offers a pane for the multiplayer view in which all spectators currently watching the
+ * game are being displayed.
+ *
+ * @author Josef Feger
+ */
+public class SpectatorList extends BorderPane implements PropertyChangeListener {
+
+  private ResourceBundle messages;
+
+  private static final int SPACING_VBOX_SPECTATORLIST = 15;
+  private static final int SPACING_HBOX_PLAYER = 20;
+<span class="nc" id="L32">  private static final Insets PADDING_HBOX_PLAYER = new Insets(15);</span>
+  private static final int PREFWIDTH_HBOX_PLAYER = 150;
+
+  private static final String CSS_PROFILEIMAGE =
+<span class="nc" id="L36">      &quot;-fx-border-color: #000000; -fx-border-radius: 8; -fx-background-radius: 8;&quot;;</span>
+
+  /**
+   * Public constructor of this class initialises variables and builds pane.
+   *
+   * @param messages the ResourceBundle for the externalised strings
+   */
+<span class="nc" id="L43">  public SpectatorList(ResourceBundle messages, int lobbyId) {</span>
+
+<span class="nc" id="L45">    this.messages = messages;</span>
+
+<span class="nc" id="L47">    initSpectatorList(lobbyId);</span>
+<span class="nc" id="L48">  }</span>
+
+  private void initSpectatorList(int lobbyId) {
+<span class="nc" id="L51">    getStylesheets().add(&quot;cssFiles/mainGame.css&quot;);</span>
+<span class="nc" id="L52">    setId(&quot;spectator-pane&quot;);</span>
+
+<span class="nc" id="L54">    showLobbyId(lobbyId);</span>
+<span class="nc" id="L55">    buildSpectatorList(new Spectators(lobbyId));</span>
+<span class="nc" id="L56">  }</span>
+
+  private void showLobbyId(int lobbyId) {
+<span class="nc" id="L59">    Label label =</span>
+<span class="nc" id="L60">        new Label(messages.getString(&quot;ViewImpl_LabelLobbyID&quot;) + &quot; &quot; + String.valueOf(lobbyId));</span>
+<span class="nc" id="L61">    label.getStyleClass().add(&quot;spectatorlist-label&quot;);</span>
+<span class="nc" id="L62">    setTop(label);</span>
+<span class="nc" id="L63">    BorderPane.setAlignment(label, Pos.CENTER);</span>
+<span class="nc" id="L64">  }</span>
+
+  private void buildSpectatorList(Spectators spectators) {
+
+<span class="nc" id="L68">    VBox spectatorList = new VBox(SPACING_VBOX_SPECTATORLIST);</span>
+<span class="nc" id="L69">    spectatorList.setAlignment(Pos.CENTER);</span>
+
+<span class="nc bnc" id="L71" title="All 2 branches missed.">    if (spectators.isEmpty()) {</span>
+<span class="nc" id="L72">      Label label = new Label(messages.getString(&quot;SpectatorList_NoSpectators&quot;));</span>
+<span class="nc" id="L73">      label.getStyleClass().add(&quot;spectatorList-label&quot;);</span>
+<span class="nc" id="L74">      spectatorList.getChildren().add(label);</span>
+    }
+
+<span class="nc bnc" id="L77" title="All 2 branches missed.">    for (Player player : spectators) {</span>
+<span class="nc" id="L78">      HBox hbox = new HBox(SPACING_HBOX_PLAYER);</span>
+<span class="nc" id="L79">      hbox.setAlignment(Pos.CENTER_LEFT);</span>
+<span class="nc" id="L80">      hbox.setPadding(PADDING_HBOX_PLAYER);</span>
+<span class="nc" id="L81">      hbox.setPrefWidth(PREFWIDTH_HBOX_PLAYER);</span>
+<span class="nc" id="L82">      hbox.setStyle(</span>
+<span class="nc" id="L83">          &quot;-fx-border-color: &quot;</span>
+<span class="nc" id="L84">              + toHexString(player.getColor())</span>
+<span class="nc" id="L85">              + &quot;; -fx-border-width: 2; -fx-background-color: rgb(235,235,235);&quot;);</span>
+
+<span class="nc" id="L87">      Image profile =</span>
+<span class="nc" id="L88">          new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/profile.png&quot;));</span>
+<span class="nc" id="L89">      ImageView imageView = new ImageView(profile);</span>
+<span class="nc" id="L90">      imageView.setPreserveRatio(true);</span>
+<span class="nc" id="L91">      imageView.setFitHeight(40);</span>
+<span class="nc" id="L92">      imageView.setStyle(CSS_PROFILEIMAGE);</span>
+
+<span class="nc" id="L94">      hbox.getChildren().add(imageView);</span>
+
+<span class="nc" id="L96">      Label name = new Label(player.getName());</span>
+<span class="nc" id="L97">      name.getStyleClass().add(&quot;spectatorList-label&quot;);</span>
+<span class="nc" id="L98">      hbox.getChildren().add(name);</span>
+<span class="nc" id="L99">      spectatorList.getChildren().add(hbox);</span>
+    }
+
+<span class="nc" id="L102">    ScrollPane scrollPane = new ScrollPane();</span>
+<span class="nc" id="L103">    scrollPane.setContent(spectatorList);</span>
+<span class="nc" id="L104">    scrollPane.setFitToWidth(false);</span>
+<span class="nc" id="L105">    scrollPane.setFitToHeight(true);</span>
+<span class="nc" id="L106">    scrollPane.setPrefWidth(PREFWIDTH_HBOX_PLAYER);</span>
+<span class="nc" id="L107">    scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);</span>
+<span class="nc" id="L108">    scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);</span>
+<span class="nc" id="L109">    setCenter(scrollPane);</span>
+<span class="nc" id="L110">    setMinWidth(PREFWIDTH_HBOX_PLAYER);</span>
+<span class="nc" id="L111">  }</span>
+
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+<span class="nc bnc" id="L115" title="All 2 branches missed.">    if (evt.getPropertyName() == View.SPECTATORS_CHANGED) {</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">      if (evt.getNewValue() instanceof Spectators) {</span>
+<span class="nc" id="L117">        buildSpectatorList((Spectators) evt.getNewValue());</span>
+      }
+<span class="nc bnc" id="L119" title="All 2 branches missed.">    } else if (evt.getPropertyName() == ViewImpl.LOBBYID_CHANGED) {</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">      if (evt.getNewValue() instanceof Integer) {</span>
+<span class="nc" id="L121">        showLobbyId((int) evt.getNewValue());</span>
+      }
+    }
+<span class="nc" id="L124">  }</span>
+
+  private String format(double val) {
+<span class="nc" id="L127">    String in = Integer.toHexString((int) Math.round(val * 255));</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">    return in.length() == 1 ? &quot;0&quot; + in : in;</span>
+  }
+
+  private String toHexString(Color value) {
+<span class="nc" id="L132">    return &quot;#&quot;</span>
+<span class="nc" id="L133">        + (format(value.getRed())</span>
+<span class="nc" id="L134">                + format(value.getGreen())</span>
+<span class="nc" id="L135">                + format(value.getBlue())</span>
+<span class="nc" id="L136">                + format(value.getOpacity()))</span>
+<span class="nc" id="L137">            .toUpperCase();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

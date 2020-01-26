@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>DiskPlacement.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network.communication</a> &gt; <span class="el_source">DiskPlacement.java</span></div><h1>DiskPlacement.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network.communication;
+
+import de.lmu.ifi.sosylab.fddlj.model.Cell;
+import de.lmu.ifi.sosylab.fddlj.model.Disk;
+import java.util.Objects;
+import java.util.UUID;
+
+/**
+ * Data storage type to combine {@link Disk} and {@link Cell} objects. For integrity and ordering
+ * purposes a DiskPlacement stores its own (generated) {@link UUID} and the UUID of its predecessor.
+ *
+ * @author Leonard Ganz
+ */
+public class DiskPlacement {
+
+  private UUID previous;
+  private UUID uuid;
+  private Disk disk;
+  private Cell location;
+
+  /**
+   * Create a new {@link DiskPlacement}. A {@link UUID} will be generated automatically.
+   *
+   * @param previous UUID of the disk placement's predecessor. Can be &lt;code&gt;null&lt;/code&gt; to indicate
+   *     that there was no previous placement
+   * @param disk {@link Disk} to be placed
+   * @param location {@link Cell} on which the disk shall be placed
+   * @throws NullPointerException if disk or location are &lt;code&gt;null&lt;/code&gt;
+   */
+<span class="fc" id="L30">  public DiskPlacement(UUID previous, Disk disk, Cell location) {</span>
+<span class="fc" id="L31">    this.previous = previous;</span>
+<span class="fc" id="L32">    this.disk = Objects.requireNonNull(disk);</span>
+<span class="fc" id="L33">    this.location = Objects.requireNonNull(location);</span>
+<span class="fc" id="L34">    uuid = UUID.randomUUID();</span>
+<span class="fc" id="L35">  }</span>
+
+  /**
+   * The ID of the predecessor can be used to ensure the correct order is maintained.
+   *
+   * @return the {@link UUID} of this disk placements predecessor.
+   */
+  public UUID getPrevious() {
+<span class="fc" id="L43">    return previous;</span>
+  }
+
+  /**
+   * Get the {@link UUID}.
+   *
+   * @return the {@link UUID} of this disk placement
+   */
+  public UUID getUuid() {
+<span class="fc" id="L52">    return uuid;</span>
+  }
+
+  /**
+   * Get the {@link Disk}.
+   *
+   * @return the {@link Disk} to place
+   */
+  public Disk getDisk() {
+<span class="fc" id="L61">    return disk;</span>
+  }
+
+  /**
+   * Get the location.
+   *
+   * @return the {@link Cell} on which the {@link Disk} shall be placed
+   */
+  public Cell getLocation() {
+<span class="fc" id="L70">    return location;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L75">    return Objects.hash(disk, location, previous, uuid);</span>
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+<span class="nc bnc" id="L80" title="All 2 branches missed.">    if (this == obj) {</span>
+<span class="nc" id="L81">      return true;</span>
+    }
+<span class="nc bnc" id="L83" title="All 2 branches missed.">    if (!(obj instanceof DiskPlacement)) {</span>
+<span class="nc" id="L84">      return false;</span>
+    }
+<span class="nc" id="L86">    DiskPlacement other = (DiskPlacement) obj;</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">    return Objects.equals(disk, other.disk)</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        &amp;&amp; Objects.equals(location, other.location)</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">        &amp;&amp; Objects.equals(previous, other.previous)</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        &amp;&amp; Objects.equals(uuid, other.uuid);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

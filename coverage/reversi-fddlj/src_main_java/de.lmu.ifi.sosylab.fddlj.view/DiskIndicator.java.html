@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>DiskIndicator.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">DiskIndicator.java</span></div><h1>DiskIndicator.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+
+/**
+ * This class offers a pane that can be used to indicate the current player's disk color and in case
+ * of a multi player game, which disk color this game's player is playing.
+ *
+ * @author Josef Feger
+ */
+public class DiskIndicator extends VBox implements PropertyChangeListener {
+
+  private static final int DISK_RADIUS = 40;
+  private static final int MAX_RADIUS = 80;
+
+  private static final int MARGIN = 30;
+  private static final double SIMILARITY_DISTANCE = 0.25;
+
+  private Label titel;
+  private Label name;
+
+  private Model model;
+  private Controller controller;
+
+  private GraphicDisk circle;
+
+  /**
+   * Constructor of this class initialises variables and calls first layout.
+   *
+   * @param model a reference to a model instance
+   * @param labelText the text to be displayed
+   * @param view a reference to a view instance
+   */
+  public DiskIndicator(Model model, String labelText, View view, Controller controller) {
+
+<span class="nc" id="L42">    super(5);</span>
+<span class="nc" id="L43">    setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L45">    this.model = model;</span>
+<span class="nc" id="L46">    this.controller = controller;</span>
+<span class="nc" id="L47">    view.addListener(this);</span>
+
+<span class="nc" id="L49">    setMinHeight(2 * MARGIN + 2 * getSpacing() + DISK_RADIUS);</span>
+
+<span class="nc" id="L51">    initLabel(labelText);</span>
+<span class="nc" id="L52">    initCanvas();</span>
+<span class="nc" id="L53">    initPlayerName();</span>
+<span class="nc" id="L54">  }</span>
+
+  private void initLabel(String labelText) {
+<span class="nc" id="L57">    titel = new Label(labelText);</span>
+<span class="nc" id="L58">    titel.setId(&quot;disk-indicator-label&quot;);</span>
+<span class="nc" id="L59">    getChildren().add(titel);</span>
+<span class="nc" id="L60">  }</span>
+
+  private void initCanvas() {
+
+<span class="nc" id="L64">    Color color = model.getState().getPlayerManagement().getCurrentPlayer().getColor();</span>
+
+<span class="nc bnc" id="L66" title="All 2 branches missed.">    if (controller instanceof MultiplayerController) {</span>
+<span class="nc" id="L67">      if (!model</span>
+<span class="nc" id="L68">          .getState()</span>
+<span class="nc" id="L69">          .getPlayerManagement()</span>
+<span class="nc" id="L70">          .getCurrentPlayer()</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">          .equals(((MultiplayerController) controller).getOwnPlayer())) {</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (similarTo(color, ((MultiplayerController) controller).getOwnPlayer().getColor())) {</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">          if (similarTo(color, Color.WHITE)) {</span>
+<span class="nc" id="L74">            color = Color.SILVER;</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">          } else if (similarTo(color, Color.BLACK)) {</span>
+<span class="nc" id="L76">            color = Color.GRAY;</span>
+<span class="nc" id="L77">          } else {</span>
+<span class="nc" id="L78">            color = color.deriveColor(15, 15, 10, 1);</span>
+          }
+        }
+      }
+    }
+
+<span class="nc" id="L84">    circle = new GraphicDisk(getWidth(), getHeight(), MAX_RADIUS, color);</span>
+
+<span class="nc" id="L86">    getChildren().add(circle);</span>
+<span class="nc" id="L87">  }</span>
+
+  /** Resizes the disk to fit the current parent's size. */
+  void resizeDisk() {
+
+<span class="nc" id="L92">    double radius =</span>
+<span class="nc" id="L93">        ((getHeight() - titel.getHeight() - name.getHeight()) - GraphicDisk.PADDING) / 2;</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">    if (radius &lt; DISK_RADIUS) {</span>
+<span class="nc" id="L95">      radius = DISK_RADIUS;</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">    } else if (radius &gt; MAX_RADIUS) {</span>
+<span class="nc" id="L97">      radius = MAX_RADIUS;</span>
+    }
+
+<span class="nc" id="L100">    circle.resizeDisk(getHeight(), getHeight(), radius);</span>
+<span class="nc" id="L101">  }</span>
+
+  private void initPlayerName() {
+<span class="nc" id="L104">    name = new Label(model.getState().getPlayerManagement().getCurrentPlayer().getName());</span>
+<span class="nc" id="L105">    name.setId(&quot;disk-indicator-label&quot;);</span>
+<span class="nc" id="L106">    getChildren().add(name);</span>
+<span class="nc" id="L107">  }</span>
+
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+<span class="nc" id="L111">    handlePropertyChangeEvent(evt);</span>
+<span class="nc" id="L112">  }</span>
+
+  private void handlePropertyChangeEvent(PropertyChangeEvent event) {
+<span class="nc bnc" id="L115" title="All 2 branches missed.">    if (event.getPropertyName().equals(Model.STATE_CHANGED)) {</span>
+<span class="nc" id="L116">      circle.setFill(model.getState().getPlayerManagement().getCurrentPlayer().getColor());</span>
+<span class="nc" id="L117">      name.setText(model.getState().getPlayerManagement().getCurrentPlayer().getName());</span>
+    }
+
+<span class="nc bnc" id="L120" title="All 2 branches missed.">    if (event.getPropertyName().equals(Model.LISTENERS_CHANGED)) {</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">      if (event.getNewValue() instanceof Model) {</span>
+<span class="nc" id="L122">        this.model = (Model) event.getNewValue();</span>
+      }
+    }
+<span class="nc" id="L125">  }</span>
+
+  private boolean similarTo(Color c, Color v) {
+<span class="nc" id="L128">    double distance =</span>
+<span class="nc" id="L129">        Math.sqrt(</span>
+<span class="nc" id="L130">            (c.getRed() - v.getRed()) * (c.getRed() - v.getRed())</span>
+<span class="nc" id="L131">                + (c.getGreen() - v.getGreen()) * (c.getGreen() - v.getGreen())</span>
+<span class="nc" id="L132">                + (c.getBlue() - v.getBlue()) * (c.getBlue() - v.getBlue()));</span>
+
+<span class="nc bnc" id="L134" title="All 2 branches missed.">    if (distance &lt; SIMILARITY_DISTANCE) {</span>
+<span class="nc" id="L135">      return true;</span>
+    } else {
+<span class="nc" id="L137">      return false;</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

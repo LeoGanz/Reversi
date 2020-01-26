@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>GameBoardGrid.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">GameBoardGrid.java</span></div><h1>GameBoardGrid.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ResourceBundle;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+/**
+ * This class offers a grid of cells that represents a game board.
+ *
+ * @author Josef Feger
+ */
+public class GameBoardGrid extends BorderPane implements PropertyChangeListener {
+
+  private static final int MARGIN_TOGGLEBUTTON = 30;
+  private static final int TOGGLEBUTTON_PREF_HEIGHT = 15;
+  private static final int TOGGLEBUTTON_PREF_WIDTH = 100;
+  private static final int SPACING_HBOX_TOGGLEBUTTON = 15;
+
+  private Model model;
+  private Controller controller;
+  private View view;
+
+  private SwitchButton switchButton;
+
+  private boolean playSound;
+  private float volume;
+
+  private ResourceBundle messages;
+
+  /**
+   * Constructor of this class initialises variables and is responsible for building GUI elements.
+   *
+   * @param model a reference to a model instance
+   * @param controller a reference to a controller instance
+   * @param stage a reference to the game's main stage
+   * @param view a reference to a view instance
+   * @param messages the ResourceBundle for the externalised strings
+   */
+  public GameBoardGrid(
+      Model model, Controller controller, Stage stage, View view, ResourceBundle messages) {
+<span class="nc" id="L62">    super();</span>
+
+<span class="nc" id="L64">    this.model = model;</span>
+<span class="nc" id="L65">    this.controller = controller;</span>
+<span class="nc" id="L66">    this.view = view;</span>
+
+<span class="nc" id="L68">    this.playSound = true;</span>
+<span class="nc" id="L69">    this.volume = 0.6f;</span>
+
+<span class="nc" id="L71">    view.addListener(this);</span>
+<span class="nc" id="L72">    this.messages = messages;</span>
+
+<span class="nc" id="L74">    getStyleClass().add(&quot;transparent&quot;);</span>
+<span class="nc" id="L75">    initToggleSwitch();</span>
+<span class="nc" id="L76">    initGameBoard(stage, view);</span>
+<span class="nc" id="L77">    setMinWidth(model.getState().getField().getSize() * GraphicCell.MIN_WIDTH);</span>
+<span class="nc" id="L78">    setMinHeight(</span>
+<span class="nc" id="L79">        model.getState().getField().getSize() * GraphicCell.MIN_HEIGHT</span>
+<span class="nc" id="L80">            + TOGGLEBUTTON_PREF_HEIGHT * 2</span>
+<span class="nc" id="L81">            + MARGIN_TOGGLEBUTTON);</span>
+
+<span class="nc" id="L83">    new Thread(() -&gt; initialiseAudioSystem()).start();</span>
+<span class="nc" id="L84">  }</span>
+
+  private void initGameBoard(Stage stage, View view) {
+
+<span class="nc" id="L88">    VBox centerGrid = new VBox();</span>
+<span class="nc" id="L89">    centerGrid.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L90">    centerGrid.setEffect(new DropShadow(10, 5, 5, Color.BLACK));</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">    for (int row = 1; row &lt; model.getState().getField().getSize() + 1; row++) {</span>
+
+<span class="nc" id="L93">      HBox hboxRow = new HBox();</span>
+<span class="nc" id="L94">      hboxRow.setAlignment(Pos.CENTER);</span>
+
+<span class="nc bnc" id="L96" title="All 2 branches missed.">      for (int column = 1; column &lt; model.getState().getField().getSize() + 1; column++) {</span>
+
+<span class="nc" id="L98">        GraphicCell cell = new GraphicCell(column - 1, row - 1, this, model, controller);</span>
+<span class="nc" id="L99">        hboxRow.getChildren().add(cell);</span>
+<span class="nc" id="L100">        switchButton.addListener(cell);</span>
+<span class="nc" id="L101">        view.addListener(cell);</span>
+      }
+
+<span class="nc" id="L104">      centerGrid.getChildren().add(hboxRow);</span>
+    }
+
+<span class="nc" id="L107">    setCenter(centerGrid);</span>
+<span class="nc" id="L108">  }</span>
+
+  private void initToggleSwitch() {
+
+<span class="nc" id="L112">    HBox hbox = new HBox(SPACING_HBOX_TOGGLEBUTTON);</span>
+<span class="nc" id="L113">    hbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L115">    Label hints = getLabel(messages.getString(&quot;GameBoardGrid_ShowHints_Label&quot;));</span>
+<span class="nc" id="L116">    switchButton = new SwitchButton(TOGGLEBUTTON_PREF_WIDTH, TOGGLEBUTTON_PREF_HEIGHT);</span>
+
+<span class="nc" id="L118">    hbox.getChildren().addAll(hints, switchButton);</span>
+<span class="nc" id="L119">    BorderPane borderPane = new BorderPane();</span>
+<span class="nc" id="L120">    borderPane.setCenter(hbox);</span>
+<span class="nc" id="L121">    BorderPane.setAlignment(hbox, Pos.CENTER);</span>
+
+<span class="nc" id="L123">    setBottom(borderPane);</span>
+<span class="nc" id="L124">    BorderPane.setMargin(borderPane, new Insets(MARGIN_TOGGLEBUTTON, 0, 0, 0));</span>
+<span class="nc" id="L125">  }</span>
+
+  private Label getLabel(String text) {
+<span class="nc" id="L128">    Label label = new Label(text);</span>
+<span class="nc" id="L129">    label.setId(&quot;gameBoardGrid-label&quot;);</span>
+<span class="nc" id="L130">    return label;</span>
+  }
+
+  void playPlacementSound() {
+
+<span class="nc bnc" id="L135" title="All 2 branches missed.">    if (!playSound) {</span>
+<span class="nc" id="L136">      return;</span>
+    }
+
+<span class="nc" id="L139">    new Thread(</span>
+<span class="nc" id="L140">        () -&gt; {</span>
+          try {
+<span class="nc" id="L142">            InputStream isAudioFile =</span>
+<span class="nc" id="L143">                getClass().getClassLoader().getResourceAsStream(&quot;audio/placement.wav&quot;);</span>
+<span class="nc" id="L144">            Clip clip = AudioSystem.getClip();</span>
+<span class="nc" id="L145">            AudioInputStream inputStream =</span>
+<span class="nc" id="L146">                AudioSystem.getAudioInputStream(new BufferedInputStream(isAudioFile));</span>
+<span class="nc" id="L147">            clip.open(inputStream);</span>
+<span class="nc" id="L148">            FloatControl gainControl =</span>
+<span class="nc" id="L149">                (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);</span>
+<span class="nc" id="L150">            gainControl.setValue(20f * (float) Math.log10(volume));</span>
+<span class="nc" id="L151">            clip.start();</span>
+<span class="nc" id="L152">          } catch (RuntimeException e) {</span>
+<span class="nc" id="L153">            throw e;</span>
+<span class="nc" id="L154">          } catch (Exception e) {</span>
+<span class="nc" id="L155">            view.displayAlert(</span>
+<span class="nc" id="L156">                AlertType.ERROR,</span>
+<span class="nc" id="L157">                messages.getString(&quot;GameBoardGrid_SoundError_Title&quot;),</span>
+<span class="nc" id="L158">                messages.getString(&quot;GameBoardGrid_SoundError_Subtitle&quot;),</span>
+<span class="nc" id="L159">                messages.getString(&quot;GameBoardGrid_SoundError_Info&quot;));</span>
+          }
+<span class="nc" id="L161">        })</span>
+<span class="nc" id="L162">        .start();</span>
+<span class="nc" id="L163">  }</span>
+
+  /**
+   * This method seems to be needed in order to initialise the OS's audio system because otherwise
+   * the first time playing the clip takes a really long time.
+   */
+  private void initialiseAudioSystem() {
+
+    try {
+<span class="nc" id="L172">      InputStream isAudioFile =</span>
+<span class="nc" id="L173">          getClass().getClassLoader().getResourceAsStream(&quot;audio/placement.wav&quot;);</span>
+<span class="nc" id="L174">      Clip clip = AudioSystem.getClip();</span>
+<span class="nc" id="L175">      AudioInputStream inputStream = AudioSystem.getAudioInputStream(isAudioFile);</span>
+<span class="nc" id="L176">      clip.open(inputStream);</span>
+<span class="nc" id="L177">    } catch (LineUnavailableException e) {</span>
+<span class="nc" id="L178">      view.displayAlert(</span>
+<span class="nc" id="L179">          AlertType.ERROR,</span>
+<span class="nc" id="L180">          messages.getString(&quot;GameBoardGrid_SoundInitialisationError_Title&quot;),</span>
+<span class="nc" id="L181">          messages.getString(&quot;GameBoardGrid_SoundInitialisationError_Subtitle&quot;),</span>
+<span class="nc" id="L182">          messages.getString(&quot;GameBoardGrid_SoundInitialisationError_Info&quot;));</span>
+<span class="nc" id="L183">    } catch (UnsupportedAudioFileException e) {</span>
+<span class="nc" id="L184">      view.displayAlert(</span>
+<span class="nc" id="L185">          AlertType.ERROR,</span>
+<span class="nc" id="L186">          messages.getString(&quot;GameBoardGrid_SoundInitialisationError_Title&quot;),</span>
+<span class="nc" id="L187">          messages.getString(&quot;GameBoardGrid_SoundInitialisationError_Subtitle&quot;),</span>
+<span class="nc" id="L188">          messages.getString(&quot;GameBoardGrid_SoundInitialisationError_Info&quot;));</span>
+<span class="nc" id="L189">    } catch (IOException e) {</span>
+<span class="nc" id="L190">      view.displayAlert(</span>
+<span class="nc" id="L191">          AlertType.ERROR,</span>
+<span class="nc" id="L192">          messages.getString(&quot;GameBoardGrid_SoundInitialisationError_Title&quot;),</span>
+<span class="nc" id="L193">          messages.getString(&quot;GameBoardGrid_SoundInitialisationError_Subtitle&quot;),</span>
+<span class="nc" id="L194">          messages.getString(&quot;GameBoardGrid_SoundInitialisationError_Info&quot;));</span>
+    }
+<span class="nc" id="L196">  }</span>
+
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+<span class="nc" id="L200">    Platform.runLater(</span>
+<span class="nc" id="L201">        () -&gt; {</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">          if (evt.getPropertyName().equals(Model.LISTENERS_CHANGED)) {</span>
+
+<span class="nc bnc" id="L204" title="All 2 branches missed.">            if (evt.getNewValue() instanceof Model) {</span>
+
+<span class="nc" id="L206">              this.model = (Model) evt.getNewValue();</span>
+            }
+<span class="nc bnc" id="L208" title="All 2 branches missed.">          } else if (evt.getPropertyName().equals(ViewImpl.SOUND_MODE_CHANGED)) {</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">            if (evt.getNewValue() instanceof Boolean) {</span>
+<span class="nc" id="L210">              this.playSound = (boolean) evt.getNewValue();</span>
+            }
+<span class="nc bnc" id="L212" title="All 2 branches missed.">          } else if (evt.getPropertyName().equals(ViewImpl.VOLUME_CHANGED)) {</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">            if (evt.getNewValue() instanceof Float) {</span>
+<span class="nc" id="L214">              this.volume = (float) evt.getNewValue();</span>
+            }
+          }
+<span class="nc" id="L217">        });</span>
+<span class="nc" id="L218">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

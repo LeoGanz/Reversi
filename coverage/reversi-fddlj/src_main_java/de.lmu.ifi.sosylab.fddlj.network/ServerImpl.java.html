@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ServerImpl.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network</a> &gt; <span class="el_source">ServerImpl.java</span></div><h1>ServerImpl.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network;
+
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest.Response.ResponseType;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener.Change;
+import javafx.collections.ObservableMap;
+
+/**
+ * The server provides means of communication for clients. It will accept connections and pair them
+ * to enable them to play against each other. Furthermore the server sends notifications to manage
+ * the game flow.
+ *
+ * @see ServerNotification
+ * @author Leonard Ganz
+ */
+public class ServerImpl implements Server {
+
+  private static final int PORT = 43200;
+  private final ServerSocket serverSocket;
+<span class="fc" id="L33">  private int nextConnectionID = 0;</span>
+<span class="fc" id="L34">  private int nextLobbyID = 0;</span>
+  private boolean serverRunning;
+  private boolean serverHasBeenStarted;
+  private Set&lt;ServerListener&gt; serverListeners;
+
+  private Map&lt;Integer, ClientConnection&gt; connections;
+  private ObservableMap&lt;Integer, GameLobby&gt; lobbies;
+  private Map&lt;Integer, LobbyRepresentation&gt; lobbyRepresentations;
+  private Optional&lt;Integer&gt; freshPublicLobbyWaitingForPlayer;
+
+  /**
+   * Initialize a new server. The server will be ready but needs to be started by calling {@link
+   * #startServer()}.
+   *
+   * @throws IOException if a new server cannot be created on the default port or if other problems
+   *     occur with necessary IO
+   */
+<span class="fc" id="L51">  public ServerImpl() throws IOException {</span>
+<span class="fc" id="L52">    serverSocket = new ServerSocket(PORT);</span>
+<span class="fc" id="L53">    serverListeners = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L54">    connections = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L55">    lobbies =</span>
+<span class="fc" id="L56">        FXCollections.checkedObservableMap(</span>
+<span class="fc" id="L57">            FXCollections.observableHashMap(), Integer.class, GameLobby.class);</span>
+<span class="fc" id="L58">    lobbies.addListener(this::processUpdateOnLobbyMap);</span>
+<span class="fc" id="L59">    lobbyRepresentations = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L60">    freshPublicLobbyWaitingForPlayer = Optional.empty();</span>
+<span class="fc" id="L61">  }</span>
+
+  @Override
+  public void startServer() {
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">    if (serverHasBeenStarted) { // server was started before</span>
+<span class="nc" id="L66">      throw new IllegalStateException(&quot;Server has been started before&quot;);</span>
+    }
+<span class="fc" id="L68">    serverHasBeenStarted = true;</span>
+<span class="fc" id="L69">    serverRunning = true;</span>
+<span class="fc" id="L70">    Thread connectorThread = new Thread(this::acceptConnections);</span>
+<span class="fc" id="L71">    connectorThread.setDaemon(true);</span>
+<span class="fc" id="L72">    connectorThread.start();</span>
+<span class="fc" id="L73">  }</span>
+
+  private void acceptConnections() {
+    try {
+<span class="fc bfc" id="L77" title="All 2 branches covered.">      while (serverRunning) {</span>
+        @SuppressWarnings(&quot;resource&quot;) // ClientConnection manages socket
+<span class="fc" id="L79">        Socket newConnection = serverSocket.accept();</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (newConnection != null) {</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">          if (serverRunning) {</span>
+<span class="fc" id="L82">            handleNewConnection(newConnection);</span>
+<span class="fc" id="L83">          } else {</span>
+<span class="fc" id="L84">            newConnection.close();</span>
+          }
+        }
+      }
+<span class="pc" id="L88">    } catch (@SuppressWarnings(&quot;unused&quot;) IOException e) {</span>
+<span class="nc" id="L89">      initiateShutdown();</span>
+    }
+<span class="fc" id="L91">  }</span>
+
+  private void handleNewConnection(Socket clientSocket) {
+<span class="fc" id="L94">    ClientConnection clientConnection =</span>
+<span class="fc" id="L95">        new ClientConnection(clientSocket, nextConnectionID++, this);</span>
+
+<span class="fc" id="L97">    connections.put(clientConnection.getConnectionID(), clientConnection);</span>
+<span class="fc" id="L98">    Thread thread =</span>
+<span class="fc" id="L99">        new Thread(clientConnection, &quot;ClientConnection-&quot; + clientConnection.getConnectionID());</span>
+<span class="fc" id="L100">    thread.start();</span>
+<span class="fc" id="L101">  }</span>
+
+  /**
+   * Handle a join request from a specified connection. Lobbies are built if needed.
+   *
+   * @param joinRequest data needed for joining a lobby
+   * @param connectionID integer to specify the joining connection
+   */
+  public synchronized void joinLobby(JoinRequest joinRequest, int connectionID) {
+<span class="fc" id="L110">    ClientConnection conn = connections.get(connectionID);</span>
+<span class="fc" id="L111">    Player player = joinRequest.getPlayer();</span>
+<span class="fc" id="L112">    boolean asSpectator = joinRequest.isAsSpectator();</span>
+<span class="fc" id="L113">    int lobbyID = joinRequest.getLobbyID();</span>
+
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">    switch (joinRequest.getJoinType()) {</span>
+      case ANY_PUBLIC_LOBBY:
+<span class="fc" id="L117">        handlePublicJoin(conn, player, asSpectator);</span>
+<span class="fc" id="L118">        break;</span>
+      case SPECIFIC_LOBBY:
+<span class="fc" id="L120">        handleSpecificJoin(conn, player, asSpectator, lobbyID);</span>
+<span class="fc" id="L121">        break;</span>
+      case NEW_PRIVATE_LOBBY:
+<span class="fc" id="L123">        handlePrivateJoin(conn, player);</span>
+<span class="fc" id="L124">        break;</span>
+      default:
+        break;
+    }
+<span class="fc" id="L128">  }</span>
+
+  private void handlePublicJoin(ClientConnection conn, Player player, boolean asSpectator) {
+<span class="fc bfc" id="L131" title="All 2 branches covered.">    if (asSpectator) {</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">      if (lobbies.isEmpty()) {</span>
+<span class="fc" id="L133">        conn.sendMessageWith(new JoinRequest.Response(ResponseType.NO_LOBBY_AVAILABLE));</span>
+<span class="fc" id="L134">        return;</span>
+      }
+<span class="fc" id="L136">      GameLobby[] lobbiesArray = lobbies.values().toArray(new GameLobby[0]);</span>
+<span class="fc" id="L137">      GameLobby randomLobby = lobbiesArray[new Random().nextInt(lobbiesArray.length)];</span>
+<span class="fc" id="L138">      handleLobbyJoinAsSpectator(randomLobby, conn, player);</span>
+<span class="fc" id="L139">    } else {</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">      if (freshPublicLobbyWaitingForPlayer.isPresent()) {</span>
+<span class="fc" id="L141">        GameLobby lobby = lobbies.get(freshPublicLobbyWaitingForPlayer.get());</span>
+<span class="fc" id="L142">        handleLobbyJoinAsPlayer(lobby, conn, player);</span>
+<span class="fc" id="L143">        freshPublicLobbyWaitingForPlayer = Optional.empty();</span>
+<span class="fc" id="L144">      } else {</span>
+<span class="fc" id="L145">        GameLobby lobby = new GameLobby(nextLobbyID++, this);</span>
+<span class="fc" id="L146">        handleLobbyJoinAsPlayer(lobby, conn, player);</span>
+<span class="fc" id="L147">        lobbies.put(lobby.getLobbyID(), lobby);</span>
+<span class="fc" id="L148">        freshPublicLobbyWaitingForPlayer = Optional.of(lobby.getLobbyID());</span>
+      }
+    }
+<span class="fc" id="L151">  }</span>
+
+  private void handleSpecificJoin(
+      ClientConnection conn, Player player, boolean asSpectator, int lobbyID) {
+<span class="fc" id="L155">    GameLobby lobby = lobbies.get(lobbyID);</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    if (lobby == null) {</span>
+<span class="fc" id="L157">      conn.sendMessageWith(new JoinRequest.Response(ResponseType.LOBBY_NOT_FOUND));</span>
+<span class="fc" id="L158">    } else {</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">      if (asSpectator) {</span>
+<span class="fc" id="L160">        handleLobbyJoinAsSpectator(lobby, conn, player);</span>
+<span class="fc" id="L161">      } else {</span>
+<span class="fc" id="L162">        handleLobbyJoinAsPlayer(lobby, conn, player);</span>
+      }
+    }
+<span class="fc" id="L165">  }</span>
+
+  private void handlePrivateJoin(ClientConnection conn, Player player) {
+<span class="fc" id="L168">    GameLobby privateLobby = new GameLobby(nextLobbyID++, this);</span>
+<span class="fc" id="L169">    handleLobbyJoinAsPlayer(privateLobby, conn, player);</span>
+<span class="fc" id="L170">    lobbies.put(privateLobby.getLobbyID(), privateLobby);</span>
+<span class="fc" id="L171">  }</span>
+
+  private void handleLobbyJoinAsPlayer(GameLobby lobby, ClientConnection conn, Player player) {
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">    if (!serverRunning) {</span>
+<span class="nc" id="L175">      return;</span>
+    }
+<span class="fc" id="L177">    boolean joinSuccessful = lobby.joinAsPlayer(conn, player);</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">    if (joinSuccessful) {</span>
+<span class="fc" id="L179">      conn.sendMessageWith(</span>
+<span class="fc" id="L180">          new JoinRequest.Response(ResponseType.JOIN_SUCCESSFUL, lobby.getLobbyID()));</span>
+<span class="fc" id="L181">    } else {</span>
+<span class="fc" id="L182">      conn.sendMessageWith(new JoinRequest.Response(ResponseType.NO_PLAYERS_NEEDED));</span>
+    }
+<span class="fc" id="L184">  }</span>
+
+  private void handleLobbyJoinAsSpectator(GameLobby lobby, ClientConnection conn, Player player) {
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">    if (!serverRunning) {</span>
+<span class="nc" id="L188">      return;</span>
+    }
+<span class="fc" id="L190">    lobby.joinAsSpectator(conn, player);</span>
+<span class="fc" id="L191">    conn.sendMessageWith(</span>
+<span class="fc" id="L192">        new JoinRequest.Response(ResponseType.JOIN_SUCCESSFUL, lobby.getLobbyID()));</span>
+<span class="fc" id="L193">  }</span>
+
+  /**
+   * Called when a {@link ClientConnection} is terminated. This is needed to maintain the list of
+   * connected clients.
+   *
+   * @param connectionID integer to reference the connection that has (been) terminated
+   */
+  public synchronized void connectionTerminated(int connectionID) {
+<span class="fc bfc" id="L202" title="All 2 branches covered.">    if (serverRunning) {</span>
+<span class="fc" id="L203">      connections.remove(connectionID);</span>
+    }
+<span class="fc" id="L205">  }</span>
+
+  @Override
+  public synchronized void initiateShutdown() {
+<span class="fc" id="L209">    serverRunning = false;</span>
+<span class="pc" id="L210">    serverListeners.forEach(listener -&gt; listener.serverShuttingDown());</span>
+<span class="fc" id="L211">    serverListeners = Set.of();</span>
+
+<span class="fc" id="L213">    terminateAllConnections();</span>
+    // Trigger accept(), so that the main while loop stops
+<span class="fc" id="L215">    try (Socket connection = new Socket(InetAddress.getLocalHost(), PORT)) {</span>
+      assert true; // conform with checkstyle
+<span class="pc bpc" id="L217" title="6 of 8 branches missed.">    } catch (@SuppressWarnings(&quot;unused&quot;)IOException e) {</span>
+      // do nothing as server is already trying to shutdown
+    }
+    try {
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">      if (serverSocket != null) {</span>
+<span class="fc" id="L222">        serverSocket.close();</span>
+      }
+<span class="pc" id="L224">    } catch (@SuppressWarnings(&quot;unused&quot;) IOException e) {</span>
+      // do nothing as server is already trying to shutdown
+    }
+<span class="fc" id="L227">  }</span>
+
+  private void terminateAllConnections() {
+<span class="fc" id="L230">    connections</span>
+<span class="fc" id="L231">        .values()</span>
+<span class="fc" id="L232">        .forEach(</span>
+<span class="fc" id="L233">            conn -&gt; {</span>
+<span class="fc" id="L234">              conn.sendMessageWith(ServerNotification.SERVER_SHUTTING_DOWN);</span>
+<span class="fc" id="L235">              conn.terminate();</span>
+<span class="fc" id="L236">            });</span>
+<span class="fc" id="L237">  }</span>
+
+  @Override
+  public boolean isRunning() {
+<span class="fc" id="L241">    return serverRunning;</span>
+  }
+
+  /**
+   * Called when a {@link GameLobby} closes.
+   *
+   * @param lobbyID integer id to reference the closed lobby
+   */
+  public synchronized void lobbyClosed(int lobbyID) {
+<span class="fc" id="L250">    lobbies.remove(lobbyID);</span>
+<span class="fc" id="L251">  }</span>
+
+  /**
+   * Called when a lobby updated.
+   *
+   * @param lobbyID integer id to reference the closed lobby
+   */
+  public void lobbyUpdated(int lobbyID) {
+<span class="fc" id="L259">    GameLobby gameLobby = lobbies.get(lobbyID);</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">    if (gameLobby != null) {</span>
+<span class="fc" id="L261">      LobbyRepresentation lobbyRepresentation = gameLobby.getRepresentation();</span>
+<span class="fc" id="L262">      lobbyRepresentations.put(lobbyID, lobbyRepresentation);</span>
+<span class="fc" id="L263">      notifyListenersOfLobbyUpdate(lobbyID, lobbyRepresentation);</span>
+    }
+<span class="fc" id="L265">  }</span>
+
+  /**
+   * Get the connection with the specified ID if available.
+   *
+   * @param connectionID integer to reference the connection
+   * @return the client connection
+   */
+  public ClientConnection getConnection(int connectionID) {
+<span class="fc" id="L274">    return connections.get(connectionID);</span>
+  }
+
+  private void processUpdateOnLobbyMap(Change&lt;? extends Integer, ? extends GameLobby&gt; change) {
+<span class="fc" id="L278">    Integer key = change.getKey();</span>
+<span class="fc bfc" id="L279" title="All 2 branches covered.">    if (change.wasRemoved()) {</span>
+<span class="fc" id="L280">      lobbyRepresentations.remove(key);</span>
+<span class="fc" id="L281">      notifyListenersOfLobbyUpdate(key, null);</span>
+<span class="pc bpc" id="L282" title="1 of 2 branches missed.">    } else if (change.wasAdded()) {</span>
+<span class="fc" id="L283">      lobbyRepresentations.put(key, change.getValueAdded().getRepresentation());</span>
+<span class="fc" id="L284">      notifyListenersOfLobbyUpdate(key, lobbyRepresentations.get(key));</span>
+    }
+<span class="fc" id="L286">  }</span>
+
+  private void notifyListenersOfLobbyUpdate(int lobbyID, LobbyRepresentation lobbyRepresentation) {
+<span class="pc" id="L289">    serverListeners.forEach(listener -&gt; listener.lobbyUpdated(lobbyID, lobbyRepresentation));</span>
+<span class="fc" id="L290">  }</span>
+
+  @Override
+  public void addListener(ServerListener listener) {
+<span class="nc" id="L294">    serverListeners.add(listener);</span>
+<span class="nc" id="L295">    listener.allLobbies(lobbyRepresentations);</span>
+<span class="nc" id="L296">  }</span>
+
+  @Override
+  public void removeListener(ServerListener listener) {
+<span class="nc" id="L300">    serverListeners.remove(listener);</span>
+<span class="nc" id="L301">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

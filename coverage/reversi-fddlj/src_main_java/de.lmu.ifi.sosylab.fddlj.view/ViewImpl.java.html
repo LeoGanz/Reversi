@@ -1,0 +1,938 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ViewImpl.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">ViewImpl.java</span></div><h1>ViewImpl.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
+import de.lmu.ifi.sosylab.fddlj.model.Phase;
+import de.lmu.ifi.sosylab.fddlj.network.ClientCompatibleGui;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest.Response;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest.Response.ResponseType;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement.Reason;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+/**
+ * This class represents the game's main frame that holds all other GUI elements.
+ *
+ * @author Josef Feger
+ */
+public class ViewImpl implements OnlineView, ClientCompatibleGui {
+
+  static final String LOBBYID_CHANGED = &quot;Lobby id changed&quot;;
+
+  private static final int MINHEIGHT_SPACER = 40;
+  private static final int MAXHEIGHT_SPACER = 80;
+<span class="nc" id="L61">  private static final Insets GAMEBOARD_INSETS = new Insets(30, 50, 30, 50);</span>
+<span class="nc" id="L62">  private static final Insets INSETS_PANERIGHT = new Insets(0, 15, 0, 0);</span>
+
+<span class="nc" id="L64">  private static final Font FONT_BUTTON = Font.font(18);</span>
+<span class="nc" id="L65">  private static final Cursor CURSOR_BUTTON = Cursor.HAND;</span>
+  private static final int MINWIDTH_BUTTON = 100;
+  private static final int MAXWIDTH_BUTTON = 250;
+  private static final int MINHEIGHT_BUTTON = 40;
+  private static final int PREFWIDTH_BUTTON = 170;
+<span class="nc" id="L70">  private static final int PREFHEIGHT_BUTTON = 50;</span>
+
+<span class="nc" id="L72">  final Image play =</span>
+<span class="nc" id="L73">      new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/loudspeaker.png&quot;));</span>
+<span class="nc" id="L74">  final Image mute =</span>
+<span class="nc" id="L75">      new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/loudspeaker_mute.png&quot;));</span>
+
+  private Model model;
+  private Controller controller;
+
+  private Stage stage;
+  private Scene scene;
+  private BorderPane root;
+  private GameBoardGrid gameBoard;
+
+  private Label numberPlayerOneDisks;
+  private Label numberPlayerTwoDisks;
+  private Label lobbyID;
+  private VBox diskTrianglePlayerOne;
+  private VBox diskTrianglePlayerTwo;
+
+  private PropertyChangeSupport support;
+
+  private boolean playSound;
+  private boolean volumeControlShowing;
+  private boolean guiShowing;
+
+  private float volume;
+  private int lobbyId;
+
+  private ResourceBundle messages;
+  private GameFinishedScreen gameFinishedScreen;
+  private AboutWindow aboutWindow;
+
+  /**
+   * Constructor of this class initialises the main frame of the game.
+   *
+   * @param stage the stage created upon launching the application
+   * @param model a reference to the model instance
+   * @param controller a reference to the controller instance
+   * @param messages the ResourceBundle for the externalised strings
+   */
+<span class="nc" id="L112">  public ViewImpl(Stage stage, Model model, Controller controller, ResourceBundle messages) {</span>
+
+<span class="nc" id="L114">    this.controller = controller;</span>
+<span class="nc" id="L115">    this.stage = stage;</span>
+<span class="nc" id="L116">    this.model = model;</span>
+
+<span class="nc" id="L118">    this.messages = messages;</span>
+
+<span class="nc" id="L120">    support = new PropertyChangeSupport(this);</span>
+<span class="nc" id="L121">    playSound = true;</span>
+<span class="nc" id="L122">    volume = 0.6f;</span>
+
+<span class="nc" id="L124">    this.stage.setTitle(messages.getString(&quot;Game_Title&quot;));</span>
+<span class="nc" id="L125">    this.stage.setMaximized(true);</span>
+<span class="nc" id="L126">    this.stage.setMinWidth(2 * Screen.getPrimary().getVisualBounds().getWidth() / 5.0);</span>
+<span class="nc" id="L127">    this.stage.setMinHeight(2 * Screen.getPrimary().getVisualBounds().getHeight() / 3);</span>
+<span class="nc" id="L128">    this.stage</span>
+<span class="nc" id="L129">        .widthProperty()</span>
+<span class="nc" id="L130">        .addListener(</span>
+<span class="nc" id="L131">            (obs, oldVal, newVal) -&gt; {</span>
+<span class="nc" id="L132">              support.firePropertyChange(</span>
+<span class="nc" id="L133">                  new PropertyChangeEvent(this, STAGE_RESIZED, null, support));</span>
+<span class="nc" id="L134">            });</span>
+
+<span class="nc" id="L136">    this.stage</span>
+<span class="nc" id="L137">        .heightProperty()</span>
+<span class="nc" id="L138">        .addListener(</span>
+<span class="nc" id="L139">            (obs, oldVal, newVal) -&gt; {</span>
+<span class="nc" id="L140">              support.firePropertyChange(</span>
+<span class="nc" id="L141">                  new PropertyChangeEvent(this, STAGE_RESIZED, null, support));</span>
+<span class="nc" id="L142">            });</span>
+<span class="nc" id="L143">    this.stage.setOnCloseRequest(e -&gt; controller.close());</span>
+<span class="nc" id="L144">  }</span>
+
+  @Override
+  public void showGame(GameMode gameMode) {
+<span class="nc bnc" id="L148" title="All 2 branches missed.">    if (guiShowing) {</span>
+<span class="nc" id="L149">      return;</span>
+    }
+
+<span class="nc" id="L152">    guiShowing = true;</span>
+<span class="nc" id="L153">    root = new BorderPane();</span>
+<span class="nc" id="L154">    root.getStylesheets().add(&quot;cssFiles/mainGame.css&quot;);</span>
+<span class="nc" id="L155">    root.setId(&quot;main-background&quot;);</span>
+
+<span class="nc" id="L157">    HBox spacerTop = new HBox();</span>
+<span class="nc" id="L158">    spacerTop.setMinHeight(MINHEIGHT_SPACER);</span>
+<span class="nc" id="L159">    spacerTop.setMaxHeight(MAXHEIGHT_SPACER);</span>
+<span class="nc" id="L160">    spacerTop.setId(&quot;borderpane-spacer&quot;);</span>
+<span class="nc" id="L161">    root.setTop(spacerTop);</span>
+
+<span class="nc" id="L163">    HBox spacerBottom = new HBox();</span>
+<span class="nc" id="L164">    spacerBottom.setMinHeight(MINHEIGHT_SPACER);</span>
+<span class="nc" id="L165">    spacerBottom.setMaxHeight(MAXHEIGHT_SPACER);</span>
+<span class="nc" id="L166">    spacerBottom.setId(&quot;borderpane-spacer&quot;);</span>
+<span class="nc" id="L167">    root.setBottom(spacerBottom);</span>
+
+<span class="nc" id="L169">    VBox left = getDiskIndicators(gameMode);</span>
+<span class="nc" id="L170">    root.setLeft(left);</span>
+<span class="nc" id="L171">    BorderPane.setAlignment(left, Pos.CENTER);</span>
+
+<span class="nc" id="L173">    gameBoard = new GameBoardGrid(model, controller, stage, this, messages);</span>
+<span class="nc" id="L174">    root.setCenter(gameBoard);</span>
+<span class="nc" id="L175">    BorderPane.setAlignment(root, Pos.CENTER);</span>
+<span class="nc" id="L176">    BorderPane.setMargin(gameBoard, GAMEBOARD_INSETS);</span>
+
+<span class="nc" id="L178">    VBox right = getMuteAndMainMenuButton();</span>
+<span class="nc" id="L179">    root.setRight(right);</span>
+<span class="nc" id="L180">    BorderPane.setMargin(right, INSETS_PANERIGHT);</span>
+
+<span class="nc" id="L182">    scene = new Scene(root);</span>
+<span class="nc" id="L183">    stage.setMinWidth(</span>
+<span class="nc" id="L184">        left.getMinWidth()</span>
+<span class="nc" id="L185">            + gameBoard.getMinWidth()</span>
+<span class="nc" id="L186">            + BorderPane.getMargin(gameBoard).getLeft()</span>
+<span class="nc" id="L187">            + BorderPane.getMargin(gameBoard).getRight()</span>
+<span class="nc" id="L188">            + right.getMinWidth()</span>
+<span class="nc" id="L189">            + 2 * BorderPane.getMargin(right).getRight());</span>
+
+<span class="nc" id="L191">    double minHeightLeft =</span>
+<span class="nc" id="L192">        left.getMinHeight() + spacerBottom.getMinHeight() + spacerTop.getMinHeight();</span>
+<span class="nc" id="L193">    double minHeightBoard =</span>
+<span class="nc" id="L194">        gameBoard.getMinHeight()</span>
+<span class="nc" id="L195">            + spacerBottom.getMinHeight()</span>
+<span class="nc" id="L196">            + spacerTop.getMinHeight()</span>
+<span class="nc" id="L197">            + BorderPane.getMargin(gameBoard).getTop()</span>
+<span class="nc" id="L198">            + BorderPane.getMargin(gameBoard).getBottom();</span>
+
+<span class="nc bnc" id="L200" title="All 2 branches missed.">    if (minHeightLeft &gt; minHeightBoard) {</span>
+<span class="nc" id="L201">      stage.setMinHeight(minHeightLeft);</span>
+<span class="nc" id="L202">    } else {</span>
+<span class="nc" id="L203">      stage.setMinHeight(minHeightBoard);</span>
+    }
+
+<span class="nc" id="L206">    stage.setScene(scene);</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">    if (!stage.isShowing()) {</span>
+<span class="nc" id="L208">      stage.show();</span>
+    }
+<span class="nc" id="L210">  }</span>
+
+  private VBox getDiskIndicators(GameMode gameMode) {
+
+<span class="nc" id="L214">    VBox vbox = new VBox(30);</span>
+<span class="nc" id="L215">    vbox.setAlignment(Pos.TOP_CENTER);</span>
+<span class="nc" id="L216">    vbox.setPadding(new Insets(20));</span>
+
+<span class="nc" id="L218">    DiskIndicator currentPlayer =</span>
+<span class="nc" id="L219">        new DiskIndicator(model, messages.getString(&quot;ViewImpl_CurrentPlayer&quot;), this, controller);</span>
+<span class="nc" id="L220">    vbox.getChildren().add(currentPlayer);</span>
+<span class="nc" id="L221">    stage.heightProperty().addListener(e -&gt; currentPlayer.resizeDisk());</span>
+<span class="nc" id="L222">    stage.widthProperty().addListener(e -&gt; currentPlayer.resizeDisk());</span>
+
+<span class="nc" id="L224">    Button reset = getButton(messages.getString(&quot;ViewImpl_ButtonResetGame&quot;));</span>
+<span class="nc" id="L225">    reset.setOnAction(</span>
+<span class="nc" id="L226">        e -&gt; {</span>
+<span class="nc" id="L227">          controller.resetGame(</span>
+<span class="nc" id="L228">              gameMode,</span>
+<span class="nc" id="L229">              model.getState().getPlayerManagement().getPlayerOne(),</span>
+<span class="nc" id="L230">              model.getState().getPlayerManagement().getPlayerTwo(),</span>
+<span class="nc" id="L231">              model.getState().getField().getSize());</span>
+
+<span class="nc bnc" id="L233" title="All 2 branches missed.">          if (gameMode == GameMode.MULTIPLAYER) {</span>
+<span class="nc" id="L234">            gameBoard.setDisable(true);</span>
+<span class="nc" id="L235">            showAlert(</span>
+<span class="nc" id="L236">                AlertType.INFORMATION,</span>
+<span class="nc" id="L237">                messages.getString(&quot;ViewImpl_ResetRequest_Title&quot;),</span>
+<span class="nc" id="L238">                messages.getString(&quot;ViewImpl_ResetRequest_Subtitle&quot;),</span>
+<span class="nc" id="L239">                messages.getString(&quot;ViewImpl_ResetRequest_Info&quot;));</span>
+          }
+<span class="nc" id="L241">        });</span>
+
+<span class="nc" id="L243">    Region spacer = new Region();</span>
+<span class="nc" id="L244">    VBox.setVgrow(spacer, Priority.ALWAYS);</span>
+
+<span class="nc" id="L246">    VBox diskCounter = getDiskCounter();</span>
+<span class="nc" id="L247">    vbox.getChildren().addAll(new Separator(Orientation.HORIZONTAL), spacer, diskCounter);</span>
+
+<span class="nc" id="L249">    Region bottomSpacer = new Region();</span>
+<span class="nc" id="L250">    VBox.setVgrow(bottomSpacer, Priority.ALWAYS);</span>
+
+<span class="nc" id="L252">    vbox.getChildren().addAll(bottomSpacer, new Separator(Orientation.HORIZONTAL), getHelpButton());</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">    if (gameMode != GameMode.SPECTATOR) {</span>
+<span class="nc" id="L254">      vbox.getChildren().addAll(reset);</span>
+    }
+<span class="nc" id="L256">    vbox.setMinWidth(</span>
+<span class="nc" id="L257">        (diskCounter.getMinWidth() + vbox.getPadding().getLeft() + vbox.getPadding().getRight()));</span>
+<span class="nc" id="L258">    vbox.setMinHeight(</span>
+<span class="nc" id="L259">        vbox.getSpacing() * (vbox.getChildren().size() - 1)</span>
+<span class="nc" id="L260">            + currentPlayer.getMinHeight()</span>
+<span class="nc" id="L261">            + reset.getPrefHeight()</span>
+<span class="nc" id="L262">            + diskCounter.getMinHeight()</span>
+<span class="nc" id="L263">            + getHelpButton().getMinHeight()</span>
+<span class="nc" id="L264">            + vbox.getPadding().getTop()</span>
+<span class="nc" id="L265">            + vbox.getPadding().getBottom());</span>
+
+<span class="nc" id="L267">    return vbox;</span>
+  }
+
+  private VBox getDiskCounter() {
+<span class="nc" id="L271">    VBox vbox = new VBox(30);</span>
+<span class="nc" id="L272">    vbox.setAlignment(Pos.TOP_CENTER);</span>
+<span class="nc" id="L273">    vbox.getStyleClass().add(&quot;transparent&quot;);</span>
+<span class="nc" id="L274">    vbox.setMaxWidth(Double.POSITIVE_INFINITY);</span>
+
+<span class="nc bnc" id="L276" title="All 2 branches missed.">    if (model instanceof ModelImpl) {</span>
+
+<span class="nc" id="L278">      HBox playerOneInfo = new HBox(10);</span>
+<span class="nc" id="L279">      playerOneInfo.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L280">      playerOneInfo.getStyleClass().add(&quot;transparent&quot;);</span>
+<span class="nc" id="L281">      playerOneInfo.setMaxWidth(Double.POSITIVE_INFINITY);</span>
+
+<span class="nc" id="L283">      ModelImpl mod = (ModelImpl) model;</span>
+
+<span class="nc" id="L285">      diskTrianglePlayerOne =</span>
+<span class="nc" id="L286">          buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor());</span>
+<span class="nc" id="L287">      playerOneInfo.getChildren().add(diskTrianglePlayerOne);</span>
+<span class="nc" id="L288">      numberPlayerOneDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerOne()));</span>
+<span class="nc" id="L289">      Font labelFont = Font.font(&quot;Boulder&quot;, FontWeight.BOLD, 25);</span>
+<span class="nc" id="L290">      numberPlayerOneDisks.setFont(labelFont);</span>
+<span class="nc" id="L291">      numberPlayerOneDisks.getStyleClass().add(&quot;white-label&quot;);</span>
+<span class="nc" id="L292">      playerOneInfo.getChildren().add(numberPlayerOneDisks);</span>
+<span class="nc" id="L293">      vbox.getChildren().add(playerOneInfo);</span>
+
+<span class="nc" id="L295">      HBox playerTwoInfo = new HBox(10);</span>
+<span class="nc" id="L296">      playerTwoInfo.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L297">      playerTwoInfo.getStyleClass().add(&quot;transparent&quot;);</span>
+
+<span class="nc" id="L299">      diskTrianglePlayerTwo =</span>
+<span class="nc" id="L300">          buildDiskTriangle(model.getState().getPlayerManagement().getPlayerTwo().getColor());</span>
+<span class="nc" id="L301">      playerTwoInfo.getChildren().add(diskTrianglePlayerTwo);</span>
+<span class="nc" id="L302">      numberPlayerTwoDisks = new Label(String.valueOf(mod.getNumberOfDisksPlayerTwo()));</span>
+<span class="nc" id="L303">      numberPlayerTwoDisks.setFont(labelFont);</span>
+<span class="nc" id="L304">      numberPlayerTwoDisks.getStyleClass().add(&quot;white-label&quot;);</span>
+<span class="nc" id="L305">      playerTwoInfo.getChildren().add(numberPlayerTwoDisks);</span>
+
+<span class="nc" id="L307">      vbox.getChildren().add(playerTwoInfo);</span>
+
+<span class="nc" id="L309">      vbox.setMinHeight((vbox.getSpacing() + diskTrianglePlayerOne.getMinHeight() * 2));</span>
+<span class="nc" id="L310">      vbox.setMinWidth(</span>
+<span class="nc" id="L311">          (diskTrianglePlayerOne.getMinWidth()</span>
+<span class="nc" id="L312">              + playerOneInfo.getSpacing()</span>
+<span class="nc" id="L313">              + labelFont.getSize() * 2));</span>
+    }
+
+<span class="nc" id="L316">    return vbox;</span>
+  }
+
+  private VBox buildDiskTriangle(Color color) {
+<span class="nc" id="L320">    GridPane grid = new GridPane();</span>
+<span class="nc" id="L321">    VBox vbox = new VBox(3);</span>
+
+<span class="nc" id="L323">    vbox.getStyleClass().add(&quot;transparent&quot;);</span>
+<span class="nc" id="L324">    grid.setGridLinesVisible(false);</span>
+<span class="nc" id="L325">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L327">    GraphicDisk diskOne = new GraphicDisk(30, 30, 15, color);</span>
+
+<span class="nc" id="L329">    HBox topRow = new HBox();</span>
+<span class="nc" id="L330">    topRow.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L331">    topRow.getChildren().add(diskOne);</span>
+<span class="nc" id="L332">    GraphicDisk diskTwo = new GraphicDisk(30, 30, 15, color);</span>
+<span class="nc" id="L333">    GraphicDisk diskThree = new GraphicDisk(30, 30, 15, color);</span>
+
+<span class="nc" id="L335">    HBox bottomRow = new HBox(3);</span>
+<span class="nc" id="L336">    bottomRow.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L337">    bottomRow.getChildren().addAll(diskTwo, diskThree);</span>
+
+<span class="nc" id="L339">    vbox.setMinHeight(80);</span>
+<span class="nc" id="L340">    vbox.setMinWidth((3 * 30));</span>
+
+<span class="nc" id="L342">    vbox.getChildren().addAll(topRow, bottomRow);</span>
+
+<span class="nc" id="L344">    return vbox;</span>
+  }
+
+  private Button getHelpButton() {
+<span class="nc" id="L348">    Image help = new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/help.png&quot;));</span>
+
+<span class="nc" id="L350">    ImageView imageView = new ImageView(help);</span>
+<span class="nc" id="L351">    imageView.setPreserveRatio(true);</span>
+<span class="nc" id="L352">    imageView.setFitHeight(50);</span>
+<span class="nc" id="L353">    Button button = new Button(&quot;&quot;, imageView);</span>
+<span class="nc" id="L354">    button.setCursor(Cursor.HAND);</span>
+<span class="nc" id="L355">    button.setStyle(&quot;-fx-background-color: transparent; -fx-border-color: transparent;&quot;);</span>
+<span class="nc" id="L356">    button.setOnAction(e -&gt; aboutWindow = new AboutWindow(messages));</span>
+<span class="nc" id="L357">    Tooltip helper = new Tooltip();</span>
+<span class="nc" id="L358">    helper.setText(messages.getString(&quot;ViewImpl_ButtonHelp_Tooltip&quot;));</span>
+<span class="nc" id="L359">    button.setTooltip(helper);</span>
+<span class="nc" id="L360">    button.setMinHeight(50);</span>
+
+<span class="nc" id="L362">    return button;</span>
+  }
+
+  private VBox getMuteAndMainMenuButton() {
+<span class="nc" id="L366">    VBox vbox = new VBox(30);</span>
+<span class="nc" id="L367">    vbox.setAlignment(Pos.TOP_CENTER);</span>
+<span class="nc" id="L368">    vbox.setPadding(new Insets(20));</span>
+
+<span class="nc bnc" id="L370" title="All 2 branches missed.">    if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {</span>
+<span class="nc" id="L371">      SpectatorList spectatorList = new SpectatorList(messages, lobbyId);</span>
+<span class="nc" id="L372">      support.addPropertyChangeListener(spectatorList);</span>
+<span class="nc" id="L373">      addListener(spectatorList);</span>
+
+<span class="nc" id="L375">      vbox.getChildren().add(spectatorList);</span>
+    }
+
+<span class="nc" id="L378">    Region spacer = new Region();</span>
+<span class="nc" id="L379">    VBox.setVgrow(spacer, Priority.ALWAYS);</span>
+<span class="nc" id="L380">    vbox.getChildren().add(spacer);</span>
+
+<span class="nc bnc" id="L382" title="All 2 branches missed.">    if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {</span>
+<span class="nc" id="L383">      vbox.getChildren().add(new Separator(Orientation.HORIZONTAL));</span>
+    }
+
+<span class="nc" id="L386">    ImageView imageView = new ImageView(play);</span>
+<span class="nc" id="L387">    imageView.setPreserveRatio(true);</span>
+<span class="nc" id="L388">    imageView.setFitHeight(30);</span>
+<span class="nc" id="L389">    Button button = new Button(&quot;&quot;, imageView);</span>
+<span class="nc" id="L390">    button.setCursor(Cursor.HAND);</span>
+<span class="nc" id="L391">    button.setId(&quot;mute-button&quot;);</span>
+<span class="nc" id="L392">    button.setPrefSize(50, 50);</span>
+<span class="nc" id="L393">    button.setOnAction(</span>
+<span class="nc" id="L394">        e -&gt; {</span>
+<span class="nc bnc" id="L395" title="All 2 branches missed.">          if (playSound) {</span>
+<span class="nc" id="L396">            playSound = false;</span>
+
+<span class="nc" id="L398">            imageView.setImage(mute);</span>
+<span class="nc" id="L399">            button.setGraphic(imageView);</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">            support.firePropertyChange(SOUND_MODE_CHANGED, !playSound, playSound);</span>
+<span class="nc" id="L401">          } else {</span>
+<span class="nc" id="L402">            playSound = true;</span>
+
+<span class="nc" id="L404">            imageView.setImage(play);</span>
+<span class="nc" id="L405">            button.setGraphic(imageView);</span>
+<span class="nc bnc" id="L406" title="All 2 branches missed.">            support.firePropertyChange(SOUND_MODE_CHANGED, !playSound, playSound);</span>
+          }
+<span class="nc" id="L408">        });</span>
+<span class="nc" id="L409">    button.setOnMouseClicked(</span>
+<span class="nc" id="L410">        e -&gt; {</span>
+<span class="nc bnc" id="L411" title="All 2 branches missed.">          if (e.getButton() == MouseButton.SECONDARY) {</span>
+<span class="nc" id="L412">            showVolumeControl(button);</span>
+<span class="nc" id="L413">            return;</span>
+          }
+<span class="nc" id="L415">        });</span>
+<span class="nc" id="L416">    button.setTooltip(new Tooltip(messages.getString(&quot;ViewImpl_ButtonSound_Tooltip&quot;)));</span>
+
+<span class="nc" id="L418">    vbox.getChildren().add(button);</span>
+
+<span class="nc" id="L420">    Button back = getButton(messages.getString(&quot;ViewImpl_ButtonBack_Text&quot;));</span>
+<span class="nc" id="L421">    back.setOnAction(e -&gt; returnToMainMenu());</span>
+<span class="nc" id="L422">    vbox.getChildren().add(back);</span>
+
+<span class="nc" id="L424">    vbox.setMinWidth(</span>
+<span class="nc" id="L425">        back.getPrefWidth() + vbox.getPadding().getRight() + vbox.getPadding().getLeft());</span>
+<span class="nc" id="L426">    return vbox;</span>
+  }
+
+  private void showVolumeControl(Button parent) {
+<span class="nc bnc" id="L430" title="All 2 branches missed.">    if (!volumeControlShowing) {</span>
+<span class="nc" id="L431">      volumeControlShowing = true;</span>
+<span class="nc" id="L432">      final Stage dialog = new Stage();</span>
+<span class="nc" id="L433">      dialog.initModality(Modality.NONE);</span>
+
+<span class="nc" id="L435">      HBox dialogBox = new HBox(15);</span>
+<span class="nc" id="L436">      dialogBox.setStyle(&quot;-fx-background-color: #dddddd&quot;);</span>
+<span class="nc" id="L437">      dialogBox.setPadding(new Insets(10));</span>
+
+<span class="nc" id="L439">      Slider slider = new Slider();</span>
+<span class="nc" id="L440">      slider.setMin(0);</span>
+<span class="nc" id="L441">      slider.setMax(100);</span>
+<span class="nc" id="L442">      slider.setValue(volume * 100);</span>
+<span class="nc" id="L443">      slider.setShowTickLabels(true);</span>
+<span class="nc" id="L444">      slider.setShowTickMarks(true);</span>
+<span class="nc" id="L445">      slider.setMajorTickUnit(50);</span>
+<span class="nc" id="L446">      slider.setMinorTickCount(5);</span>
+<span class="nc" id="L447">      slider.setBlockIncrement(5);</span>
+<span class="nc" id="L448">      slider.setMinWidth(200);</span>
+<span class="nc" id="L449">      slider.setMinHeight(35);</span>
+<span class="nc" id="L450">      slider.setCursor(Cursor.HAND);</span>
+
+<span class="nc" id="L452">      Label label = new Label(String.valueOf(volume * 100));</span>
+<span class="nc" id="L453">      label.getStyleClass().add(&quot;spectatorlist-label&quot;);</span>
+<span class="nc" id="L454">      slider</span>
+<span class="nc" id="L455">          .valueProperty()</span>
+<span class="nc" id="L456">          .addListener(</span>
+<span class="nc" id="L457">              (ov, oldVal, newVal) -&gt; {</span>
+<span class="nc" id="L458">                volume = (float) (newVal.intValue() / 100.0);</span>
+<span class="nc" id="L459">                label.setText(String.valueOf(newVal.intValue()));</span>
+
+<span class="nc" id="L461">                support.firePropertyChange(VOLUME_CHANGED, null, volume);</span>
+<span class="nc" id="L462">              });</span>
+
+<span class="nc" id="L464">      dialogBox.getChildren().addAll(slider, label);</span>
+<span class="nc" id="L465">      Scene dialogScene = new Scene(dialogBox, 280, 50);</span>
+<span class="nc" id="L466">      dialog.setScene(dialogScene);</span>
+<span class="nc" id="L467">      dialog.setX(</span>
+<span class="nc" id="L468">          parent.localToScreen(parent.getBoundsInLocal()).getMinX() - dialogScene.getWidth() - 10);</span>
+<span class="nc" id="L469">      dialog.setY(parent.localToScreen(parent.getBoundsInLocal()).getMinY());</span>
+<span class="nc" id="L470">      dialog.initStyle(StageStyle.UNDECORATED);</span>
+<span class="nc" id="L471">      dialog.show();</span>
+<span class="nc" id="L472">      dialog</span>
+<span class="nc" id="L473">          .focusedProperty()</span>
+<span class="nc" id="L474">          .addListener(</span>
+<span class="nc" id="L475">              (ov, oldVal, newVal) -&gt; {</span>
+<span class="nc bnc" id="L476" title="All 2 branches missed.">                if (!newVal) {</span>
+<span class="nc" id="L477">                  dialog.close();</span>
+<span class="nc" id="L478">                  volumeControlShowing = false;</span>
+                }
+<span class="nc" id="L480">              });</span>
+    }
+<span class="nc" id="L482">  }</span>
+
+  private Button getButton(String text) {
+<span class="nc" id="L485">    Button button = new Button(text);</span>
+<span class="nc" id="L486">    button.setId(&quot;button&quot;);</span>
+<span class="nc" id="L487">    button.setMinHeight(MINHEIGHT_BUTTON);</span>
+<span class="nc" id="L488">    button.setPrefHeight(PREFHEIGHT_BUTTON);</span>
+<span class="nc" id="L489">    button.setMaxWidth(MAXWIDTH_BUTTON);</span>
+<span class="nc" id="L490">    button.setMinWidth(MINWIDTH_BUTTON);</span>
+<span class="nc" id="L491">    button.setPrefWidth(PREFWIDTH_BUTTON);</span>
+<span class="nc" id="L492">    button.setCursor(CURSOR_BUTTON);</span>
+<span class="nc" id="L493">    button.setFont(FONT_BUTTON);</span>
+
+<span class="nc" id="L495">    return button;</span>
+  }
+
+  @Override
+  public void showWaitingScreen() {
+<span class="nc" id="L500">    root = new BorderPane();</span>
+<span class="nc" id="L501">    root.getStylesheets().add(&quot;cssFiles/mainGame.css&quot;);</span>
+<span class="nc" id="L502">    root.setId(&quot;main-background&quot;);</span>
+<span class="nc" id="L503">    root.setPadding(new Insets(50));</span>
+
+<span class="nc" id="L505">    Image loadingGif =</span>
+<span class="nc" id="L506">        new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/LoadingGif.gif&quot;));</span>
+<span class="nc" id="L507">    ImageView imageView = new ImageView(loadingGif);</span>
+<span class="nc" id="L508">    root.setCenter(imageView);</span>
+
+<span class="nc" id="L510">    Label waiting = new Label(messages.getString(&quot;ViewImpl_WaitForOpponent&quot;));</span>
+<span class="nc" id="L511">    waiting.setFont(Font.font(20));</span>
+<span class="nc" id="L512">    waiting.setStyle(&quot;-fx-text-fill: white&quot;);</span>
+<span class="nc" id="L513">    root.setTop(waiting);</span>
+<span class="nc" id="L514">    BorderPane.setAlignment(waiting, Pos.CENTER);</span>
+
+<span class="nc" id="L516">    lobbyID = new Label(messages.getString(&quot;ViewImpl_LabelLobbyID&quot;));</span>
+<span class="nc" id="L517">    lobbyID.setStyle(&quot;-fx-text-fill: white&quot;);</span>
+<span class="nc" id="L518">    root.setBottom(lobbyID);</span>
+<span class="nc" id="L519">    BorderPane.setAlignment(lobbyID, Pos.CENTER);</span>
+
+<span class="nc" id="L521">    scene = new Scene(root);</span>
+<span class="nc" id="L522">    stage.setScene(scene);</span>
+<span class="nc bnc" id="L523" title="All 2 branches missed.">    if (!stage.isShowing()) {</span>
+<span class="nc" id="L524">      stage.show();</span>
+    }
+<span class="nc" id="L526">  }</span>
+
+  @Override
+  public void propertyChange(PropertyChangeEvent event) {
+<span class="nc" id="L530">    Platform.runLater(() -&gt; handleChangeEvent(event));</span>
+<span class="nc" id="L531">  }</span>
+
+  /**
+   * The observable (= model) has just published that it has changed its state. The GUI needs to be
+   * updated accordingly here.
+   *
+   * @param event The event that has been fired by the model.
+   */
+  private void handleChangeEvent(PropertyChangeEvent event) {
+
+<span class="nc bnc" id="L541" title="All 2 branches missed.">    if (event.getPropertyName().equals(Model.STATE_CHANGED)) {</span>
+<span class="nc" id="L542">      support.firePropertyChange(event.getPropertyName(), event.getOldValue(), event.getNewValue());</span>
+
+<span class="nc" id="L544">      changePlayerDiskNumber();</span>
+
+<span class="nc bnc" id="L546" title="All 2 branches missed.">      if (model.getState().getCurrentPhase() == Phase.FINISHED) {</span>
+
+<span class="nc" id="L548">        root.setDisable(true);</span>
+<span class="nc" id="L549">        gameFinishedScreen = new GameFinishedScreen(controller, model, stage, messages);</span>
+      }
+    }
+
+<span class="nc bnc" id="L553" title="All 2 branches missed.">    if (event.getPropertyName().equals(Model.LISTENERS_CHANGED)) {</span>
+
+<span class="nc bnc" id="L555" title="All 2 branches missed.">      if (event.getNewValue() instanceof Model) {</span>
+<span class="nc bnc" id="L556" title="All 2 branches missed.">        if (root.isDisabled()) {</span>
+<span class="nc" id="L557">          root.setDisable(false);</span>
+        }
+
+<span class="nc" id="L560">        this.model = (Model) event.getNewValue();</span>
+<span class="nc" id="L561">        support.firePropertyChange(event);</span>
+      }
+    }
+<span class="nc" id="L564">  }</span>
+
+  @Override
+  public void addListener(PropertyChangeListener listener) {
+<span class="nc" id="L568">    support.addPropertyChangeListener(listener);</span>
+<span class="nc" id="L569">  }</span>
+
+  @Override
+  public void removeListener(PropertyChangeListener listener) {
+<span class="nc" id="L573">    support.removePropertyChangeListener(listener);</span>
+<span class="nc" id="L574">  }</span>
+
+  @Override
+  public void receivedJoinRequestResponse(Response response) {
+<span class="nc" id="L578">    Platform.runLater(() -&gt; handleJoinRequestResponse(response));</span>
+<span class="nc" id="L579">  }</span>
+
+  private void handleJoinRequestResponse(Response response) {
+<span class="nc bnc" id="L582" title="All 2 branches missed.">    if (response.getType() == ResponseType.JOIN_SUCCESSFUL) {</span>
+<span class="nc" id="L583">      lobbyId = response.getLobbyID();</span>
+<span class="nc" id="L584">      support.firePropertyChange(LOBBYID_CHANGED, null, lobbyId);</span>
+<span class="nc bnc" id="L585" title="All 2 branches missed.">      if (lobbyID != null) {</span>
+<span class="nc" id="L586">        lobbyID.setText(lobbyID.getText() + &quot; &quot; + response.getLobbyID());</span>
+      }
+<span class="nc bnc" id="L588" title="All 2 branches missed.">    } else if (response.getType() == ResponseType.LOBBY_NOT_FOUND) {</span>
+<span class="nc" id="L589">      showAlert(</span>
+<span class="nc" id="L590">          AlertType.ERROR,</span>
+<span class="nc" id="L591">          messages.getString(&quot;ViewImpl_JoinError_LobbyNotFound_Title&quot;),</span>
+<span class="nc" id="L592">          messages.getString(&quot;ViewImpl_JoinError_LobbyNotFound_Subtitle&quot;),</span>
+<span class="nc" id="L593">          messages.getString(&quot;ViewImpl_JoinError_LobbyNotFound_Info&quot;));</span>
+<span class="nc" id="L594">      returnToMainMenu();</span>
+<span class="nc bnc" id="L595" title="All 2 branches missed.">    } else if (response.getType() == ResponseType.NO_PLAYERS_NEEDED) {</span>
+
+<span class="nc" id="L597">      showAlert(</span>
+<span class="nc" id="L598">          AlertType.ERROR,</span>
+<span class="nc" id="L599">          messages.getString(&quot;ViewImpl_JoinError_NoPlayerNeeded_Title&quot;),</span>
+<span class="nc" id="L600">          messages.getString(&quot;ViewImpl_JoinError_NoPlayerNeeded_Subtitle&quot;),</span>
+<span class="nc" id="L601">          messages.getString(&quot;ViewImpl_JoinError_NoPlayerNeeded_Info&quot;));</span>
+<span class="nc" id="L602">      returnToMainMenu();</span>
+<span class="nc bnc" id="L603" title="All 2 branches missed.">    } else if (response.getType() == ResponseType.NO_LOBBY_AVAILABLE) {</span>
+<span class="nc" id="L604">      showAlert(</span>
+<span class="nc" id="L605">          AlertType.ERROR,</span>
+<span class="nc" id="L606">          messages.getString(&quot;ViewImpl_NoLobbyAvailable_Title&quot;),</span>
+<span class="nc" id="L607">          messages.getString(&quot;ViewImpl_NoLobbyAvailable_Subtitle&quot;),</span>
+<span class="nc" id="L608">          messages.getString(&quot;ViewImpl_NoLobbyAvailable_Info&quot;));</span>
+<span class="nc" id="L609">      returnToMainMenu();</span>
+    }
+<span class="nc" id="L611">  }</span>
+
+  private void returnToMainMenu() {
+<span class="nc bnc" id="L614" title="All 2 branches missed.">    if (controller instanceof ControllerImpl) {</span>
+<span class="nc" id="L615">      ((ControllerImpl) controller).showGameModeSelector(new Stage());</span>
+<span class="nc" id="L616">    } else {</span>
+<span class="nc" id="L617">      controller = new ControllerImpl(messages);</span>
+<span class="nc" id="L618">      ((ControllerImpl) controller).showGameModeSelector(new Stage());</span>
+    }
+
+<span class="nc" id="L621">    closeOpenWindows();</span>
+
+<span class="nc" id="L623">    stage.close();</span>
+<span class="nc" id="L624">  }</span>
+
+  @Override
+  public void receivedRejectedPlacementReason(Reason rejectedPlacement) {
+<span class="nc" id="L628">    Platform.runLater(</span>
+<span class="nc" id="L629">        () -&gt;</span>
+<span class="nc" id="L630">            showAlert(</span>
+<span class="nc" id="L631">                AlertType.ERROR,</span>
+<span class="nc" id="L632">                messages.getString(&quot;ViewImpl_DiskError_Title&quot;),</span>
+<span class="nc" id="L633">                messages.getString(&quot;ViewImpl_DiskError_Subtitle&quot;),</span>
+<span class="nc" id="L634">                messages.getString(&quot;ViewImpl_DiskError_Info&quot;)));</span>
+<span class="nc" id="L635">  }</span>
+
+  @Override
+  public void receivedServerNotification(ServerNotification serverNotification) {
+<span class="nc" id="L639">    Platform.runLater(() -&gt; handleServerNotification(serverNotification));</span>
+<span class="nc" id="L640">  }</span>
+
+  private void handleServerNotification(ServerNotification serverNotification) {
+
+<span class="nc bnc" id="L644" title="All 9 branches missed.">    switch (serverNotification) {</span>
+      case SERVER_SHUTTING_DOWN:
+<span class="nc" id="L646">        handleServerShuttingDown();</span>
+<span class="nc" id="L647">        break;</span>
+      case RESTARTING:
+<span class="nc" id="L649">        break;</span>
+      case RECEIVED_INVALID_DATA:
+<span class="nc" id="L651">        break;</span>
+      case PARTNER_ACCEPTED_RESTART:
+<span class="nc" id="L653">        gameBoard.setDisable(false);</span>
+<span class="nc" id="L654">        break;</span>
+      case PARTNER_DENIED_RESTART:
+<span class="nc" id="L656">        showAlert(</span>
+<span class="nc" id="L657">            AlertType.INFORMATION,</span>
+<span class="nc" id="L658">            messages.getString(&quot;ViewImpl_ResetRequest_Denied_Title&quot;),</span>
+<span class="nc" id="L659">            messages.getString(&quot;ViewImpl_ResetRequest_Denied_Subtitle&quot;),</span>
+<span class="nc" id="L660">            messages.getString(&quot;ViewImpl_ResetRequest_Denied_Info&quot;));</span>
+<span class="nc" id="L661">        root.setDisable(false);</span>
+<span class="nc" id="L662">        break;</span>
+      case PARTNER_REQUESTED_RESTART:
+<span class="nc" id="L664">        handleRestartRequest();</span>
+<span class="nc" id="L665">        break;</span>
+      case PLAYER_ONE_LEFT:
+      case PLAYER_TWO_LEFT:
+<span class="nc" id="L668">        handleOnePlayerLeft();</span>
+<span class="nc" id="L669">        break;</span>
+      case LOBBY_CLOSED:
+<span class="nc" id="L671">        handleLobbyClosed();</span>
+<span class="nc" id="L672">        break;</span>
+      default:
+        break;
+    }
+<span class="nc" id="L676">  }</span>
+
+  private void handleServerShuttingDown() {
+<span class="nc bnc" id="L679" title="All 2 branches missed.">    if (!stage.isShowing()) {</span>
+<span class="nc" id="L680">      return;</span>
+    }
+<span class="nc" id="L682">    ButtonType backToMainMenu = new ButtonType(messages.getString(&quot;ViewImpl_ButtonBack_Text&quot;));</span>
+<span class="nc" id="L683">    ButtonType continueAgainstAi =</span>
+<span class="nc" id="L684">        new ButtonType(messages.getString(&quot;ViewImpl_ButtonContinueAgainstAI_Text&quot;));</span>
+<span class="nc" id="L685">    ButtonType exit = new ButtonType(messages.getString(&quot;ViewImpl_ButtonExit_Text&quot;));</span>
+
+<span class="nc" id="L687">    ArrayList&lt;ButtonType&gt; buttonTypes = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L688">    buttonTypes.add(backToMainMenu);</span>
+<span class="nc bnc" id="L689" title="All 2 branches missed.">    if (controller.getCurrentGameMode() != GameMode.SPECTATOR) {</span>
+<span class="nc" id="L690">      buttonTypes.add(continueAgainstAi);</span>
+    }
+<span class="nc" id="L692">    buttonTypes.add(exit);</span>
+
+<span class="nc" id="L694">    Alert alert =</span>
+<span class="nc" id="L695">        showOptionDialog(</span>
+<span class="nc" id="L696">            AlertType.INFORMATION,</span>
+<span class="nc" id="L697">            messages.getString(&quot;ViewImpl_ServerShutdown_Title&quot;),</span>
+<span class="nc" id="L698">            messages.getString(&quot;ViewImpl_ServerShutdown_Subtitle&quot;),</span>
+<span class="nc" id="L699">            messages.getString(&quot;ViewImpl_ServerShutdown_Info&quot;),</span>
+<span class="nc" id="L700">            buttonTypes);</span>
+
+<span class="nc" id="L702">    Optional&lt;ButtonType&gt; optional = alert.showAndWait();</span>
+<span class="nc bnc" id="L703" title="All 2 branches missed.">    if (optional.get().equals(backToMainMenu)) {</span>
+<span class="nc" id="L704">      returnToMainMenu();</span>
+<span class="nc bnc" id="L705" title="All 2 branches missed.">    } else if (optional.get().equals(continueAgainstAi)) {</span>
+<span class="nc" id="L706">      controller.continueAgainstAi(model);</span>
+<span class="nc bnc" id="L707" title="All 2 branches missed.">    } else if (optional.get().equals(exit)) {</span>
+<span class="nc" id="L708">      controller.close();</span>
+<span class="nc" id="L709">    } else {</span>
+<span class="nc" id="L710">      returnToMainMenu();</span>
+    }
+<span class="nc" id="L712">  }</span>
+
+  private void handleRestartRequest() {
+<span class="nc bnc" id="L715" title="All 2 branches missed.">    if (!stage.isShowing()) {</span>
+<span class="nc" id="L716">      return;</span>
+    }
+<span class="nc" id="L718">    ButtonType accept = new ButtonType(messages.getString(&quot;ViewImpl_ResetRequest_Accept&quot;));</span>
+<span class="nc" id="L719">    ButtonType deny = new ButtonType(messages.getString(&quot;ViewImpl_ResetRequest_Deny&quot;));</span>
+
+<span class="nc" id="L721">    ArrayList&lt;ButtonType&gt; buttonTypes = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L722">    buttonTypes.add(accept);</span>
+<span class="nc" id="L723">    buttonTypes.add(deny);</span>
+
+<span class="nc" id="L725">    root.setDisable(true);</span>
+
+<span class="nc" id="L727">    Alert alert =</span>
+<span class="nc" id="L728">        showOptionDialog(</span>
+<span class="nc" id="L729">            AlertType.INFORMATION,</span>
+<span class="nc" id="L730">            messages.getString(&quot;ViewImpl_ResetRequest_Received_Title&quot;),</span>
+<span class="nc" id="L731">            messages.getString(&quot;ViewImpl_ResetRequest_Received_Subtitle&quot;),</span>
+<span class="nc" id="L732">            messages.getString(&quot;ViewImpl_ResetRequest_Received_Info&quot;),</span>
+<span class="nc" id="L733">            buttonTypes);</span>
+
+<span class="nc" id="L735">    Optional&lt;ButtonType&gt; optional = alert.showAndWait();</span>
+<span class="nc bnc" id="L736" title="All 2 branches missed.">    if (optional.get().equals(accept)) {</span>
+<span class="nc bnc" id="L737" title="All 2 branches missed.">      if (controller instanceof MultiplayerController) {</span>
+<span class="nc" id="L738">        ((MultiplayerController) controller).acceptGameRestart();</span>
+      }
+<span class="nc bnc" id="L740" title="All 2 branches missed.">    } else if (optional.get().equals(deny)) {</span>
+<span class="nc bnc" id="L741" title="All 2 branches missed.">      if (controller instanceof MultiplayerController) {</span>
+<span class="nc" id="L742">        ((MultiplayerController) controller).denyGameRestart();</span>
+      }
+    }
+
+<span class="nc" id="L746">    root.setDisable(false);</span>
+<span class="nc" id="L747">  }</span>
+
+  private void handleLobbyClosed() {
+<span class="nc bnc" id="L750" title="All 2 branches missed.">    if (!stage.isShowing()) {</span>
+<span class="nc" id="L751">      return;</span>
+    }
+
+<span class="nc" id="L754">    ButtonType backToMainMenu = new ButtonType(messages.getString(&quot;ViewImpl_ButtonBack_Text&quot;));</span>
+<span class="nc" id="L755">    ButtonType continueAgainstAi =</span>
+<span class="nc" id="L756">        new ButtonType(messages.getString(&quot;ViewImpl_ButtonContinueAgainstAI_Text&quot;));</span>
+<span class="nc" id="L757">    ButtonType exit = new ButtonType(messages.getString(&quot;ViewImpl_ButtonExit_Text&quot;));</span>
+
+<span class="nc" id="L759">    ArrayList&lt;ButtonType&gt; buttonTypes = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L760">    buttonTypes.add(backToMainMenu);</span>
+<span class="nc bnc" id="L761" title="All 2 branches missed.">    if (controller.getCurrentGameMode() != GameMode.SPECTATOR) {</span>
+<span class="nc" id="L762">      buttonTypes.add(continueAgainstAi);</span>
+    }
+<span class="nc" id="L764">    buttonTypes.add(exit);</span>
+
+<span class="nc" id="L766">    Alert alert =</span>
+<span class="nc" id="L767">        showOptionDialog(</span>
+<span class="nc" id="L768">            AlertType.INFORMATION,</span>
+<span class="nc" id="L769">            messages.getString(&quot;ViewImpl_ServerShutdown_Title&quot;),</span>
+<span class="nc" id="L770">            messages.getString(&quot;ViewImpl_ServerShutdown_Subtitle&quot;),</span>
+<span class="nc" id="L771">            messages.getString(&quot;ViewImpl_ServerShutdown_Info&quot;),</span>
+<span class="nc" id="L772">            buttonTypes);</span>
+
+<span class="nc" id="L774">    Optional&lt;ButtonType&gt; optional = alert.showAndWait();</span>
+<span class="nc bnc" id="L775" title="All 2 branches missed.">    if (optional.get().equals(backToMainMenu)) {</span>
+<span class="nc" id="L776">      returnToMainMenu();</span>
+<span class="nc bnc" id="L777" title="All 2 branches missed.">    } else if (optional.get().equals(continueAgainstAi)) {</span>
+<span class="nc" id="L778">      controller.continueAgainstAi(model);</span>
+<span class="nc bnc" id="L779" title="All 2 branches missed.">    } else if (optional.get().equals(exit)) {</span>
+<span class="nc" id="L780">      controller.close();</span>
+<span class="nc" id="L781">    } else {</span>
+<span class="nc" id="L782">      returnToMainMenu();</span>
+    }
+<span class="nc" id="L784">  }</span>
+
+  private void handleOnePlayerLeft() {
+<span class="nc bnc" id="L787" title="All 2 branches missed.">    if (!stage.isShowing()) {</span>
+<span class="nc" id="L788">      return;</span>
+    }
+<span class="nc" id="L790">    ButtonType backToMainMenu = new ButtonType(messages.getString(&quot;ViewImpl_ButtonBack_Text&quot;));</span>
+<span class="nc" id="L791">    ButtonType continueAgainstAi =</span>
+<span class="nc" id="L792">        new ButtonType(messages.getString(&quot;ViewImpl_ButtonContinueAgainstAI_Text&quot;));</span>
+<span class="nc" id="L793">    ButtonType remainAndWait =</span>
+<span class="nc" id="L794">        new ButtonType(messages.getString(&quot;ViewImpl_OpponentDisconnected_Remain&quot;));</span>
+
+<span class="nc" id="L796">    ArrayList&lt;ButtonType&gt; buttonTypes = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L797">    buttonTypes.add(backToMainMenu);</span>
+<span class="nc bnc" id="L798" title="All 2 branches missed.">    if (controller.getCurrentGameMode() != GameMode.SPECTATOR</span>
+<span class="nc bnc" id="L799" title="All 2 branches missed.">        &amp;&amp; model.getState().getCurrentPhase() != Phase.FINISHED) {</span>
+<span class="nc" id="L800">      buttonTypes.add(continueAgainstAi);</span>
+    }
+<span class="nc bnc" id="L802" title="All 2 branches missed.">    if (model.getState().getCurrentPhase() != Phase.FINISHED) {</span>
+<span class="nc" id="L803">      buttonTypes.add(remainAndWait);</span>
+    }
+
+<span class="nc" id="L806">    ButtonType exit = new ButtonType(messages.getString(&quot;ViewImpl_ButtonExit_Text&quot;));</span>
+<span class="nc" id="L807">    buttonTypes.add(exit);</span>
+
+<span class="nc" id="L809">    Alert alert =</span>
+<span class="nc" id="L810">        showOptionDialog(</span>
+<span class="nc" id="L811">            AlertType.INFORMATION,</span>
+<span class="nc" id="L812">            messages.getString(&quot;ViewImpl_OpponentDisconnected_Title&quot;),</span>
+<span class="nc" id="L813">            messages.getString(&quot;ViewImpl_OpponentDisconnected_Subtitle&quot;),</span>
+<span class="nc" id="L814">            messages.getString(&quot;ViewImpl_OpponentDisconnected_Info&quot;),</span>
+<span class="nc" id="L815">            buttonTypes);</span>
+<span class="nc" id="L816">    Optional&lt;ButtonType&gt; optional = alert.showAndWait();</span>
+<span class="nc bnc" id="L817" title="All 2 branches missed.">    if (optional.get().equals(backToMainMenu)) {</span>
+<span class="nc" id="L818">      returnToMainMenu();</span>
+<span class="nc bnc" id="L819" title="All 2 branches missed.">    } else if (optional.get().equals(continueAgainstAi)) {</span>
+<span class="nc" id="L820">      controller.continueAgainstAi(model);</span>
+<span class="nc bnc" id="L821" title="All 2 branches missed.">    } else if (optional.get().equals(exit)) {</span>
+<span class="nc" id="L822">      controller.close();</span>
+<span class="nc bnc" id="L823" title="All 2 branches missed.">    } else if (optional.get().equals(remainAndWait)) {</span>
+<span class="nc" id="L824">      return;</span>
+    } else {
+<span class="nc" id="L826">      returnToMainMenu();</span>
+    }
+<span class="nc" id="L828">  }</span>
+
+  @Override
+  public void modelExchanged(Model model) {
+<span class="nc" id="L832">    model.addListener(this);</span>
+<span class="nc" id="L833">    this.model = model;</span>
+<span class="nc" id="L834">    Platform.runLater(</span>
+<span class="nc" id="L835">        () -&gt; {</span>
+<span class="nc bnc" id="L836" title="All 2 branches missed.">          if (root.isDisable()) {</span>
+<span class="nc" id="L837">            root.setDisable(false);</span>
+          }
+<span class="nc" id="L839">          support.firePropertyChange(Model.LISTENERS_CHANGED, null, model);</span>
+<span class="nc" id="L840">          support.firePropertyChange(Model.STATE_CHANGED, null, model.getState());</span>
+
+<span class="nc" id="L842">          changePlayerDiskNumber();</span>
+<span class="nc" id="L843">          closeOpenWindows();</span>
+<span class="nc" id="L844">          showGame(controller.getCurrentGameMode());</span>
+<span class="nc" id="L845">        });</span>
+<span class="nc" id="L846">  }</span>
+
+  @Override
+  public void receivedSpectator(Spectators spectators) {
+<span class="nc" id="L850">    Platform.runLater(() -&gt; support.firePropertyChange(View.SPECTATORS_CHANGED, null, spectators));</span>
+<span class="nc" id="L851">  }</span>
+
+  private void showAlert(AlertType alertType, String title, String header, String content) {
+<span class="nc bnc" id="L854" title="All 2 branches missed.">    if (!stage.isShowing()) {</span>
+<span class="nc" id="L855">      return;</span>
+    }
+
+<span class="nc" id="L858">    Alert alert = new Alert(alertType);</span>
+<span class="nc" id="L859">    alert.setTitle(title);</span>
+<span class="nc" id="L860">    alert.setHeaderText(header);</span>
+<span class="nc" id="L861">    alert.getDialogPane().setContent(new Label(content));</span>
+<span class="nc" id="L862">    alert.initOwner(stage);</span>
+<span class="nc" id="L863">    alert.showAndWait();</span>
+<span class="nc" id="L864">  }</span>
+
+  private Alert showOptionDialog(
+      AlertType alertType,
+      String title,
+      String header,
+      String content,
+      ArrayList&lt;ButtonType&gt; buttonTypes) {
+
+<span class="nc" id="L873">    Alert alert = new Alert(alertType);</span>
+<span class="nc" id="L874">    alert.setTitle(title);</span>
+<span class="nc" id="L875">    alert.setHeaderText(header);</span>
+<span class="nc" id="L876">    alert.getDialogPane().setContent(new Label(content));</span>
+<span class="nc" id="L877">    alert.initOwner(stage);</span>
+<span class="nc" id="L878">    alert.getButtonTypes().setAll(buttonTypes);</span>
+
+<span class="nc" id="L880">    return alert;</span>
+  }
+
+  @Override
+  public void handleConnectionError() {
+<span class="nc" id="L885">    Platform.runLater(</span>
+<span class="nc" id="L886">        () -&gt; {</span>
+<span class="nc" id="L887">          showAlert(</span>
+<span class="nc" id="L888">              AlertType.ERROR,</span>
+<span class="nc" id="L889">              messages.getString(&quot;ViewImpl_ConnectionError_Title&quot;),</span>
+<span class="nc" id="L890">              messages.getString(&quot;ViewImpl_ConnectionError_Subtitle&quot;),</span>
+<span class="nc" id="L891">              messages.getString(&quot;ViewImpl_ConnectionError_Info&quot;));</span>
+
+<span class="nc" id="L893">          returnToMainMenu();</span>
+<span class="nc" id="L894">        });</span>
+<span class="nc" id="L895">  }</span>
+
+  private void changePlayerDiskNumber() {
+<span class="nc bnc" id="L898" title="All 4 branches missed.">    if (model instanceof ModelImpl &amp;&amp; guiShowing) {</span>
+<span class="nc" id="L899">      ModelImpl mod = (ModelImpl) model;</span>
+
+<span class="nc" id="L901">      numberPlayerOneDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerOne()));</span>
+<span class="nc" id="L902">      numberPlayerTwoDisks.setText(String.valueOf(mod.getNumberOfDisksPlayerTwo()));</span>
+<span class="nc" id="L903">      diskTrianglePlayerOne =</span>
+<span class="nc" id="L904">          buildDiskTriangle(model.getState().getPlayerManagement().getPlayerOne().getColor());</span>
+<span class="nc" id="L905">      diskTrianglePlayerTwo =</span>
+<span class="nc" id="L906">          buildDiskTriangle(model.getState().getPlayerManagement().getPlayerTwo().getColor());</span>
+    }
+<span class="nc" id="L908">  }</span>
+
+  @Override
+  public void close() {
+<span class="nc bnc" id="L912" title="All 4 branches missed.">    if (aboutWindow != null &amp;&amp; aboutWindow.isShowing()) {</span>
+<span class="nc" id="L913">      aboutWindow.close();</span>
+    }
+
+<span class="nc bnc" id="L916" title="All 4 branches missed.">    if (gameFinishedScreen != null &amp;&amp; gameFinishedScreen.isShowing()) {</span>
+<span class="nc" id="L917">      gameFinishedScreen.close();</span>
+    }
+
+<span class="nc" id="L920">    stage.close();</span>
+<span class="nc" id="L921">  }</span>
+
+  @Override
+  public void displayAlert(AlertType alertType, String title, String subtitle, String content) {
+<span class="nc" id="L925">    showAlert(alertType, title, subtitle, content);</span>
+<span class="nc" id="L926">  }</span>
+
+  private void closeOpenWindows() {
+<span class="nc bnc" id="L929" title="All 4 branches missed.">    if (aboutWindow != null &amp;&amp; aboutWindow.isShowing()) {</span>
+<span class="nc" id="L930">      aboutWindow.close();</span>
+    }
+
+<span class="nc bnc" id="L933" title="All 4 branches missed.">    if (gameFinishedScreen != null &amp;&amp; gameFinishedScreen.isShowing()) {</span>
+<span class="nc" id="L934">      gameFinishedScreen.close();</span>
+    }
+<span class="nc" id="L936">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

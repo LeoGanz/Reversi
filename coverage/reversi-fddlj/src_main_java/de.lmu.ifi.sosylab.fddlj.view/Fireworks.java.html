@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>Fireworks.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">Fireworks.java</span></div><h1>Fireworks.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import javafx.animation.AnimationTimer;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.Reflection;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.Paint;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
+
+/**
+ * This class builds pane on which a fireworks can be displayed by spawning random {@link Particle
+ * particles}.
+ */
+public class Fireworks extends Pane {
+  private final AnimationTimer timer;
+  private final Canvas canvas;
+<span class="nc" id="L26">  private final List&lt;Particle&gt; particles = new ArrayList&lt;Particle&gt;();</span>
+  private final Paint[] colors;
+<span class="nc" id="L28">  private int countDownTillNextFirework = 40;</span>
+
+  /** Public constructor of this class initialises variables. */
+<span class="nc" id="L31">  public Fireworks() {</span>
+    // create a color palette of 180 colors
+<span class="nc" id="L33">    colors = new Paint[181];</span>
+<span class="nc" id="L34">    colors[0] =</span>
+<span class="nc" id="L35">        new RadialGradient(</span>
+<span class="nc" id="L36">            0,</span>
+<span class="nc" id="L37">            0,</span>
+<span class="nc" id="L38">            0.5,</span>
+<span class="nc" id="L39">            0.5,</span>
+<span class="nc" id="L40">            0.5,</span>
+<span class="nc" id="L41">            true,</span>
+<span class="nc" id="L42">            CycleMethod.NO_CYCLE,</span>
+<span class="nc" id="L43">            new Stop(0, Color.WHITE),</span>
+<span class="nc" id="L44">            new Stop(0.2, Color.hsb(59, 0.38, 1)),</span>
+<span class="nc" id="L45">            new Stop(0.6, Color.hsb(59, 0.38, 1, 0.1)),</span>
+<span class="nc" id="L46">            new Stop(1, Color.hsb(59, 0.38, 1, 0)));</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">    for (int h = 0; h &lt; 360; h += 2) {</span>
+<span class="nc" id="L48">      colors[1 + (h / 2)] =</span>
+<span class="nc" id="L49">          new RadialGradient(</span>
+<span class="nc" id="L50">              0,</span>
+<span class="nc" id="L51">              0,</span>
+<span class="nc" id="L52">              0.5,</span>
+<span class="nc" id="L53">              0.5,</span>
+<span class="nc" id="L54">              0.5,</span>
+<span class="nc" id="L55">              true,</span>
+<span class="nc" id="L56">              CycleMethod.NO_CYCLE,</span>
+<span class="nc" id="L57">              new Stop(0, Color.WHITE),</span>
+<span class="nc" id="L58">              new Stop(0.2, Color.hsb(h, 1, 1)),</span>
+<span class="nc" id="L59">              new Stop(0.6, Color.hsb(h, 1, 1, 0.1)),</span>
+<span class="nc" id="L60">              new Stop(1, Color.hsb(h, 1, 1, 0)));</span>
+    }
+    // create canvas
+<span class="nc" id="L63">    canvas = new Canvas(1024, 500);</span>
+
+<span class="nc" id="L65">    canvas.setBlendMode(BlendMode.ADD);</span>
+<span class="nc" id="L66">    canvas.setEffect(new Reflection(0, 0.4, 0.15, 0));</span>
+<span class="nc" id="L67">    getChildren().addAll(canvas);</span>
+    // create animation timer that will be called every frame
+    // final AnimationTimer timer = new AnimationTimer() {
+<span class="nc" id="L70">    timer =</span>
+<span class="nc" id="L71">        new AnimationTimer() {</span>
+
+          @Override
+          public void handle(long now) {
+<span class="nc" id="L75">            GraphicsContext gc = canvas.getGraphicsContext2D();</span>
+            // clear area with transparent black
+<span class="nc" id="L77">            gc.setFill(Color.rgb(0, 0, 0, 0.2));</span>
+<span class="nc" id="L78">            gc.fillRect(0, 0, 1024, 708);</span>
+            // draw fireworks
+<span class="nc" id="L80">            drawFireworks(gc);</span>
+            // countdown to launching the next firework
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            if (countDownTillNextFirework == 0) {</span>
+<span class="nc" id="L83">              Random random = new Random();</span>
+<span class="nc" id="L84">              countDownTillNextFirework = 10 + random.nextInt(30);</span>
+<span class="nc" id="L85">              fireParticle();</span>
+            }
+<span class="nc" id="L87">            countDownTillNextFirework--;</span>
+<span class="nc" id="L88">          }</span>
+        };
+<span class="nc" id="L90">  }</span>
+
+  /** Starts the animation. */
+  public void start() {
+<span class="nc" id="L94">    timer.start();</span>
+<span class="nc" id="L95">  }</span>
+
+  /** Stops the animation. */
+  public void stop() {
+<span class="nc" id="L99">    timer.stop();</span>
+<span class="nc" id="L100">  }</span>
+
+  /** Make resizable and keep background image proportions and center. */
+  @Override
+  protected void layoutChildren() {
+    // final double w = 480.0;
+    // final double h = 360.0;
+<span class="nc" id="L107">    final double w = getWidth();</span>
+<span class="nc" id="L108">    final double h = getHeight();</span>
+<span class="nc" id="L109">    final double scale = Math.min(w / 1024d, h / 708d);</span>
+<span class="nc" id="L110">    final int width = (int) (1024 * scale);</span>
+<span class="nc" id="L111">    final int height = (int) (708 * scale);</span>
+<span class="nc" id="L112">    final int x = (int) ((w - width) / 2);</span>
+<span class="nc" id="L113">    final int y = (int) ((h - height) / 2);</span>
+<span class="nc" id="L114">    canvas.relocate(x, y);</span>
+<span class="nc" id="L115">    canvas.setWidth(width);</span>
+<span class="nc" id="L116">    canvas.setHeight(height * 0.706);</span>
+<span class="nc" id="L117">  }</span>
+
+  private void drawFireworks(GraphicsContext gc) {
+<span class="nc" id="L120">    Iterator&lt;Particle&gt; iter = particles.iterator();</span>
+<span class="nc" id="L121">    List&lt;Particle&gt; newParticles = new ArrayList&lt;Particle&gt;();</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">    while (iter.hasNext()) {</span>
+<span class="nc" id="L123">      Particle firework = iter.next();</span>
+      // if the update returns true then particle has expired
+<span class="nc bnc" id="L125" title="All 2 branches missed.">      if (firework.update()) {</span>
+        // remove particle from those drawn
+<span class="nc" id="L127">        iter.remove();</span>
+        // check if it should be exploded
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        if (firework.shouldExplodeChildren) {</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">          if (firework.size == 9) {</span>
+<span class="nc" id="L131">            explodeCircle(firework, newParticles);</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">          } else if (firework.size == 8) {</span>
+<span class="nc" id="L133">            explodeSmallCircle(firework, newParticles);</span>
+          }
+        }
+      }
+<span class="nc" id="L137">      firework.draw(gc);</span>
+    }
+<span class="nc" id="L139">    particles.addAll(newParticles);</span>
+<span class="nc" id="L140">  }</span>
+
+  private void fireParticle() {
+<span class="nc" id="L143">    particles.add(</span>
+<span class="nc" id="L144">        new Particle(</span>
+<span class="nc" id="L145">            canvas.getWidth() * 0.5,</span>
+<span class="nc" id="L146">            canvas.getHeight() + 10,</span>
+<span class="nc" id="L147">            Math.random() * 5 - 2.5,</span>
+<span class="nc" id="L148">            0,</span>
+<span class="nc" id="L149">            0,</span>
+<span class="nc" id="L150">            150 + Math.random() * 100,</span>
+<span class="nc" id="L151">            colors[0],</span>
+<span class="nc" id="L152">            9,</span>
+<span class="nc" id="L153">            false,</span>
+<span class="nc" id="L154">            true,</span>
+<span class="nc" id="L155">            true));</span>
+<span class="nc" id="L156">  }</span>
+
+  private void explodeCircle(Particle firework, List&lt;Particle&gt; newParticles) {
+<span class="nc" id="L159">    Random random = new Random();</span>
+<span class="nc" id="L160">    final int count = 20 + random.nextInt(60);</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">    final boolean shouldExplodeChildren = Math.random() &gt; 0.5;</span>
+<span class="nc" id="L162">    final double angle = (Math.PI * 2) / count;</span>
+<span class="nc" id="L163">    final int color = (int) (Math.random() * colors.length);</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">    for (int i = count; i &gt; 0; i--) {</span>
+<span class="nc" id="L165">      double randomVelocity = 4 + Math.random() * 4;</span>
+<span class="nc" id="L166">      double particleAngle = i * angle;</span>
+<span class="nc" id="L167">      newParticles.add(</span>
+<span class="nc" id="L168">          new Particle(</span>
+<span class="nc" id="L169">              firework.posX,</span>
+<span class="nc" id="L170">              firework.posY,</span>
+<span class="nc" id="L171">              Math.cos(particleAngle) * randomVelocity,</span>
+<span class="nc" id="L172">              Math.sin(particleAngle) * randomVelocity,</span>
+<span class="nc" id="L173">              0,</span>
+<span class="nc" id="L174">              0,</span>
+<span class="nc" id="L175">              colors[color],</span>
+<span class="nc" id="L176">              8,</span>
+<span class="nc" id="L177">              true,</span>
+<span class="nc" id="L178">              shouldExplodeChildren,</span>
+<span class="nc" id="L179">              true));</span>
+    }
+<span class="nc" id="L181">  }</span>
+
+  private void explodeSmallCircle(Particle firework, List&lt;Particle&gt; newParticles) {
+<span class="nc" id="L184">    final double angle = (Math.PI * 2) / 12;</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">    for (int count = 12; count &gt; 0; count--) {</span>
+<span class="nc" id="L186">      double randomVelocity = 2 + Math.random() * 2;</span>
+<span class="nc" id="L187">      double particleAngle = count * angle;</span>
+<span class="nc" id="L188">      newParticles.add(</span>
+<span class="nc" id="L189">          new Particle(</span>
+<span class="nc" id="L190">              firework.posX,</span>
+<span class="nc" id="L191">              firework.posY,</span>
+<span class="nc" id="L192">              Math.cos(particleAngle) * randomVelocity,</span>
+<span class="nc" id="L193">              Math.sin(particleAngle) * randomVelocity,</span>
+<span class="nc" id="L194">              0,</span>
+<span class="nc" id="L195">              0,</span>
+<span class="nc" id="L196">              firework.color,</span>
+<span class="nc" id="L197">              4,</span>
+<span class="nc" id="L198">              true,</span>
+<span class="nc" id="L199">              false,</span>
+<span class="nc" id="L200">              false));</span>
+    }
+<span class="nc" id="L202">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

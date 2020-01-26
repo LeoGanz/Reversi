@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ModelImpl.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.model</a> &gt; <span class="el_source">ModelImpl.java</span></div><h1>ModelImpl.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.model;
+
+import static java.util.Objects.requireNonNull;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+
+/**
+ * A concrete Implementation of the {@link Model} interface.
+ *
+ * @author Daniel Leidreiter, Dora Pruteanu
+ */
+<span class="pc bpc" id="L17" title="1 of 2 branches missed.">public class ModelImpl implements Model {</span>
+
+  private final PropertyChangeSupport support;
+  private static final int AI_MOVE_OFFSET = 750;
+  private static final int AI_MAX_SLEEP_AMOUNT = 1700;
+
+  private ModifiableGameState state;
+  private GameMode mode;
+  private ArtificialIntelligence ai;
+  private static final int AI_DEPTH = 3;
+<span class="fc" id="L27">  private static final int NUMBER_OF_MOVES_IN_BEGINNING_PHASE = 4;</span>
+  private final int disksPerPlayer;
+  private int numberOfPlayerOneDisks;
+  private int numberOfPlayerTwoDisks;
+
+  /**
+   * Creates a new game with a given {@link GameMode} and two given {@link Player}.
+   *
+   * @param mode the game shall be played in.
+   * @param playerOne who will play in this game.
+   * @param playerTwo who will play in this game.
+   */
+  public ModelImpl(GameMode mode, Player playerOne, Player playerTwo) {
+<span class="fc" id="L40">    this(mode, GameField.STANDARD_SIZE, playerOne, playerTwo);</span>
+<span class="fc" id="L41">  }</span>
+
+  /**
+   * Creates a new game with a given {@link GameMode}, a given size for the {@link GameField} and
+   * two given {@link Player}.
+   *
+   * @param mode the game shall be played in.
+   * @param fieldSize the GameField will be initiated with.
+   * @param playerOne who will play in this game.
+   * @param playerTwo who will play in this game.
+   */
+<span class="fc" id="L52">  public ModelImpl(GameMode mode, int fieldSize, Player playerOne, Player playerTwo) {</span>
+<span class="fc" id="L53">    support = new PropertyChangeSupport(this);</span>
+
+<span class="fc" id="L55">    this.mode = mode;</span>
+
+<span class="fc" id="L57">    state = new GameStateImpl();</span>
+<span class="fc" id="L58">    state.setGameField(new GameFieldImpl(fieldSize));</span>
+<span class="fc" id="L59">    state.setCurrentPhase(Phase.RUNNING);</span>
+<span class="fc" id="L60">    ModifiablePlayerManagement manager = new PlayerManagementImpl(playerOne, playerTwo);</span>
+<span class="fc" id="L61">    state.setPlayerManagement(manager);</span>
+
+<span class="fc" id="L63">    disksPerPlayer = ((int) Math.pow(state.getField().getSize(), 2)) / 2;</span>
+<span class="fc" id="L64">    numberOfPlayerOneDisks = disksPerPlayer;</span>
+<span class="fc" id="L65">    numberOfPlayerTwoDisks = disksPerPlayer;</span>
+
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">    if (mode.equals(GameMode.SINGLEPLAYER)) {</span>
+<span class="nc" id="L68">      ai = new ArtificialIntelligenceImpl(AI_DEPTH, new HeuristicImpl());</span>
+    }
+<span class="fc" id="L70">  }</span>
+
+  /**
+   * Creates a new game with a deep copy of the given {@link GameState} and {@link GameMode}.
+   *
+   * @param newState with which the game shall be initialized.
+   * @param mode with which the game shall be initialized.
+   */
+<span class="fc" id="L78">  public ModelImpl(GameState newState, GameMode mode) {</span>
+<span class="fc" id="L79">    support = new PropertyChangeSupport(this);</span>
+
+<span class="fc" id="L81">    state = (ModifiableGameState) newState.makeCopy();</span>
+<span class="fc" id="L82">    this.mode = mode;</span>
+
+<span class="fc" id="L84">    disksPerPlayer = ((int) Math.pow(state.getField().getSize(), 2)) / 2;</span>
+<span class="fc" id="L85">    numberOfPlayerOneDisks = disksPerPlayer;</span>
+<span class="fc" id="L86">    numberOfPlayerTwoDisks = disksPerPlayer;</span>
+
+<span class="fc bfc" id="L88" title="All 2 branches covered.">    if (mode.equals(GameMode.SINGLEPLAYER)) {</span>
+<span class="fc" id="L89">      ai = new ArtificialIntelligenceImpl(AI_DEPTH, new HeuristicImpl());</span>
+    }
+<span class="fc" id="L91">  }</span>
+
+  @Override
+  public boolean placeDisk(Disk disk, Cell cell) {
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (!state.getCurrentPhase().equals(Phase.RUNNING)) {</span>
+<span class="fc" id="L96">      return false;</span>
+    }
+
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    if (checkIfLegalMove(disk, cell)) {</span>
+<span class="fc" id="L100">      ModifiableGameField field = state.getField();</span>
+<span class="fc" id="L101">      field.set(cell, disk);</span>
+<span class="fc" id="L102">      turnDisks(cell);</span>
+
+<span class="fc" id="L104">      if (state</span>
+<span class="fc" id="L105">          .getPlayerManagement()</span>
+<span class="fc" id="L106">          .getCurrentPlayer()</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">          .equals(state.getPlayerManagement().getPlayerOne())) {</span>
+<span class="fc" id="L108">        numberOfPlayerOneDisks--;</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if (numberOfPlayerTwoDisks &lt;= 0) {</span>
+<span class="nc" id="L110">          state.setCurrentPhase(Phase.FINISHED);</span>
+<span class="nc" id="L111">          handleWinner();</span>
+        }
+<span class="nc" id="L113">      } else {</span>
+<span class="fc" id="L114">        numberOfPlayerTwoDisks--;</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if (numberOfPlayerOneDisks &lt;= 0) {</span>
+<span class="nc" id="L116">          state.setCurrentPhase(Phase.FINISHED);</span>
+<span class="nc" id="L117">          handleWinner();</span>
+        }
+      }
+
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">      if (state.getCurrentPhase().equals(Phase.RUNNING)) {</span>
+<span class="fc" id="L122">        ModifiablePlayerManagement manager = state.getPlayerManagement();</span>
+<span class="fc" id="L123">        manager.switchCurrentPlayer();</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (getPossibleMovesForPlayer(manager.getCurrentPlayer()).isEmpty()) {</span>
+<span class="fc" id="L125">          manager.switchCurrentPlayer();</span>
+<span class="fc" id="L126">          state.setCurrentPhase(Phase.FINISHED);</span>
+<span class="fc" id="L127">          handleWinner();</span>
+        }
+      }
+
+<span class="fc" id="L131">      notifyListenersOfChangedState();</span>
+<span class="fc" id="L132">      triggerAiMove();</span>
+
+<span class="fc" id="L134">      return true;</span>
+
+    } else {
+<span class="fc" id="L137">      return false;</span>
+    }
+  }
+
+  @Override
+  public Set&lt;Cell&gt; getPossibleMovesForPlayer(Player player) {
+<span class="fc" id="L143">    Set&lt;Cell&gt; listOfMoves = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L144">    int size = state.getField().getSize();</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">    for (int column = 0; column &lt; size; column++) {</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">      for (int row = 0; row &lt; size; row++) {</span>
+<span class="fc" id="L147">        Cell checkedCell = new CellImpl(column, row);</span>
+<span class="fc" id="L148">        Disk disk = new DiskImpl(state.getPlayerManagement().getCurrentPlayer());</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        if (checkIfLegalMove(disk, checkedCell)) {</span>
+<span class="fc" id="L150">          listOfMoves.add(checkedCell);</span>
+        }
+      }
+    }
+<span class="fc" id="L154">    return listOfMoves;</span>
+  }
+
+  @Override
+  public void addListener(PropertyChangeListener pcl) {
+<span class="fc" id="L159">    requireNonNull(pcl);</span>
+<span class="fc" id="L160">    support.addPropertyChangeListener(pcl);</span>
+<span class="fc" id="L161">    notifyListenersOfChangedListeners();</span>
+<span class="fc" id="L162">  }</span>
+
+  @Override
+  public void removeListener(PropertyChangeListener pcl) {
+<span class="fc" id="L166">    requireNonNull(pcl);</span>
+<span class="fc" id="L167">    support.removePropertyChangeListener(pcl);</span>
+<span class="fc" id="L168">    notifyListenersOfChangedListeners();</span>
+<span class="fc" id="L169">  }</span>
+
+  @Override
+  public GameState getState() {
+<span class="fc" id="L173">    return state;</span>
+  }
+
+  @Override
+  public boolean setWaiting() {
+<span class="fc bfc" id="L178" title="All 2 branches covered.">    if (state.getCurrentPhase().equals(Phase.RUNNING)) {</span>
+<span class="fc" id="L179">      state.setCurrentPhase(Phase.WAITING);</span>
+<span class="fc" id="L180">      notifyListenersOfChangedState();</span>
+<span class="fc" id="L181">      return true;</span>
+    } else {
+<span class="fc" id="L183">      return false;</span>
+    }
+  }
+
+  @Override
+  public boolean unsetWaiting() {
+<span class="fc bfc" id="L189" title="All 2 branches covered.">    if (state.getCurrentPhase().equals(Phase.WAITING)) {</span>
+<span class="fc" id="L190">      state.setCurrentPhase(Phase.RUNNING);</span>
+<span class="fc" id="L191">      notifyListenersOfChangedState();</span>
+<span class="fc" id="L192">      return true;</span>
+    } else {
+<span class="fc" id="L194">      return false;</span>
+    }
+  }
+
+  @Override
+  public void substitutePlayersWith(Player newPlayerOne, Player newPlayerTwo) {
+<span class="fc" id="L200">    Set&lt;Cell&gt; cellsPlayerOne =</span>
+<span class="fc" id="L201">        state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerOne());</span>
+<span class="fc" id="L202">    Set&lt;Cell&gt; cellsPlayerTwo =</span>
+<span class="fc" id="L203">        state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerTwo());</span>
+
+<span class="pc" id="L205">    cellsPlayerOne.stream().forEach(c -&gt; state.getField().set(c, new DiskImpl(newPlayerOne)));</span>
+<span class="pc" id="L206">    cellsPlayerTwo.stream().forEach(c -&gt; state.getField().set(c, new DiskImpl(newPlayerTwo)));</span>
+
+<span class="fc" id="L208">    state.getPlayerManagement().setPlayerOne(newPlayerOne);</span>
+<span class="fc" id="L209">    state.getPlayerManagement().setPlayerTwo(newPlayerTwo);</span>
+<span class="fc" id="L210">    notifyListenersOfChangedState();</span>
+<span class="fc" id="L211">  }</span>
+
+  /**
+   * Turns all Disks belonging to the opponent lying between the placed Disk and another Disk of the
+   * same Player.
+   *
+   * @param cell at which a disk was recently placed. The cell must not be empty.
+   */
+  private void turnDisks(Cell cell) {
+
+<span class="pc bpc" id="L221" title="2 of 4 branches missed.">    assert state.getField().get(cell).isPresent();</span>
+<span class="fc" id="L222">    Player player = state.getField().get(cell).get().getPlayer();</span>
+
+<span class="fc" id="L224">    Player opponentPlayer = state.getPlayerManagement().getOpponentPlayer(player);</span>
+
+<span class="fc bfc" id="L226" title="All 2 branches covered.">    for (int x = -1; x &lt; 2; x++) {</span>
+<span class="fc bfc" id="L227" title="All 2 branches covered.">      for (int y = -1; y &lt; 2; y++) {</span>
+<span class="fc bfc" id="L228" title="All 4 branches covered.">        if (!((x == 0) &amp;&amp; (y == 0))) {</span>
+<span class="fc" id="L229">          Cell cellChecked = new CellImpl(cell.getColumn() + x, cell.getRow() + y);</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">          if (state.getField().isWithinBounds(cellChecked)</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">              &amp;&amp; (state.getField().isCellOfPlayer(opponentPlayer, cellChecked))) {</span>
+<span class="fc" id="L232">            Set&lt;Cell&gt; toTurn = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L233">            int xcoor = cellChecked.getColumn();</span>
+<span class="fc" id="L234">            int ycoor = cellChecked.getRow();</span>
+<span class="fc" id="L235">            Cell opponentCell = new CellImpl(xcoor, ycoor);</span>
+
+<span class="fc bfc" id="L237" title="All 2 branches covered.">            while (state.getField().isWithinBounds(opponentCell)</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">                &amp;&amp; (state.getField().isCellOfPlayer(opponentPlayer, opponentCell))) {</span>
+<span class="fc" id="L239">              toTurn.add(opponentCell);</span>
+<span class="fc" id="L240">              xcoor = xcoor + x;</span>
+<span class="fc" id="L241">              ycoor = ycoor + y;</span>
+<span class="fc" id="L242">              opponentCell = new CellImpl(xcoor, ycoor);</span>
+            }
+
+<span class="fc bfc" id="L245" title="All 2 branches covered.">            if (state.getField().isWithinBounds(opponentCell)</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">                &amp;&amp; state.getField().isCellOfPlayer(player, opponentCell)) {</span>
+<span class="fc bfc" id="L247" title="All 2 branches covered.">              for (Cell c : toTurn) {</span>
+<span class="fc" id="L248">                ModifiableGameField field = state.getField();</span>
+<span class="fc" id="L249">                field.set(c, new DiskImpl(player));</span>
+              }
+            }
+          }
+        }
+      }
+    }
+<span class="fc" id="L256">  }</span>
+
+  /**
+   * Checks whether a given {@link Disk} can be placed at a given {@link Cell} according to the
+   * Reversi rules.
+   *
+   * @param disk which is tested for whether it can be placed.
+   * @param cell which is tested for whether the disk can be placed here.
+   * @return {@code true} if the disk can be placed according to the rules, {@code false} otherwise.
+   */
+  private boolean checkIfLegalMove(Disk disk, Cell cell) {
+
+<span class="fc bfc" id="L268" title="All 2 branches covered.">    if (!(disk.getPlayer().equals(state.getPlayerManagement().getCurrentPlayer()))) {</span>
+<span class="fc" id="L269">      return false;</span>
+    }
+<span class="fc bfc" id="L271" title="All 2 branches covered.">    if (state.getField().get(cell).isPresent()) {</span>
+<span class="fc" id="L272">      return false;</span>
+    }
+<span class="fc bfc" id="L274" title="All 2 branches covered.">    if (state.getField().getCellsOccupiedWithDisks().size() &lt; NUMBER_OF_MOVES_IN_BEGINNING_PHASE) {</span>
+<span class="fc" id="L275">      return isWithinMiddleSquare(cell);</span>
+    }
+
+<span class="fc" id="L278">    PlayerManagement manager = state.getPlayerManagement();</span>
+<span class="fc" id="L279">    Player opponentPlayer = manager.getOpponentPlayer(manager.getCurrentPlayer());</span>
+
+<span class="fc bfc" id="L281" title="All 2 branches covered.">    for (int x = -1; x &lt; 2; x++) {</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">      for (int y = -1; y &lt; 2; y++) {</span>
+<span class="fc" id="L283">        Cell cellChecked = new CellImpl(cell.getColumn() + x, cell.getRow() + y);</span>
+<span class="fc bfc" id="L284" title="All 2 branches covered.">        if (state.getField().isWithinBounds(cellChecked)</span>
+<span class="fc bfc" id="L285" title="All 2 branches covered.">            &amp;&amp; (state.getField().isCellOfPlayer(opponentPlayer, cellChecked))) {</span>
+<span class="fc" id="L286">          int xcoor = cellChecked.getColumn();</span>
+<span class="fc" id="L287">          int ycoor = cellChecked.getRow();</span>
+          Cell opponentCell;
+          do {
+<span class="fc" id="L290">            xcoor = xcoor + x;</span>
+<span class="fc" id="L291">            ycoor = ycoor + y;</span>
+<span class="fc" id="L292">            opponentCell = new CellImpl(xcoor, ycoor);</span>
+
+<span class="fc bfc" id="L294" title="All 2 branches covered.">          } while (state.getField().isWithinBounds(opponentCell)</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">              &amp;&amp; (state.getField().isCellOfPlayer(opponentPlayer, opponentCell)));</span>
+
+<span class="fc bfc" id="L297" title="All 2 branches covered.">          if (state.getField().isWithinBounds(opponentCell)</span>
+<span class="fc" id="L298">              &amp;&amp; state</span>
+<span class="fc" id="L299">                  .getField()</span>
+<span class="fc bfc" id="L300" title="All 2 branches covered.">                  .isCellOfPlayer(state.getPlayerManagement().getCurrentPlayer(), opponentCell)) {</span>
+<span class="fc" id="L301">            return true;</span>
+          }
+        }
+      }
+    }
+<span class="fc" id="L306">    return false;</span>
+  }
+
+  /** 
+   * Notifies all Listeners of a changed {@link GameState}. 
+   */
+  private void notifyListenersOfChangedState() {
+<span class="fc" id="L313">    support.firePropertyChange(Model.STATE_CHANGED, null, state);</span>
+<span class="fc" id="L314">  }</span>
+
+  /** Notifies all listeners that a listener was added or removed. */
+  private void notifyListenersOfChangedListeners() {
+<span class="fc" id="L318">    support.firePropertyChange(Model.LISTENERS_CHANGED, null, this);</span>
+<span class="fc" id="L319">  }</span>
+
+  /**
+   * Checks whether a {@link Cell} is part of the middle of the {@link GameField} in which {@link
+   * Disk} are placed during the very beginning of the game.
+   *
+   * @param cell which shall be checked.
+   * @return {@code true} if the disk can be placed at the cell during the first moves, {@code
+   *     false} otherwise.
+   */
+  private boolean isWithinMiddleSquare(Cell cell) {
+<span class="fc" id="L330">    int size = state.getField().getSize();</span>
+<span class="fc" id="L331">    int minCoordinate = (size / 2) - 1;</span>
+<span class="fc" id="L332">    int maxCoordinate = size / 2;</span>
+<span class="fc bfc" id="L333" title="All 2 branches covered.">    return (cell.getRow() &gt;= minCoordinate)</span>
+<span class="fc bfc" id="L334" title="All 2 branches covered.">        &amp;&amp; (cell.getRow() &lt;= maxCoordinate)</span>
+<span class="fc bfc" id="L335" title="All 2 branches covered.">        &amp;&amp; (cell.getColumn() &gt;= minCoordinate)</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">        &amp;&amp; (cell.getColumn() &lt;= maxCoordinate)</span>
+<span class="pc bpc" id="L337" title="1 of 2 branches missed.">        &amp;&amp; state.getField().get(cell).isEmpty();</span>
+  }
+
+  /** Checks who has won if the game is finished and sets the winner. */
+  private void handleWinner() {
+<span class="pc bpc" id="L342" title="1 of 2 branches missed.">    if (!(state.getCurrentPhase().equals(Phase.FINISHED))) {</span>
+<span class="nc" id="L343">      return;</span>
+    }
+<span class="fc" id="L345">    int numberOfDisksPlayerOne =</span>
+<span class="fc" id="L346">        state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerOne()).size();</span>
+<span class="fc" id="L347">    int numberOfDisksPlayerTwo =</span>
+<span class="fc" id="L348">        state.getField().getAllCellsForPlayer(state.getPlayerManagement().getPlayerTwo()).size();</span>
+<span class="fc" id="L349">    ModifiablePlayerManagement manager = state.getPlayerManagement();</span>
+
+<span class="fc bfc" id="L351" title="All 2 branches covered.">    if (numberOfDisksPlayerOne == numberOfDisksPlayerTwo) {</span>
+<span class="fc" id="L352">      manager.setWinner(Optional.empty());</span>
+<span class="fc" id="L353">      return;</span>
+    }
+<span class="pc bpc" id="L355" title="1 of 2 branches missed.">    if (numberOfDisksPlayerOne &gt; numberOfDisksPlayerTwo) {</span>
+<span class="fc" id="L356">      manager.setWinner(Optional.of(manager.getPlayerOne()));</span>
+<span class="fc" id="L357">    } else {</span>
+<span class="nc" id="L358">      manager.setWinner(Optional.of(manager.getPlayerTwo()));</span>
+    }
+<span class="fc" id="L360">  }</span>
+
+  /**
+   * Returns the number of disks player one still has left.
+   *
+   * @return the remaining number of disks of player one
+   */
+  public int getNumberOfDisksPlayerOne() {
+<span class="nc" id="L368">    return numberOfPlayerOneDisks;</span>
+  }
+
+  /**
+   * Returns the number of disks player two still has left.
+   *
+   * @return the remaining number of disks of player two
+   */
+  public int getNumberOfDisksPlayerTwo() {
+<span class="nc" id="L377">    return numberOfPlayerTwoDisks;</span>
+  }
+
+  @Override
+  public void triggerAiMove() {
+<span class="fc bfc" id="L382" title="All 2 branches covered.">    if (mode.equals(GameMode.SINGLEPLAYER)</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">        &amp;&amp; (state.getPlayerManagement().getCurrentPlayer() instanceof AiPlayer)</span>
+<span class="pc bpc" id="L384" title="1 of 2 branches missed.">        &amp;&amp; state.getCurrentPhase().equals(Phase.RUNNING)) {</span>
+<span class="fc" id="L385">      long sleepAmount =</span>
+<span class="fc" id="L386">          new Random().nextInt(AI_MAX_SLEEP_AMOUNT - AI_MOVE_OFFSET) + AI_MOVE_OFFSET;</span>
+      try {
+<span class="fc" id="L388">        Thread.sleep(sleepAmount);</span>
+<span class="pc" id="L389">      } catch (InterruptedException e) {</span>
+        // Doesn't matter
+      }
+<span class="fc" id="L392">      Cell bestMove = ai.calculateBestMove(state);</span>
+<span class="fc" id="L393">      placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), bestMove);</span>
+    }
+<span class="fc" id="L395">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

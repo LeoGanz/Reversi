@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>Message.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network.communication</a> &gt; <span class="el_source">Message.java</span></div><h1>Message.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network.communication;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.annotations.SerializedName;
+import de.lmu.ifi.sosylab.fddlj.model.CustomGson;
+
+/**
+ * A generic implementation for JSON serializable network messages. This kind of structure give us
+ * the benefit to split meta data and concrete data.
+ *
+ * @param &lt;T&gt; concrete data type the message contains
+ * @author Leonard Ganz
+ * @author Florian Theimer (prototype)
+ */
+public class Message&lt;T&gt; {
+
+  public static final String DATA_CLASS_FIELD = &quot;dataClass&quot;;
+  public static final String DATA_FIELD = &quot;data&quot;;
+
+  /**
+   * The fully qualified class name of the data typed, which will be used for consistent
+   * serialization.
+   */
+  @SerializedName(DATA_CLASS_FIELD)
+  private final String dataClass;
+
+  /** The concrete object which should be transferred by the message. */
+  @SerializedName(DATA_FIELD)
+  private final T data;
+
+  /**
+   * Create a new message with the given data.
+   *
+   * @param data data of the message
+   * @throws NullPointerException if data is null
+   */
+<span class="fc" id="L40">  public Message(T data) {</span>
+<span class="fc" id="L41">    this.dataClass = data.getClass().getName();</span>
+<span class="fc" id="L42">    this.data = data;</span>
+<span class="fc" id="L43">  }</span>
+
+  /** Needed for reflection. */
+  @SuppressWarnings(&quot;unused&quot;)
+<span class="fc" id="L47">  private Message() {</span>
+<span class="fc" id="L48">    dataClass = null;</span>
+<span class="fc" id="L49">    data = null;</span>
+<span class="fc" id="L50">  }</span>
+
+  /**
+   * Concrete data class of the message.
+   *
+   * @return data class of the message.
+   * @throws ClassNotFoundException if class of the message data field is not resolvable
+   */
+  public Class&lt;?&gt; getDataClass() throws ClassNotFoundException {
+<span class="fc" id="L59">    return Class.forName(dataClass);</span>
+  }
+
+  /**
+   * Concrete data of the message.
+   *
+   * @return data of the message.
+   */
+  public T getData() {
+<span class="fc" id="L68">    return data;</span>
+  }
+
+  /**
+   * Converts this message to its json representation.
+   *
+   * @return a string containing this message encoded with json
+   */
+  public String toJson() {
+<span class="fc" id="L77">    return CustomGson.createGson().toJson(this);</span>
+  }
+
+  /**
+   * Creates a {@link Message} from the given JSON string.
+   *
+   * @param json String which represents the message.
+   * @return Message decoded from the json string
+   */
+  public static Message&lt;?&gt; fromJson(String json) {
+<span class="fc" id="L87">    return CustomGson.createGson().fromJson(json, Message.class);</span>
+  }
+
+  /**
+   * Convert a JSON string to pretty print version.
+   *
+   * @param jsonString json to be prettified
+   * @return a prettified version of the json string
+   */
+  public static String prettifyJson(String jsonString) {
+<span class="fc" id="L97">    JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();</span>
+
+<span class="fc" id="L99">    Gson gson = new GsonBuilder().setPrettyPrinting().create();</span>
+
+<span class="fc" id="L101">    return gson.toJson(json);</span>
+  }
+
+  @Override
+  public final int hashCode() {
+<span class="fc" id="L106">    final int prime = 31;</span>
+<span class="fc" id="L107">    int result = 1;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">    result = (prime * result) + ((data == null) ? 0 : data.hashCode());</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">    result = (prime * result) + ((dataClass == null) ? 0 : dataClass.hashCode());</span>
+<span class="fc" id="L110">    return result;</span>
+  }
+
+  @Override
+  public final boolean equals(Object obj) {
+<span class="fc bfc" id="L115" title="All 2 branches covered.">    if (this == obj) {</span>
+<span class="fc" id="L116">      return true;</span>
+    }
+<span class="fc bfc" id="L118" title="All 2 branches covered.">    if (!(obj instanceof Message)) {</span>
+<span class="fc" id="L119">      return false;</span>
+    }
+<span class="fc" id="L121">    Message&lt;?&gt; other = (Message&lt;?&gt;) obj;</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    if (data == null) {</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">      if (other.data != null) {</span>
+<span class="fc" id="L124">        return false;</span>
+      }
+<span class="fc bfc" id="L126" title="All 2 branches covered.">    } else if (!data.equals(other.data)) {</span>
+<span class="fc" id="L127">      return false;</span>
+    }
+<span class="fc bfc" id="L129" title="All 2 branches covered.">    if (dataClass == null) {</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">      if (other.dataClass != null) {</span>
+<span class="fc" id="L131">        return false;</span>
+      }
+<span class="fc bfc" id="L133" title="All 2 branches covered.">    } else if (!dataClass.equals(other.dataClass)) {</span>
+<span class="fc" id="L134">      return false;</span>
+    }
+<span class="fc" id="L136">    return true;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L141">    StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L142">    builder</span>
+<span class="nc" id="L143">        .append(&quot;Message [dataClass=&quot;)</span>
+<span class="nc" id="L144">        .append(dataClass)</span>
+<span class="nc" id="L145">        .append(&quot;, data=&quot;)</span>
+<span class="nc" id="L146">        .append(data)</span>
+<span class="nc" id="L147">        .append(&quot;]&quot;);</span>
+<span class="nc" id="L148">    return builder.toString();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

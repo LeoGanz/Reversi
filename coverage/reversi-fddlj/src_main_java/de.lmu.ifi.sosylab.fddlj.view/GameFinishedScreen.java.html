@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>GameFinishedScreen.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">GameFinishedScreen.java</span></div><h1>GameFinishedScreen.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import java.util.ResourceBundle;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+/**
+ * This class offers a frame that can be used to signal the end of the game and notify the player
+ * who won the game.
+ *
+ * @author Josef Feger
+ */
+public class GameFinishedScreen extends Stage {
+
+<span class="nc" id="L28">  private static final Insets INSETS_ROOTPANE = new Insets(30);</span>
+<span class="nc" id="L29">  private static final Insets PADDING_OPTIONSPANE = new Insets(20);</span>
+  private static final int SPACING_OPTIONSPANE = 30;
+
+<span class="nc" id="L32">  private static final Font FONT_BUTTON = Font.font(18);</span>
+<span class="nc" id="L33">  private static final Cursor CURSOR_BUTTON = Cursor.HAND;</span>
+  private static final int MINWIDTH_BUTTON = 200;
+  private static final int MAXWIDTH_BUTTON = 500;
+  private static final int MINHEIGHT_BUTTON = 50;
+
+<span class="nc" id="L38">  private static final Font FONT_WINNERLABEL = Font.font(&quot;Serif&quot;);</span>
+  private static final String CSS_WINNERLABEL =
+<span class="nc" id="L40">      &quot;-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 30;&quot;;</span>
+
+  private Model model;
+  private Controller controller;
+
+  private ResourceBundle messages;
+
+  /**
+   * Constructor of this class initialises variables and is responsible for building GUI elements.
+   *
+   * @param controller a reference to a controller instance
+   * @param model a reference to a model instance
+   * @param mainStage a reference to the game's main stage
+   */
+  public GameFinishedScreen(
+      Controller controller, Model model, Stage mainStage, ResourceBundle messages) {
+<span class="nc" id="L56">    super();</span>
+
+<span class="nc" id="L58">    this.controller = controller;</span>
+<span class="nc" id="L59">    this.model = model;</span>
+
+<span class="nc" id="L61">    this.messages = messages;</span>
+
+<span class="nc" id="L63">    initScreen(mainStage);</span>
+<span class="nc" id="L64">  }</span>
+
+  private void initScreen(Stage mainStage) {
+<span class="nc" id="L67">    BorderPane root = new BorderPane();</span>
+<span class="nc" id="L68">    root.getStylesheets().add(&quot;cssFiles/gameModeSelector.css&quot;);</span>
+<span class="nc" id="L69">    root.setId(&quot;main-pane&quot;);</span>
+<span class="nc" id="L70">    root.setPadding(INSETS_ROOTPANE);</span>
+
+<span class="nc" id="L72">    Label title = new Label(messages.getString(&quot;GameFinishedScreen_Title&quot;));</span>
+<span class="nc" id="L73">    title.setId(&quot;title-label&quot;);</span>
+<span class="nc" id="L74">    root.setTop(title);</span>
+<span class="nc" id="L75">    BorderPane.setAlignment(title, Pos.CENTER);</span>
+
+<span class="nc" id="L77">    BorderPane center = new BorderPane();</span>
+
+<span class="nc" id="L79">    Fireworks fireworks = new Fireworks();</span>
+<span class="nc" id="L80">    fireworks.setMaxWidth(Double.POSITIVE_INFINITY);</span>
+<span class="nc" id="L81">    center.setCenter(fireworks);</span>
+<span class="nc" id="L82">    Label winner = getWinnerLabel();</span>
+<span class="nc" id="L83">    center.setBottom(winner);</span>
+<span class="nc" id="L84">    BorderPane.setAlignment(winner, Pos.CENTER);</span>
+<span class="nc" id="L85">    root.setCenter(center);</span>
+
+<span class="nc" id="L87">    root.setBottom(getOptions(mainStage));</span>
+
+<span class="nc" id="L89">    Scene scene = new Scene(root);</span>
+
+<span class="nc" id="L91">    setScene(scene);</span>
+<span class="nc" id="L92">    setTitle(messages.getString(&quot;Game_Title&quot;));</span>
+<span class="nc" id="L93">    initStyle(StageStyle.UNDECORATED);</span>
+<span class="nc" id="L94">    setMinWidth(2 * (Screen.getPrimary().getVisualBounds().getWidth() / 3));</span>
+<span class="nc" id="L95">    setMinHeight(2 * (Screen.getPrimary().getVisualBounds().getHeight() / 3));</span>
+<span class="nc" id="L96">    setWidth(getMinWidth());</span>
+<span class="nc" id="L97">    setHeight(getMinHeight());</span>
+<span class="nc" id="L98">    centerOnScreen();</span>
+<span class="nc" id="L99">    show();</span>
+
+<span class="nc" id="L101">    fireworks.start();</span>
+<span class="nc" id="L102">  }</span>
+
+  private HBox getOptions(Stage mainStage) {
+<span class="nc" id="L105">    HBox hbox = new HBox(SPACING_OPTIONSPANE);</span>
+<span class="nc" id="L106">    hbox.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L107">    hbox.setPadding(PADDING_OPTIONSPANE);</span>
+
+<span class="nc" id="L109">    Button exit = getButton(messages.getString(&quot;GameFinishedScreen_ExitButton_Text&quot;));</span>
+<span class="nc" id="L110">    exit.setOnAction(e -&gt; controller.close());</span>
+
+<span class="nc" id="L112">    Button restart = getButton(messages.getString(&quot;GameFinishedScreen_RestartButton_Text&quot;));</span>
+<span class="nc" id="L113">    restart.setOnAction(</span>
+<span class="nc" id="L114">        e -&gt; {</span>
+<span class="nc" id="L115">          close();</span>
+<span class="nc" id="L116">          controller.resetGame(</span>
+<span class="nc" id="L117">              controller.getCurrentGameMode(),</span>
+<span class="nc" id="L118">              model.getState().getPlayerManagement().getPlayerOne(),</span>
+<span class="nc" id="L119">              model.getState().getPlayerManagement().getPlayerTwo(),</span>
+<span class="nc" id="L120">              model.getState().getField().getSize());</span>
+<span class="nc" id="L121">        });</span>
+
+<span class="nc" id="L123">    Button mainScreen = getButton(messages.getString(&quot;GameFinishedScreen_MainScreenButton_Text&quot;));</span>
+<span class="nc" id="L124">    mainScreen.setOnAction(</span>
+<span class="nc" id="L125">        e -&gt; {</span>
+<span class="nc" id="L126">          close();</span>
+<span class="nc" id="L127">          mainStage.close();</span>
+
+<span class="nc bnc" id="L129" title="All 2 branches missed.">          if (controller instanceof ControllerImpl) {</span>
+<span class="nc" id="L130">            ((ControllerImpl) controller).showGameModeSelector(new Stage());</span>
+<span class="nc" id="L131">          } else {</span>
+<span class="nc" id="L132">            Alert alert = new Alert(AlertType.ERROR);</span>
+<span class="nc" id="L133">            alert.setTitle(messages.getString(&quot;GameFinishedScreen_ReturnError_Title&quot;));</span>
+<span class="nc" id="L134">            alert.setHeaderText(messages.getString(&quot;GameFinishedScreen_ReturnError_Subtitle&quot;));</span>
+<span class="nc" id="L135">            alert.setContentText(messages.getString(&quot;GameFinishedScreen_ReturnError_Info&quot;));</span>
+
+<span class="nc" id="L137">            alert.showAndWait();</span>
+<span class="nc" id="L138">            controller.close();</span>
+          }
+<span class="nc" id="L140">        });</span>
+
+<span class="nc" id="L142">    hbox.getChildren().addAll(mainScreen, restart, exit);</span>
+<span class="nc" id="L143">    return hbox;</span>
+  }
+
+  private Button getButton(String text) {
+<span class="nc" id="L147">    Button button = new Button(text);</span>
+<span class="nc" id="L148">    button.setId(&quot;button&quot;);</span>
+<span class="nc" id="L149">    button.setMinHeight(MINHEIGHT_BUTTON);</span>
+<span class="nc" id="L150">    button.setMaxWidth(MAXWIDTH_BUTTON);</span>
+<span class="nc" id="L151">    button.setMinWidth(MINWIDTH_BUTTON);</span>
+<span class="nc" id="L152">    button.setCursor(CURSOR_BUTTON);</span>
+<span class="nc" id="L153">    button.setFont(FONT_BUTTON);</span>
+
+<span class="nc" id="L155">    return button;</span>
+  }
+
+  private Label getWinnerLabel() {
+    String text;
+
+<span class="nc bnc" id="L161" title="All 2 branches missed.">    if (model.getState().getPlayerManagement().getWinner().isPresent()) {</span>
+<span class="nc" id="L162">      text =</span>
+<span class="nc" id="L163">          messages.getString(&quot;GameFinishedScreen_Congratulations&quot;)</span>
+<span class="nc" id="L164">              + &quot; &quot;</span>
+<span class="nc" id="L165">              + model.getState().getPlayerManagement().getWinner().get().getName()</span>
+<span class="nc" id="L166">              + &quot; &quot;</span>
+<span class="nc" id="L167">              + messages.getString(&quot;GameFinishedScreen_WinnerText&quot;);</span>
+<span class="nc" id="L168">    } else {</span>
+<span class="nc" id="L169">      text = messages.getString(&quot;GameFinishedScreen_Draw&quot;);</span>
+    }
+
+<span class="nc" id="L172">    Label label = new Label(text);</span>
+<span class="nc" id="L173">    label.setFont(FONT_WINNERLABEL);</span>
+<span class="nc" id="L174">    label.setStyle(CSS_WINNERLABEL);</span>
+
+<span class="nc" id="L176">    return label;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

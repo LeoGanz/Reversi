@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>GraphicDisk.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">GraphicDisk.java</span></div><h1>GraphicDisk.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.Disk;
+import javafx.animation.Animation;
+import javafx.animation.FillTransition;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.util.Duration;
+
+/**
+ * This class is the graphical representation of the {@link Disk}.
+ *
+ * @author Josef Feger
+ */
+public class GraphicDisk extends Circle {
+
+  static final float PADDING = 10;
+  static final float SCALE = 1.12f;
+
+  private Light.Spot light;
+
+  /**
+   * Constructor of this class initialises variables and paints the disk.
+   *
+   * @param width the disk's parent's width in pixel
+   * @param height the disk's parent's height in pixel
+   * @param radius the disk's radius
+   * @param color the disk's initial color
+   */
+<span class="nc" id="L32">  public GraphicDisk(double width, double height, double radius, Color color) {</span>
+
+<span class="nc" id="L34">    initDisk(width, height, radius, color);</span>
+<span class="nc" id="L35">  }</span>
+
+  private void initDisk(double width, double height, double radius, Color color) {
+
+<span class="nc" id="L39">    setCenterX(width / 2);</span>
+<span class="nc" id="L40">    setCenterY(height / 2);</span>
+<span class="nc" id="L41">    setRadius(radius);</span>
+<span class="nc" id="L42">    setFill(color);</span>
+
+<span class="nc" id="L44">    light = new Light.Spot();</span>
+<span class="nc" id="L45">    light.setColor(Color.WHITE);</span>
+<span class="nc" id="L46">    light.setX(getCenterX() - radius / 2 + 1.5 * PADDING);</span>
+<span class="nc" id="L47">    light.setY(getCenterY() - radius / 2 + 1.5 * PADDING);</span>
+<span class="nc" id="L48">    light.setZ(SCALE * height);</span>
+<span class="nc" id="L49">    light.setPointsAtX(2.5 * PADDING);</span>
+<span class="nc" id="L50">    light.setPointsAtY(2.5 * PADDING);</span>
+<span class="nc" id="L51">    light.setPointsAtZ(0);</span>
+<span class="nc" id="L52">    light.setSpecularExponent(2.0);</span>
+
+<span class="nc" id="L54">    Lighting lighting = new Lighting();</span>
+<span class="nc" id="L55">    lighting.setLight(light);</span>
+<span class="nc" id="L56">    setEffect(lighting);</span>
+<span class="nc" id="L57">  }</span>
+
+  /**
+   * Changes the disk's color with a {@link FillTransistion}.
+   *
+   * @param fill the disk's new color
+   */
+  void changeColor(Color fill) {
+<span class="nc bnc" id="L65" title="All 2 branches missed.">    if (!fill.equals(getFill())) {</span>
+
+<span class="nc" id="L67">      FillTransition ft = new FillTransition(Duration.millis(350), this, (Color) getFill(), fill);</span>
+<span class="nc" id="L68">      ft.setCycleCount(1);</span>
+<span class="nc" id="L69">      ft.setAutoReverse(false);</span>
+
+<span class="nc" id="L71">      ft.play();</span>
+<span class="nc" id="L72">      setFill(fill);</span>
+    }
+<span class="nc" id="L74">  }</span>
+
+  /**
+   * Changes the disk's color from the current fill to the new fill infinitely with a {@link
+   * FillTransistion}.
+   *
+   * @param fill the new color for the fill transition.
+   * @param duration time in milliseconds how long the transition should play
+   */
+  void changeColorInfinitely(Color fill, long duration) {
+<span class="nc bnc" id="L84" title="All 2 branches missed.">    if (!fill.equals(getFill())) {</span>
+
+<span class="nc" id="L86">      FillTransition ft =</span>
+<span class="nc" id="L87">          new FillTransition(Duration.millis(duration), this, (Color) getFill(), fill);</span>
+<span class="nc" id="L88">      ft.setCycleCount(Animation.INDEFINITE);</span>
+<span class="nc" id="L89">      ft.setAutoReverse(true);</span>
+
+<span class="nc" id="L91">      ft.play();</span>
+    }
+<span class="nc" id="L93">  }</span>
+
+  /**
+   * Resizes the disk to the new coordinates.
+   *
+   * @param width the parent's new width
+   * @param height the parent's new height
+   * @param radius the disk's new radius
+   */
+  void resizeDisk(double width, double height, double radius) {
+<span class="nc" id="L103">    initDisk(width, height, radius, (Color) getFill());</span>
+<span class="nc" id="L104">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>SpectatorsTypeAdapter.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network.communication</a> &gt; <span class="el_source">SpectatorsTypeAdapter.java</span></div><h1>SpectatorsTypeAdapter.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network.communication;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+import java.lang.reflect.Type;
+import java.util.Set;
+
+/**
+ * Custom Gson serializer and deserializer for {@link Spectators}.
+ *
+ * @author Leonard Ganz
+ */
+public class SpectatorsTypeAdapter
+    implements JsonSerializer&lt;Spectators&gt;, JsonDeserializer&lt;Spectators&gt; {
+<span class="fc" id="L24">  private static final Object INSTANCE = new SpectatorsTypeAdapter();</span>
+
+  private SpectatorsTypeAdapter() {
+  }
+
+  /**
+   * Get (de)serializer instance for the {@link Spectators} class. Add this as a {@link TypeAdapter}
+   * to your {@link GsonBuilder}:
+   *
+   * &lt;pre&gt;{@code
+   * GsonBuilder gsonBuilder = new GsonBuilder;
+   * gsonBuilder.
+   *     .registerTypeAdapter(Spectators.class,
+   *     SpectatorsTypeAdapter.getAdapter());
+   * Gson gson = gsonBuilder.create();
+   * }&lt;/pre&gt;
+   *
+   * @return a (de)serializer for spectators that implements {@link JsonSerializer} and {@link
+   *     JsonDeserializer}
+   */
+  public static Object getAdapter() {
+<span class="fc" id="L45">    return INSTANCE;</span>
+  }
+
+  private static final String LOBBY_ID = &quot;lobbyId&quot;;
+<span class="fc" id="L49">  private static final String PLAYERS = &quot;players&quot;;</span>
+
+  @Override
+  public Spectators deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+      throws JsonParseException {
+<span class="fc" id="L54">    JsonObject jsonSpectators = json.getAsJsonObject();</span>
+<span class="fc" id="L55">    int lobbyId = jsonSpectators.get(LOBBY_ID).getAsInt();</span>
+<span class="fc" id="L56">    JsonElement playersElement = jsonSpectators.get(PLAYERS);</span>
+<span class="fc" id="L57">    Set&lt;Player&gt; players =</span>
+<span class="fc" id="L58">        context.deserialize(playersElement, new TypeToken&lt;Set&lt;Player&gt;&gt;() {}.getType());</span>
+<span class="fc" id="L59">    return new Spectators(lobbyId, players);</span>
+  }
+
+  @Override
+  public JsonElement serialize(Spectators src, Type typeOfSrc, JsonSerializationContext context) {
+<span class="fc" id="L64">    JsonObject jsonSpectators = new JsonObject();</span>
+<span class="fc" id="L65">    jsonSpectators.addProperty(LOBBY_ID, src.getLobbyId());</span>
+<span class="fc" id="L66">    jsonSpectators.add(PLAYERS, context.serialize(src, new TypeToken&lt;Set&lt;Player&gt;&gt;() {}.getType()));</span>
+<span class="fc" id="L67">    return context.serialize(jsonSpectators);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ArtificialIntelligenceImpl.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.model</a> &gt; <span class="el_source">ArtificialIntelligenceImpl.java</span></div><h1>ArtificialIntelligenceImpl.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.model;
+
+import java.util.Set;
+import java.util.TreeSet;
+
+/**
+ * Artificial intelligence using the minmax-algorithm.
+ *
+ * @author Daniel Leidreiter, Dora Pruteanu
+ */
+public class ArtificialIntelligenceImpl implements ArtificialIntelligence {
+
+  private final int calculationDepth;
+  private final Heuristic heuristic;
+
+  /**
+   * Creates an AI with a given calculation depth.
+   *
+   * @param calculationDepth is the number of successive moves evaluated in the minmax.
+   */
+<span class="fc" id="L21">  public ArtificialIntelligenceImpl(int calculationDepth, Heuristic heuristic) {</span>
+<span class="fc" id="L22">    this.calculationDepth = calculationDepth;</span>
+<span class="fc" id="L23">    this.heuristic = heuristic;</span>
+<span class="fc" id="L24">  }</span>
+
+  @Override
+  public Cell calculateBestMove(GameState state) {
+<span class="fc" id="L28">    Model game = new ModelImpl(state, GameMode.HOTSEAT);</span>
+<span class="fc" id="L29">    Player currentPlayer = state.getPlayerManagement().getCurrentPlayer();</span>
+<span class="fc" id="L30">    Set&lt;Cell&gt; possibleMoves = new TreeSet&lt;&gt;(game.getPossibleMovesForPlayer(currentPlayer));</span>
+<span class="fc" id="L31">    double moveValue = Double.NEGATIVE_INFINITY;</span>
+<span class="fc" id="L32">    Cell bestMove = null;</span>
+
+<span class="fc bfc" id="L34" title="All 2 branches covered.">    for (Cell cell : possibleMoves) {</span>
+<span class="fc" id="L35">      double tempMoveValue = evaluateRecursively(state, cell, currentPlayer, 0);</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">      if (tempMoveValue &gt; moveValue) {</span>
+<span class="fc" id="L37">        moveValue = tempMoveValue;</span>
+<span class="fc" id="L38">        bestMove = cell;</span>
+      }
+    }
+<span class="fc" id="L41">    return bestMove;</span>
+  }
+
+  /**
+   * Evaluates a given move recursively.
+   *
+   * @param state upon which the move is made and then recursively evaluated
+   * @param toPlace is the move that will be made and then evaluated
+   * @param aiPlayer is the player for whom the best move is searched
+   * @param depth is the number of successive moves already evaluated
+   * @return the {@code double} value of the evaluated move
+   */
+  private double evaluateRecursively(GameState state, Cell toPlace, Player aiPlayer, int depth) {
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    if (depth &gt;= calculationDepth) {</span>
+<span class="fc" id="L55">      return evaluateSituationWithHeuristic(state, aiPlayer, depth);</span>
+    }
+<span class="fc" id="L57">    Model game = new ModelImpl(state.makeCopy(), GameMode.HOTSEAT);</span>
+<span class="fc" id="L58">    game.placeDisk(new DiskImpl(state.getPlayerManagement().getCurrentPlayer()), toPlace);</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">    if (game.getState().getCurrentPhase().equals(Phase.FINISHED)) {</span>
+<span class="nc" id="L60">      return evaluateSituationWithHeuristic(game.getState(), aiPlayer, depth);</span>
+    }
+
+<span class="fc" id="L63">    Player currentPlayer = game.getState().getPlayerManagement().getCurrentPlayer();</span>
+<span class="fc" id="L64">    Set&lt;Cell&gt; possibleMoves = new TreeSet&lt;&gt;(game.getPossibleMovesForPlayer(currentPlayer));</span>
+    double moveValue;
+<span class="fc bfc" id="L66" title="All 2 branches covered.">    if (currentPlayer.equals(aiPlayer)) {</span>
+<span class="fc" id="L67">      moveValue = Double.NEGATIVE_INFINITY;</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">      for (Cell cell : possibleMoves) {</span>
+<span class="fc" id="L69">        double tempMoveValue = evaluateRecursively(game.getState(), cell, aiPlayer, depth + 1);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (tempMoveValue &gt; moveValue) {</span>
+<span class="fc" id="L71">          moveValue = tempMoveValue;</span>
+        }
+      }
+<span class="fc" id="L74">    } else {</span>
+<span class="fc" id="L75">      moveValue = Double.POSITIVE_INFINITY;</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">      for (Cell cell : possibleMoves) {</span>
+<span class="fc" id="L77">        double tempMoveValue = evaluateRecursively(game.getState(), cell, aiPlayer, depth + 1);</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if (tempMoveValue &lt; moveValue) {</span>
+<span class="fc" id="L79">          moveValue = tempMoveValue;</span>
+        }
+      }
+    }
+<span class="fc" id="L83">    return moveValue;</span>
+  }
+
+  /**
+   * Evaluates the state.
+   *
+   * @param state which will be evaluated
+   * @param aiPlayer from whose perspective it shall be evaluated
+   * @return {@code double} value of the given state
+   */
+  private double evaluateSituationWithHeuristic(GameState state, Player aiPlayer, int depth) {
+<span class="fc" id="L94">    return heuristic.evaluateSituationWithHeuristic(state, aiPlayer, depth);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

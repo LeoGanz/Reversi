@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>GameModeSelector.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">GameModeSelector.java</span></div><h1>GameModeSelector.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import java.util.ResourceBundle;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+/**
+ * This class offers the start window in which the user can select the game mode he wants to play.
+ *
+ * @author Josef Feger
+ */
+public class GameModeSelector extends Stage {
+
+  private static final String CSS_CLOSELABEL_NORMAL = &quot;-fx-text-fill: white; -fx-font-size: 35;&quot;;
+  private static final String CSS_CLOSELABEL_SELECTED = &quot;-fx-text-fill: red; -fx-font-size: 35;&quot;;
+
+<span class="nc" id="L32">  private static final Insets TOP_INSETS = new Insets(15, 15, 0, 0);</span>
+  private static final int DISK_ADDITION = 15;
+  private static final int DISK_SCALING = 10;
+
+<span class="nc" id="L36">  private static final Font FONT_BUTTON = Font.font(18);</span>
+<span class="nc" id="L37">  private static final Cursor CURSOR_BUTTON = Cursor.HAND;</span>
+  private static final int MINWIDTH_BUTTON = 200;
+  private static final int MAXWIDTH_BUTTON = 500;
+<span class="nc" id="L40">  private static final int MINHEIGHT_BUTTON = 50;</span>
+
+  private Controller controller;
+  private Scene scene;
+  private Stage primaryStage;
+
+  private BorderPane borderPane;
+  private StartScreenDiskGrid startScreenDisks;
+
+  private ResourceBundle messages;
+
+  /**
+   * Constructor of this class initialises variables and builds the stage.
+   *
+   * @param controller a reference to a controller instance
+   * @param stage the stage created by the application thread
+   * @param messages the ResourceBundle for the externalised strings
+   */
+  public GameModeSelector(Controller controller, Stage stage, ResourceBundle messages) {
+<span class="nc" id="L59">    super();</span>
+
+<span class="nc" id="L61">    this.controller = controller;</span>
+<span class="nc" id="L62">    this.primaryStage = stage;</span>
+
+<span class="nc" id="L64">    this.messages = messages;</span>
+<span class="nc" id="L65">  }</span>
+
+  /** Displays a stage that allows the user to select which game mode he/she wants to play. */
+  public void showGameModeSelection() {
+
+<span class="nc" id="L70">    borderPane = new BorderPane();</span>
+<span class="nc" id="L71">    borderPane.getStylesheets().add(&quot;cssFiles/gameModeSelector.css&quot;);</span>
+<span class="nc" id="L72">    borderPane.setId(&quot;main-pane&quot;);</span>
+
+<span class="nc" id="L74">    borderPane.setTop(buildTopPart());</span>
+<span class="nc" id="L75">    borderPane.setRight(buildSelectionPane());</span>
+<span class="nc" id="L76">    startScreenDisks = new StartScreenDiskGrid();</span>
+<span class="nc" id="L77">    borderPane.setCenter(startScreenDisks);</span>
+
+<span class="nc" id="L79">    scene = new Scene(borderPane);</span>
+
+<span class="nc" id="L81">    setScene(scene);</span>
+<span class="nc" id="L82">    setTitle(messages.getString(&quot;Game_Title&quot;));</span>
+<span class="nc" id="L83">    initStyle(StageStyle.UNDECORATED);</span>
+<span class="nc" id="L84">    setMinWidth(2 * (Screen.getPrimary().getVisualBounds().getWidth() / 3));</span>
+<span class="nc" id="L85">    setMinHeight(2.1 * (Screen.getPrimary().getVisualBounds().getHeight() / 3));</span>
+<span class="nc" id="L86">    setWidth(getMinWidth());</span>
+<span class="nc" id="L87">    setHeight(getMinHeight());</span>
+<span class="nc" id="L88">    centerOnScreen();</span>
+<span class="nc" id="L89">    show();</span>
+<span class="nc" id="L90">  }</span>
+
+  private BorderPane buildTopPart() {
+
+<span class="nc" id="L94">    BorderPane bp = new BorderPane();</span>
+<span class="nc" id="L95">    bp.getStyleClass().add(&quot;transparent&quot;);</span>
+
+<span class="nc" id="L97">    Label close = new Label(&quot;X&quot;);</span>
+<span class="nc" id="L98">    close.setCursor(Cursor.HAND);</span>
+<span class="nc" id="L99">    close.setStyle(CSS_CLOSELABEL_NORMAL);</span>
+<span class="nc" id="L100">    close.setOnMouseEntered(e -&gt; close.setStyle(CSS_CLOSELABEL_SELECTED));</span>
+<span class="nc" id="L101">    close.setOnMouseExited(e -&gt; close.setStyle(CSS_CLOSELABEL_NORMAL));</span>
+<span class="nc" id="L102">    close.setOnMouseClicked(e -&gt; close());</span>
+<span class="nc" id="L103">    bp.setRight(close);</span>
+<span class="nc" id="L104">    BorderPane.setAlignment(close, Pos.TOP_RIGHT);</span>
+<span class="nc" id="L105">    BorderPane.setMargin(close, TOP_INSETS);</span>
+
+<span class="nc" id="L107">    HBox title = getTitleWithDisks();</span>
+<span class="nc" id="L108">    bp.setCenter(title);</span>
+<span class="nc" id="L109">    BorderPane.setAlignment(title, Pos.CENTER);</span>
+<span class="nc" id="L110">    BorderPane.setMargin(title, TOP_INSETS);</span>
+
+<span class="nc" id="L112">    return bp;</span>
+  }
+
+  private HBox getTitleWithDisks() {
+<span class="nc" id="L116">    HBox hbox = new HBox(10);</span>
+<span class="nc" id="L117">    hbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc bnc" id="L119" title="All 2 branches missed.">    for (int i = 1; i &lt; 4; i++) {</span>
+<span class="nc" id="L120">      hbox.getChildren()</span>
+<span class="nc" id="L121">          .add(</span>
+<span class="nc" id="L122">              getDisk(</span>
+<span class="nc" id="L123">                  i * DISK_SCALING + DISK_ADDITION,</span>
+<span class="nc" id="L124">                  i * DISK_SCALING + DISK_ADDITION,</span>
+<span class="nc" id="L125">                  (i * DISK_SCALING + DISK_ADDITION) / 2.0,</span>
+<span class="nc" id="L126">                  Color.WHITE));</span>
+    }
+
+<span class="nc" id="L129">    Label title = new Label(messages.getString(&quot;Game_Title&quot;));</span>
+<span class="nc" id="L130">    title.setId(&quot;title-label&quot;);</span>
+<span class="nc" id="L131">    hbox.getChildren().add(title);</span>
+
+<span class="nc bnc" id="L133" title="All 2 branches missed.">    for (int i = 3; i &gt; 0; i--) {</span>
+<span class="nc" id="L134">      hbox.getChildren()</span>
+<span class="nc" id="L135">          .add(</span>
+<span class="nc" id="L136">              getDisk(</span>
+<span class="nc" id="L137">                  i * DISK_SCALING + DISK_ADDITION,</span>
+<span class="nc" id="L138">                  i * DISK_SCALING + DISK_ADDITION,</span>
+<span class="nc" id="L139">                  (i * DISK_SCALING + DISK_ADDITION) / 2.0,</span>
+<span class="nc" id="L140">                  Color.BLACK));</span>
+    }
+
+<span class="nc" id="L143">    return hbox;</span>
+  }
+
+  private VBox buildSelectionPane() {
+
+<span class="nc" id="L148">    VBox vbox = new VBox(35);</span>
+<span class="nc" id="L149">    vbox.setId(&quot;selection-pane&quot;);</span>
+<span class="nc" id="L150">    vbox.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L151">    vbox.setPrefWidth(1.3 * (Screen.getPrimary().getVisualBounds().getWidth() / 5));</span>
+<span class="nc" id="L152">    vbox.setMaxWidth(vbox.getPrefWidth());</span>
+<span class="nc" id="L153">    vbox.setFillWidth(true);</span>
+
+<span class="nc" id="L155">    Region top = new Region();</span>
+<span class="nc" id="L156">    VBox.setVgrow(top, Priority.ALWAYS);</span>
+<span class="nc" id="L157">    vbox.getChildren().add(top);</span>
+
+<span class="nc" id="L159">    PlayerCreation playerCreation = new PlayerCreation(controller, primaryStage, messages);</span>
+
+<span class="nc" id="L161">    Button singlePlayer = getButton(messages.getString(&quot;GameModeSelector_ButtonSingleplayer_Text&quot;));</span>
+<span class="nc" id="L162">    singlePlayer.setOnAction(</span>
+<span class="nc" id="L163">        e -&gt; {</span>
+<span class="nc" id="L164">          playerCreation.getSinglePlayerInformation(controller, this);</span>
+<span class="nc" id="L165">          borderPane.setCenter(playerCreation);</span>
+<span class="nc" id="L166">          borderPane.setRight(null);</span>
+<span class="nc" id="L167">        });</span>
+
+<span class="nc" id="L169">    Button hotseat = getButton(messages.getString(&quot;GameModeSelector_ButtonHotseat_Text&quot;));</span>
+<span class="nc" id="L170">    hotseat.setOnAction(</span>
+<span class="nc" id="L171">        e -&gt; {</span>
+<span class="nc" id="L172">          playerCreation.getMultiplePlayersInformation(this);</span>
+<span class="nc" id="L173">          borderPane.setCenter(playerCreation);</span>
+<span class="nc" id="L174">          borderPane.setRight(null);</span>
+<span class="nc" id="L175">        });</span>
+
+<span class="nc" id="L177">    Button multiPlayer = getButton(messages.getString(&quot;GameModeSelector_ButtonMultiplayer&quot;));</span>
+<span class="nc" id="L178">    multiPlayer.setOnAction(</span>
+<span class="nc" id="L179">        e -&gt; {</span>
+<span class="nc" id="L180">          playerCreation.getOnlinePlayerInformation(this);</span>
+<span class="nc" id="L181">          borderPane.setCenter(playerCreation);</span>
+<span class="nc" id="L182">          borderPane.setRight(null);</span>
+<span class="nc" id="L183">        });</span>
+
+<span class="nc" id="L185">    Button spectate = getButton(messages.getString(&quot;GameModeSelector_ButtonSpectate&quot;));</span>
+<span class="nc" id="L186">    spectate.setOnAction(</span>
+<span class="nc" id="L187">        e -&gt; {</span>
+<span class="nc" id="L188">          playerCreation.getSpectatorInformation(this);</span>
+<span class="nc" id="L189">          borderPane.setCenter(playerCreation);</span>
+<span class="nc" id="L190">          borderPane.setRight(null);</span>
+<span class="nc" id="L191">        });</span>
+
+<span class="nc" id="L193">    vbox.getChildren().addAll(singlePlayer, hotseat, multiPlayer, spectate);</span>
+
+<span class="nc" id="L195">    Region bottom = new Region();</span>
+<span class="nc" id="L196">    VBox.setVgrow(bottom, Priority.ALWAYS);</span>
+<span class="nc" id="L197">    vbox.getChildren().add(bottom);</span>
+
+<span class="nc" id="L199">    Button server = getButton(messages.getString(&quot;GameModeSelector_ButtonStartServer&quot;));</span>
+<span class="nc" id="L200">    server.setOnAction(</span>
+<span class="nc" id="L201">        e -&gt; {</span>
+<span class="nc" id="L202">          controller.startServer();</span>
+<span class="nc" id="L203">        });</span>
+<span class="nc" id="L204">    vbox.getChildren().add(server);</span>
+
+<span class="nc" id="L206">    return vbox;</span>
+  }
+
+  void returnToMainScreen() {
+<span class="nc" id="L210">    borderPane.setRight(buildSelectionPane());</span>
+<span class="nc" id="L211">    borderPane.setCenter(startScreenDisks);</span>
+<span class="nc" id="L212">  }</span>
+
+  private Button getButton(String text) {
+<span class="nc" id="L215">    Button button = new Button(text);</span>
+<span class="nc" id="L216">    button.setId(&quot;button&quot;);</span>
+<span class="nc" id="L217">    button.setMinHeight(MINHEIGHT_BUTTON);</span>
+<span class="nc" id="L218">    button.setMaxWidth(MAXWIDTH_BUTTON);</span>
+<span class="nc" id="L219">    button.setMinWidth(MINWIDTH_BUTTON);</span>
+<span class="nc" id="L220">    button.setCursor(CURSOR_BUTTON);</span>
+<span class="nc" id="L221">    button.setFont(FONT_BUTTON);</span>
+<span class="nc" id="L222">    button.setEffect(new DropShadow(4, Color.DARKGRAY));</span>
+
+<span class="nc" id="L224">    return button;</span>
+  }
+
+  private GraphicDisk getDisk(double width, double height, double radius, Color color) {
+<span class="nc" id="L228">    return new GraphicDisk(width, height, radius, color);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>InterfaceAdapter.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network.communication</a> &gt; <span class="el_source">InterfaceAdapter.java</span></div><h1>InterfaceAdapter.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network.communication;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.TypeAdapter;
+import java.lang.reflect.Type;
+
+/**
+ * Gson serializer and deserializer for interface types. This enables types using fields that are
+ * specified as interfaces to be serialized if they have stored a concrete implementation of that
+ * class in the field.
+ *
+ * @author Leonard Ganz
+ * @param &lt;T&gt; type for which the serializer is being registered.
+ */
+public class InterfaceAdapter&lt;T&gt; implements JsonSerializer&lt;T&gt;, JsonDeserializer&lt;T&gt; {
+<span class="fc" id="L23">  private static final Object INSTANCE = new InterfaceAdapter&lt;&gt;();</span>
+
+  private InterfaceAdapter() {
+  }
+
+  /**
+   * Get (de)serializer instance for some interaface type class. Add this as a {@link TypeAdapter}
+   * to your {@link GsonBuilder}:
+   *
+   * &lt;pre&gt;{@code
+   * GsonBuilder gsonBuilder = new GsonBuilder;
+   * gsonBuilder.
+   *     .registerTypeAdapter(SomeInterface.class,
+   *     InterfaceAdapter.getAdapter());
+   * Gson gson = gsonBuilder.create();
+   * }&lt;/pre&gt;
+   *
+   * @return a (de)serializer for interface types that implements {@link JsonSerializer} and {@link
+   *     JsonDeserializer}
+   */
+  public static Object getAdapter() {
+<span class="fc" id="L44">    return INSTANCE;</span>
+  }
+
+  private static final String CLASSNAME = &quot;CLASSNAME&quot;;
+<span class="fc" id="L48">  private static final String DATA = &quot;DATA&quot;;</span>
+
+  @Override
+  public T deserialize(
+      JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
+      throws JsonParseException {
+
+<span class="fc" id="L55">    JsonObject jsonObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L56">    String className = jsonObject.getAsJsonPrimitive(CLASSNAME).getAsString();</span>
+<span class="fc" id="L57">    Class&lt;?&gt; klass = getObjectClass(className);</span>
+<span class="fc" id="L58">    return jsonDeserializationContext.deserialize(jsonObject.get(DATA), klass);</span>
+  }
+
+  @Override
+  public JsonElement serialize(
+      T jsonElement, Type type, JsonSerializationContext jsonSerializationContext) {
+<span class="fc" id="L64">    JsonObject jsonObject = new JsonObject();</span>
+<span class="fc" id="L65">    jsonObject.addProperty(CLASSNAME, jsonElement.getClass().getName());</span>
+<span class="fc" id="L66">    jsonObject.add(DATA, jsonSerializationContext.serialize(jsonElement));</span>
+<span class="fc" id="L67">    return jsonObject;</span>
+  }
+
+  /** Helper method to get actual class for class name. */
+  private Class&lt;?&gt; getObjectClass(String className) {
+    try {
+<span class="fc" id="L73">      return Class.forName(className);</span>
+<span class="nc" id="L74">    } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L75">      throw new JsonParseException(e.getMessage());</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

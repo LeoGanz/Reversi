@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>AiPlayerImpl.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.model</a> &gt; <span class="el_source">AiPlayerImpl.java</span></div><h1>AiPlayerImpl.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.model;
+
+import javafx.scene.paint.Color;
+
+/**
+ * This class represents an AI player and is only used inside the program to be able to
+ * differentiate between a real player and an AI player. &lt;br&gt;
+ * That is the reason why this class extends the {@link PlayerImpl} class - because it is just a
+ * more specific kind of player but has to offer the same functionality.
+ *
+ * @author Josef Feger
+ */
+public class AiPlayerImpl extends PlayerImpl implements AiPlayer {
+
+  /**
+   * Public constructor of this class takes the arguments and uses them to call the {@code super}
+   * constructor.
+   *
+   * @param playerName the AI player's name
+   * @param color the AI player's disk color
+   */
+  public AiPlayerImpl(String playerName, Color color) {
+<span class="fc" id="L23">    super(playerName, color);</span>
+<span class="fc" id="L24">  }</span>
+
+  /**
+   * Constructor of this class that initialises the AI player with the following default values.
+   * &lt;br&gt;
+   *
+   * &lt;ul&gt;
+   *   &lt;li&gt;{@code name} : AI
+   *   &lt;li&gt;{@code color} : Black
+   * &lt;/ul&gt;
+   */
+  public AiPlayerImpl() {
+<span class="fc" id="L36">    this(&quot;AI&quot;, Color.BLACK);</span>
+<span class="fc" id="L37">  }</span>
+  
+  @Override
+  public Player makeCopy() {
+<span class="fc" id="L41">    return new AiPlayerImpl(super.getName(), super.getColor());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

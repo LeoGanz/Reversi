@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ClientConnection.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network</a> &gt; <span class="el_source">ClientConnection.java</span></div><h1>ClientConnection.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network;
+
+import com.google.gson.JsonParseException;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ClientNotification;
+import de.lmu.ifi.sosylab.fddlj.network.communication.DiskPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Message;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement.Reason;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+
+/**
+ * Represents a client on the server. A ClientConnection is responsible for communicating with the
+ * client.
+ *
+ * @author Leonard Ganz
+ */
+public class ClientConnection implements Runnable {
+
+  private int connectionID;
+  private final Socket clientSocket;
+  private BufferedReader in;
+  private PrintWriter out;
+  private final ServerImpl server;
+  private boolean connectionRunning;
+  private GameLobby lobby;
+
+  /**
+   * Initialize a new client connection. Data streams for communication will be set up.
+   *
+   * @param clientSocket end point for connection with client
+   * @param connectionID integer used to identify connections
+   * @param server server that manages all client connections
+   */
+<span class="fc" id="L41">  public ClientConnection(Socket clientSocket, int connectionID, ServerImpl server) {</span>
+<span class="fc" id="L42">    this.clientSocket = clientSocket;</span>
+<span class="fc" id="L43">    this.connectionID = connectionID;</span>
+<span class="fc" id="L44">    this.server = server;</span>
+    try {
+<span class="fc" id="L46">      out = new PrintWriter(clientSocket.getOutputStream(), true, StandardCharsets.UTF_8);</span>
+<span class="fc" id="L47">      out.flush();</span>
+<span class="fc" id="L48">      in =</span>
+<span class="fc" id="L49">          new BufferedReader(</span>
+<span class="fc" id="L50">              new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));</span>
+<span class="pc" id="L51">    } catch (@SuppressWarnings(&quot;unused&quot;) IOException e) {</span>
+      // connecting not possible
+<span class="nc" id="L53">      terminate();</span>
+    }
+<span class="fc" id="L55">  }</span>
+
+  /**
+   * Get this connections identifier.
+   *
+   * @return integer id used to identify the client connection
+   */
+  public int getConnectionID() {
+<span class="fc" id="L63">    return connectionID;</span>
+  }
+
+  @Override
+  public void run() {
+<span class="fc" id="L68">    connectionRunning = true;</span>
+<span class="fc bfc" id="L69" title="All 4 branches covered.">    while (server.isRunning() &amp;&amp; connectionRunning) {</span>
+      try {
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        if (in == null) {</span>
+<span class="nc" id="L72">          terminate();</span>
+<span class="nc" id="L73">          return;</span>
+        }
+<span class="fc" id="L75">        String receivedData = in.readLine();</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (receivedData == null) { // EOF</span>
+<span class="fc" id="L77">          terminate();</span>
+<span class="fc" id="L78">        } else {</span>
+<span class="fc" id="L79">          processReceivedData(receivedData);</span>
+        }
+<span class="pc" id="L81">      } catch (@SuppressWarnings(&quot;unused&quot;) IOException e) {</span>
+        // client probably lost connection. Clean up can be done.
+<span class="nc" id="L83">        terminate();</span>
+      }
+    }
+<span class="fc" id="L86">  }</span>
+
+  private void processReceivedData(String receivedData) {
+    try {
+<span class="fc" id="L90">      Message&lt;?&gt; receivedMessage = Message.fromJson(receivedData);</span>
+<span class="fc" id="L91">      Object data = receivedMessage.getData();</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">      if (data instanceof DiskPlacement) {</span>
+<span class="fc" id="L93">        handleDiskPlacement((DiskPlacement) data);</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">      } else if (data instanceof JoinRequest) {</span>
+<span class="fc" id="L95">        handleJoinRequest((JoinRequest) data);</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">      } else if (data instanceof ClientNotification) {</span>
+<span class="fc" id="L97">        handleClientNotification((ClientNotification) data);</span>
+<span class="fc" id="L98">      } else {</span>
+<span class="nc" id="L99">        System.out.println(&quot;Received unknown message type: &quot; + data.getClass().getName());</span>
+<span class="nc" id="L100">        sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);</span>
+      }
+
+<span class="nc" id="L103">    } catch (@SuppressWarnings(&quot;unused&quot;) JsonParseException e) {</span>
+<span class="nc" id="L104">      sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);</span>
+    }
+<span class="fc" id="L106">  }</span>
+
+  private void handleDiskPlacement(DiskPlacement requestedPlacement) {
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">    if (lobby == null) {</span>
+<span class="nc" id="L110">      sendMessageWith(new RejectedPlacement(requestedPlacement.getUuid(), Reason.NO_LOBBY_JOINED));</span>
+<span class="nc" id="L111">      return;</span>
+    }
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    if (!lobby.isGameRunning()) {</span>
+<span class="nc" id="L114">      sendMessageWith(new RejectedPlacement(requestedPlacement.getUuid(), Reason.GAME_NOT_RUNNING));</span>
+<span class="nc" id="L115">      return;</span>
+    }
+<span class="fc" id="L117">    RejectedPlacement response = lobby.tryDiskPlacement(requestedPlacement);</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">    if (response != null) {</span>
+<span class="fc" id="L119">      sendMessageWith(response);</span>
+    }
+<span class="fc" id="L121">  }</span>
+
+  private void handleJoinRequest(JoinRequest joinRequest) {
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">    if (lobby != null) {</span>
+<span class="nc" id="L125">      lobby.leave(connectionID);</span>
+    }
+<span class="fc" id="L127">    server.joinLobby(joinRequest, connectionID);</span>
+<span class="fc" id="L128">  }</span>
+
+  private void handleClientNotification(ClientNotification notification) {
+<span class="fc bfc" id="L131" title="All 2 branches covered.">    if (lobby == null) {</span>
+<span class="fc" id="L132">      sendMessageWith(ServerNotification.NO_LOBBY_JOINED);</span>
+<span class="fc" id="L133">      return;</span>
+    }
+
+<span class="pc bpc" id="L136" title="4 of 5 branches missed.">    switch (notification) {</span>
+      case REQUEST_RESTART:
+<span class="nc" id="L138">        lobby.requestRestart(connectionID);</span>
+<span class="nc" id="L139">        break;</span>
+      case ACCEPT_RESTART_REQUEST:
+<span class="nc" id="L141">        lobby.acceptRestart(connectionID);</span>
+<span class="nc" id="L142">        break;</span>
+      case DENY_RESTART_REQUEST:
+<span class="nc" id="L144">        lobby.denyRestart(connectionID);</span>
+<span class="nc" id="L145">        break;</span>
+      case REQUEST_CURRENT_GAMESTATE_WITH_LAST_PLACEMENT_UUID:
+<span class="fc" id="L147">        sendMessageWith(lobby.getGameStateWithLastPlacementUuid());</span>
+<span class="fc" id="L148">        break;</span>
+
+      default:
+<span class="nc" id="L151">        sendMessageWith(ServerNotification.RECEIVED_INVALID_DATA);</span>
+        break;
+    }
+<span class="fc" id="L154">  }</span>
+
+  /**
+   * Shutdown the connection to a client. This will close all open data streams and sockets and
+   * unregister this connection from the server.
+   */
+  public void terminate() {
+<span class="fc" id="L161">    connectionRunning = false;</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">    if (lobby != null) {</span>
+<span class="fc" id="L163">      lobby.leave(connectionID);</span>
+<span class="fc" id="L164">      lobby = null;</span>
+    }
+    try {
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">      if (in != null) {</span>
+<span class="fc" id="L168">        in.close();</span>
+      }
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">      if (out != null) {</span>
+<span class="fc" id="L171">        out.close();</span>
+      }
+
+<span class="fc" id="L174">      clientSocket.close();</span>
+<span class="pc" id="L175">    } catch (@SuppressWarnings(&quot;unused&quot;) IOException e) {</span>
+      // do nothing, as connection is already doing its best to shut down
+    }
+
+<span class="fc" id="L179">    server.connectionTerminated(connectionID);</span>
+<span class="fc" id="L180">  }</span>
+
+  /**
+   * Send data to the client. The data will be packaged as a {@link Message}.
+   *
+   * @param data data to be sent to the client in a message
+   */
+  public void sendMessageWith(Object data) {
+<span class="fc" id="L188">    out.println(new Message&lt;&gt;(data).toJson());</span>
+<span class="fc" id="L189">  }</span>
+
+  /**
+   * Set the lobby this client connection is in.
+   *
+   * @param lobby the game lobby this connection is in
+   */
+  public void setLobby(GameLobby lobby) {
+<span class="fc" id="L197">    this.lobby = lobby;</span>
+<span class="fc" id="L198">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

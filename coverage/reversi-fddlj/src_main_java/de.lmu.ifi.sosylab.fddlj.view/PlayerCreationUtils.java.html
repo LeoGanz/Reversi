@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>PlayerCreationUtils.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">PlayerCreationUtils.java</span></div><h1>PlayerCreationUtils.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
+/**
+ * This class offers util methods needed upon creating the player objects needed for the game.
+ *
+ * @author Josef Feger
+ */
+<span class="nc" id="L28">public class PlayerCreationUtils {</span>
+
+<span class="nc" id="L30">  static final int[] gameFieldSizes = new int[] {8, 10, 12, 14, 16};</span>
+<span class="nc" id="L31">  static final String[] gameFieldSizeOptions =</span>
+<span class="nc" id="L32">      new String[] {&quot;8x8&quot;, &quot;10x10&quot;, &quot;12x12&quot;, &quot;14x14&quot;, &quot;16x16&quot;};</span>
+
+  private static final int PADDING_VBOX_TEXTFIELD = 15;
+  private static final int MINWIDTH_TEXTFIELD = 200;
+  private static final String CSS_TEXTFIELD_NORMAL =
+      &quot;-fx-border-color: transparent transparent #ffffff transparent;&quot; + &quot; -fx-border-width: 3&quot;;
+  private static final String CSS_TEXTFIELD_SELECTED =
+      &quot;-fx-border-color: transparent transparent rgb(0,0,255) transparent; &quot;
+          + &quot;-fx-border-width: 3&quot;;
+  private static final int MAXWIDTH_TEXTFIELD_LABEL = 300;
+
+  private static final int PREFHEIGHT_COLORPANE = 50;
+  private static final int PREFWIDTH_COLORPANE = 50;
+
+<span class="nc" id="L46">  private static final Font FONT_BUTTON = Font.font(18);</span>
+<span class="nc" id="L47">  private static final Cursor CURSOR_BUTTON = Cursor.HAND;</span>
+  private static final int MINWIDTH_BUTTON = 100;
+  private static final int MAXWIDTH_BUTTON = 250;
+  private static final int MINHEIGHT_BUTTON = 30;
+  private static final int PREFWIDTH_BUTTON = 150;
+
+  private static final double SIMILARITY_DISTANCE = 0.25;
+<span class="nc" id="L54">  private static final int MAXHEIGHT_SEPARATOR = 450;</span>
+
+  /**
+   * Returns a VBox containing a text field and a label with the given text.
+   *
+   * @param textField the text field object to use
+   * @param labelText the text to display in the label
+   * @return a vbox object containing the text field and a label
+   */
+  static VBox getInputField(TextField textField, String labelText) {
+<span class="nc" id="L64">    VBox vbox = new VBox();</span>
+<span class="nc" id="L65">    vbox.setPadding(new Insets(PADDING_VBOX_TEXTFIELD));</span>
+<span class="nc" id="L66">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L68">    textField.setMinWidth(MINWIDTH_TEXTFIELD);</span>
+<span class="nc" id="L69">    textField.setId(&quot;text-field&quot;);</span>
+<span class="nc" id="L70">    textField.setPrefWidth(200);</span>
+<span class="nc" id="L71">    textField.setMaxWidth(400);</span>
+<span class="nc" id="L72">    textField</span>
+<span class="nc" id="L73">        .focusedProperty()</span>
+<span class="nc" id="L74">        .addListener(</span>
+<span class="nc" id="L75">            new ChangeListener&lt;Boolean&gt;() {</span>
+
+              @Override
+              public void changed(
+                  ObservableValue&lt;? extends Boolean&gt; observable,
+                  Boolean oldValue,
+                  Boolean newValue) {
+
+<span class="nc bnc" id="L83" title="All 2 branches missed.">                if (newValue) {</span>
+<span class="nc" id="L84">                  textField.setStyle(CSS_TEXTFIELD_SELECTED);</span>
+<span class="nc" id="L85">                } else {</span>
+<span class="nc" id="L86">                  textField.setStyle(CSS_TEXTFIELD_NORMAL);</span>
+                }
+<span class="nc" id="L88">              }</span>
+            });
+
+<span class="nc" id="L91">    Label lbl = new Label(labelText);</span>
+<span class="nc" id="L92">    lbl.setId(&quot;normal-text&quot;);</span>
+<span class="nc" id="L93">    lbl.setWrapText(true);</span>
+<span class="nc" id="L94">    lbl.setMaxWidth(MAXWIDTH_TEXTFIELD_LABEL);</span>
+<span class="nc" id="L95">    vbox.getChildren().addAll(lbl, textField);</span>
+<span class="nc" id="L96">    return vbox;</span>
+  }
+
+  /**
+   * Creates a pane in which the user can select and color and see the selected color.
+   *
+   * @param colorPicker the color picker object to use
+   * @param messages the resource bundle object to use for predefined messages
+   * @return a vbox containing the color picker and a label to show the selected color
+   */
+  static VBox getColorPickerPane(ColorPicker colorPicker, ResourceBundle messages) {
+<span class="nc" id="L107">    VBox vbox = new VBox(5);</span>
+<span class="nc" id="L108">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L110">    Pane color = new Pane();</span>
+<span class="nc" id="L111">    color.setId(&quot;color-pane&quot;);</span>
+<span class="nc" id="L112">    color.setStyle(&quot;-fx-background-color: &quot; + toRgbCode(colorPicker.getValue()) + &quot;;&quot;);</span>
+<span class="nc" id="L113">    color.setPrefHeight(PREFHEIGHT_COLORPANE);</span>
+<span class="nc" id="L114">    color.setMinHeight(PREFHEIGHT_COLORPANE);</span>
+<span class="nc" id="L115">    color.setMaxHeight(PREFHEIGHT_COLORPANE);</span>
+<span class="nc" id="L116">    color.setPrefWidth(PREFWIDTH_COLORPANE);</span>
+<span class="nc" id="L117">    color.setMinWidth(PREFWIDTH_COLORPANE);</span>
+<span class="nc" id="L118">    color.setMaxWidth(PREFWIDTH_COLORPANE);</span>
+<span class="nc" id="L119">    colorPicker.setOnAction(</span>
+<span class="nc" id="L120">        (ActionEvent t) -&gt; {</span>
+<span class="nc" id="L121">          color.setStyle(&quot;-fx-background-color: &quot; + toRgbCode(colorPicker.getValue()) + &quot;;&quot;);</span>
+<span class="nc" id="L122">        });</span>
+
+<span class="nc" id="L124">    Label label = new Label(messages.getString(&quot;PlayerCreation_ChooseColor&quot;));</span>
+<span class="nc" id="L125">    label.setId(&quot;normal-text&quot;);</span>
+<span class="nc" id="L126">    vbox.getChildren().addAll(label, color, colorPicker);</span>
+
+<span class="nc" id="L128">    return vbox;</span>
+  }
+
+  /**
+   * Converts a color to a rgb code display in web format.
+   *
+   * @param color the color to convert
+   * @return a string representing the color in hex format.
+   */
+  static String toRgbCode(Color color) {
+
+<span class="nc" id="L139">    return String.format(</span>
+<span class="nc" id="L140">        &quot;#%02X%02X%02X&quot;,</span>
+<span class="nc" id="L141">        (int) (color.getRed() * 255),</span>
+<span class="nc" id="L142">        (int) (color.getGreen() * 255),</span>
+<span class="nc" id="L143">        (int) (color.getBlue() * 255));</span>
+  }
+
+  /**
+   * Returns a vbox object containing a label and a choice box for selecting the game field size.
+   *
+   * @param choiceBox the choice box to use for selecting the game field size.
+   * @param messages the resource bundle object to use for predefined messages
+   * @return a vbox with a label and a choice box
+   */
+  static VBox getGameFieldSizeSelection(ChoiceBox&lt;String&gt; choiceBox, ResourceBundle messages) {
+<span class="nc" id="L154">    VBox vbox = new VBox(5);</span>
+<span class="nc" id="L155">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L157">    Label label = new Label(messages.getString(&quot;PlayerCreation_ChooseGameFieldSize&quot;));</span>
+<span class="nc" id="L158">    label.setId(&quot;normal-text&quot;);</span>
+<span class="nc" id="L159">    vbox.getChildren().add(label);</span>
+
+<span class="nc" id="L161">    choiceBox.getSelectionModel().select(0);</span>
+<span class="nc" id="L162">    vbox.getChildren().add(choiceBox);</span>
+
+<span class="nc" id="L164">    return vbox;</span>
+  }
+
+  /**
+   * Returns an already styled button with the given text.
+   *
+   * @param text the button's text
+   * @return a styled button
+   */
+  static Button getButton(String text) {
+<span class="nc" id="L174">    Button button = new Button(text);</span>
+<span class="nc" id="L175">    button.setId(&quot;button&quot;);</span>
+<span class="nc" id="L176">    button.setMinHeight(MINHEIGHT_BUTTON);</span>
+<span class="nc" id="L177">    button.setMaxWidth(MAXWIDTH_BUTTON);</span>
+<span class="nc" id="L178">    button.setMinWidth(MINWIDTH_BUTTON);</span>
+<span class="nc" id="L179">    button.setPrefWidth(PREFWIDTH_BUTTON);</span>
+<span class="nc" id="L180">    button.setCursor(CURSOR_BUTTON);</span>
+<span class="nc" id="L181">    button.setFont(FONT_BUTTON);</span>
+<span class="nc" id="L182">    button.setEffect(new DropShadow(4, Color.DARKGRAY));</span>
+
+<span class="nc" id="L184">    return button;</span>
+  }
+
+  /**
+   * Checks if the entered string is a valid input.
+   *
+   * @param input the input to verify
+   * @return {@code true} if the input is valid, otherwise {@code false}
+   */
+  static boolean isTextFieldInputValid(String input) {
+<span class="nc bnc" id="L194" title="All 4 branches missed.">    return input != null &amp;&amp; !input.equals(&quot;&quot;);</span>
+  }
+
+  /**
+   * Checks whether two colors are similar to each other.
+   *
+   * @param c the first color
+   * @param v the second color
+   * @return {@code true} if they are similar to each other, otherwise {@code false}
+   */
+  static boolean similarTo(Color c, Color v) {
+<span class="nc" id="L205">    double distance =</span>
+<span class="nc" id="L206">        Math.sqrt(</span>
+<span class="nc" id="L207">            (c.getRed() - v.getRed()) * (c.getRed() - v.getRed())</span>
+<span class="nc" id="L208">                + (c.getGreen() - v.getGreen()) * (c.getGreen() - v.getGreen())</span>
+<span class="nc" id="L209">                + (c.getBlue() - v.getBlue()) * (c.getBlue() - v.getBlue()));</span>
+
+<span class="nc bnc" id="L211" title="All 2 branches missed.">    if (distance &lt; SIMILARITY_DISTANCE) {</span>
+<span class="nc" id="L212">      return true;</span>
+    } else {
+<span class="nc" id="L214">      return false;</span>
+    }
+  }
+
+  /**
+   * Returns a random color.
+   *
+   * @return a random color
+   */
+  static Color getRandomColor() {
+<span class="nc" id="L224">    return new Color(Math.random(), Math.random(), Math.random(), 1.0);</span>
+  }
+
+  /**
+   * Builds a new separator object.
+   *
+   * @return a separator object.
+   */
+  static Separator getSeparator() {
+<span class="nc" id="L233">    Separator sep = new Separator(Orientation.VERTICAL);</span>
+<span class="nc" id="L234">    sep.setMaxHeight(MAXHEIGHT_SEPARATOR);</span>
+
+<span class="nc" id="L236">    return sep;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

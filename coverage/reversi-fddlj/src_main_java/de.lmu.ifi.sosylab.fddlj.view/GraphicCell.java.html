@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>GraphicCell.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">GraphicCell.java</span></div><h1>GraphicCell.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.AiPlayer;
+import de.lmu.ifi.sosylab.fddlj.model.Cell;
+import de.lmu.ifi.sosylab.fddlj.model.CellImpl;
+import de.lmu.ifi.sosylab.fddlj.model.Disk;
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.Phase;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import javafx.application.Platform;
+import javafx.scene.Cursor;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.stage.Screen;
+
+/**
+ * This class is the graphical representation of a {@link Cell} and can hold a single {@link Disk}.
+ *
+ * @author Josef Feger
+ */
+public class GraphicCell extends BorderPane implements PropertyChangeListener {
+
+  private GraphicDisk diskOnCell;
+
+  static final int MIN_WIDTH = 40;
+  static final int MIN_HEIGHT = 40;
+
+  private Model model;
+  private GameBoardGrid gameBoardGrid;
+  private Controller controller;
+  private Cell current;
+
+  private boolean indicateMoves;
+  private boolean isMovePossibleOnCell;
+
+  static final float SPACING = 60;
+
+  private String color;
+
+  private String cssNormal;
+  private String cssHighlighted;
+  private static final String CSS_START =
+      &quot;-fx-background-color: #4a4a4a; -fx-border-color: #d6d6d6;&quot; + &quot; -fx-border-width: 1.2;&quot;;
+
+  /**
+   * Constructor of this class initialises variables and sets initial style and size.
+   *
+   * @param column the cell's columns
+   * @param row the cell's row
+   * @param gameBoardGrid a reference to the gameBoardGrid instance
+   * @param model a reference to a model instance
+   * @param controller a reference to a controller instance
+   */
+<span class="nc" id="L58">  public GraphicCell(</span>
+      int column, int row, GameBoardGrid gameBoardGrid, Model model, Controller controller) {
+
+<span class="nc" id="L61">    this.model = model;</span>
+<span class="nc" id="L62">    this.controller = controller;</span>
+<span class="nc" id="L63">    this.gameBoardGrid = gameBoardGrid;</span>
+
+<span class="nc" id="L65">    current = new CellImpl(column, row);</span>
+<span class="nc" id="L66">    indicateMoves = true;</span>
+
+<span class="nc" id="L68">    initialiseCellColor();</span>
+<span class="nc" id="L69">    setStyle(cssNormal);</span>
+<span class="nc" id="L70">    double initValue =</span>
+<span class="nc" id="L71">        (Screen.getPrimary().getVisualBounds().getHeight() - SPACING)</span>
+<span class="nc" id="L72">            / (double) (model.getState().getField().getSize() + 1);</span>
+<span class="nc" id="L73">    setPrefHeight(initValue);</span>
+<span class="nc" id="L74">    setPrefWidth(initValue);</span>
+<span class="nc" id="L75">    setMinWidth(MIN_WIDTH);</span>
+<span class="nc" id="L76">    setMinHeight(MIN_HEIGHT);</span>
+
+<span class="nc" id="L78">    addListeners(gameBoardGrid);</span>
+<span class="nc" id="L79">    setOnMouseMoved(e -&gt; handleMouseMoved(e));</span>
+<span class="nc" id="L80">    setOnMouseClicked(e -&gt; handleMouseClicked(e));</span>
+
+<span class="nc" id="L82">    setCursor(Cursor.DEFAULT);</span>
+
+<span class="nc" id="L84">    isMovePossibleOnCell =</span>
+<span class="nc" id="L85">        model</span>
+<span class="nc" id="L86">            .getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer())</span>
+<span class="nc" id="L87">            .contains(current);</span>
+<span class="nc" id="L88">    indicatePossibleMove();</span>
+<span class="nc" id="L89">  }</span>
+
+  private void initialiseCellColor() {
+
+<span class="nc bnc" id="L93" title="All 4 branches missed.">    if ((current.getRow() % 2 == 0 &amp;&amp; current.getColumn() % 2 == 0)) {</span>
+<span class="nc" id="L94">      color = &quot;#636363&quot;;</span>
+<span class="nc bnc" id="L95" title="All 4 branches missed.">    } else if ((current.getRow() % 2 != 0 &amp;&amp; current.getColumn() % 2 == 0)) {</span>
+<span class="nc" id="L96">      color = &quot;#cecece&quot;;</span>
+<span class="nc bnc" id="L97" title="All 4 branches missed.">    } else if (current.getRow() % 2 == 0 &amp;&amp; current.getColumn() % 2 != 0) {</span>
+<span class="nc" id="L98">      color = &quot;#cecece&quot;;</span>
+<span class="nc bnc" id="L99" title="All 4 branches missed.">    } else if (current.getRow() % 2 != 0 &amp;&amp; current.getColumn() % 2 != 0) {</span>
+<span class="nc" id="L100">      color = &quot;#636363&quot;;</span>
+<span class="nc" id="L101">    } else {</span>
+<span class="nc" id="L102">      color = &quot;transparent&quot;;</span>
+    }
+
+<span class="nc" id="L105">    cssNormal =</span>
+<span class="nc" id="L106">        &quot;-fx-background-color: &quot; + color + &quot;; -fx-border-color: black;&quot; + &quot; -fx-border-width: 1.5;&quot;;</span>
+<span class="nc" id="L107">    cssHighlighted =</span>
+<span class="nc" id="L108">        &quot;-fx-background-color: &quot;</span>
+<span class="nc" id="L109">            + color</span>
+<span class="nc" id="L110">            + &quot;; -fx-border-color: rgba(0,255,0,255);&quot;</span>
+<span class="nc" id="L111">            + &quot; -fx-border-width: 2.2;&quot;;</span>
+<span class="nc" id="L112">  }</span>
+
+  /**
+   * Public constructor with no arguments. Used for creating a simple graphic cell simply for
+   * displaying purposes.
+   */
+<span class="nc" id="L118">  public GraphicCell() {</span>
+<span class="nc" id="L119">    setStyle(CSS_START);</span>
+<span class="nc" id="L120">    double initValue = (Screen.getPrimary().getVisualBounds().getHeight() - SPACING) / 9.0;</span>
+<span class="nc" id="L121">    setPrefHeight(initValue);</span>
+<span class="nc" id="L122">    setPrefWidth(initValue);</span>
+<span class="nc" id="L123">  }</span>
+
+  private void addListeners(GameBoardGrid gameBoardGrid) {
+<span class="nc" id="L126">    gameBoardGrid.widthProperty().addListener((obs, oldVal, newVal) -&gt; resizeCell());</span>
+<span class="nc" id="L127">    gameBoardGrid.heightProperty().addListener((obs, oldVal, newVal) -&gt; resizeCell());</span>
+<span class="nc" id="L128">  }</span>
+
+  private void resizeCell() {
+    double prefSize;
+<span class="nc bnc" id="L132" title="All 2 branches missed.">    if (gameBoardGrid.getWidth() &gt;= gameBoardGrid.getHeight()) {</span>
+<span class="nc" id="L133">      prefSize =</span>
+<span class="nc" id="L134">          (gameBoardGrid.getHeight() - SPACING)</span>
+<span class="nc" id="L135">              / (double) (model.getState().getField().getSize() + 1);</span>
+
+<span class="nc bnc" id="L137" title="All 2 branches missed.">      if (prefSize &lt; MIN_HEIGHT) {</span>
+<span class="nc" id="L138">        prefSize = MIN_HEIGHT;</span>
+      }
+<span class="nc" id="L140">    } else {</span>
+<span class="nc" id="L141">      prefSize =</span>
+<span class="nc" id="L142">          (gameBoardGrid.getWidth() - SPACING)</span>
+<span class="nc" id="L143">              / (double) (model.getState().getField().getSize() + 1);</span>
+
+<span class="nc bnc" id="L145" title="All 2 branches missed.">      if (prefSize &lt; MIN_WIDTH) {</span>
+<span class="nc" id="L146">        prefSize = MIN_WIDTH;</span>
+      }
+    }
+
+<span class="nc" id="L150">    setPrefWidth(prefSize);</span>
+<span class="nc" id="L151">    setPrefHeight(prefSize);</span>
+<span class="nc" id="L152">    setMaxWidth(prefSize);</span>
+<span class="nc" id="L153">    setMaxHeight(prefSize);</span>
+
+<span class="nc bnc" id="L155" title="All 2 branches missed.">    if (diskOnCell != null) {</span>
+<span class="nc" id="L156">      diskOnCell.resizeDisk(</span>
+<span class="nc" id="L157">          prefSize - 2 * GraphicDisk.PADDING,</span>
+<span class="nc" id="L158">          prefSize - 2 * GraphicDisk.PADDING,</span>
+<span class="nc" id="L159">          (prefSize - 2 * GraphicDisk.PADDING) / 2);</span>
+    }
+
+<span class="nc bnc" id="L162" title="All 4 branches missed.">    if (indicateMoves &amp;&amp; isMovePossibleOnCell) {</span>
+<span class="nc" id="L163">      indicatePossibleMove();</span>
+    }
+<span class="nc" id="L165">  }</span>
+
+  private void handleMouseMoved(MouseEvent e) {
+<span class="nc bnc" id="L168" title="All 2 branches missed.">    if (controller.getCurrentGameMode() == GameMode.SPECTATOR) {</span>
+<span class="nc" id="L169">      return;</span>
+    }
+
+<span class="nc bnc" id="L172" title="All 2 branches missed.">    if (model.getState().getCurrentPhase() != Phase.RUNNING) {</span>
+<span class="nc" id="L173">      setCursor(Cursor.DEFAULT);</span>
+<span class="nc" id="L174">      return;</span>
+    }
+
+<span class="nc bnc" id="L177" title="All 2 branches missed.">    if (controller.getCurrentGameMode() == GameMode.SINGLEPLAYER</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        &amp;&amp; model.getState().getPlayerManagement().getCurrentPlayer() instanceof AiPlayer) {</span>
+<span class="nc" id="L179">      setCursor(Cursor.DEFAULT);</span>
+<span class="nc" id="L180">      return;</span>
+    }
+
+<span class="nc bnc" id="L183" title="All 2 branches missed.">    if (getCursor() == null) {</span>
+<span class="nc" id="L184">      return;</span>
+    }
+
+<span class="nc bnc" id="L187" title="All 2 branches missed.">    if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        &amp;&amp; controller instanceof MultiplayerController) {</span>
+<span class="nc" id="L189">      if (!model</span>
+<span class="nc" id="L190">          .getState()</span>
+<span class="nc" id="L191">          .getPlayerManagement()</span>
+<span class="nc" id="L192">          .getCurrentPlayer()</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">          .equals(((MultiplayerController) controller).getOwnPlayer())) {</span>
+<span class="nc" id="L194">        setCursor(Cursor.DEFAULT);</span>
+<span class="nc" id="L195">        return;</span>
+      }
+    }
+
+<span class="nc bnc" id="L199" title="All 2 branches missed.">    if (model.getState().getCurrentPhase() == Phase.RUNNING) {</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">      if (model.getState().getField().get(current).isEmpty()) {</span>
+<span class="nc" id="L201">        if (model</span>
+<span class="nc" id="L202">            .getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer())</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">            .contains(current)) {</span>
+<span class="nc" id="L204">          setCursor(Cursor.HAND);</span>
+<span class="nc" id="L205">        } else {</span>
+<span class="nc" id="L206">          setCursor(Cursor.DEFAULT);</span>
+        }
+<span class="nc" id="L208">      } else {</span>
+<span class="nc" id="L209">        setCursor(Cursor.DEFAULT);</span>
+      }
+    }
+<span class="nc" id="L212">  }</span>
+
+  private void handleMouseClicked(MouseEvent e) {
+<span class="nc bnc" id="L215" title="All 2 branches missed.">    if (controller.getCurrentGameMode() == GameMode.SPECTATOR) {</span>
+<span class="nc" id="L216">      return;</span>
+    }
+
+<span class="nc bnc" id="L219" title="All 2 branches missed.">    if (getCursor() == null) {</span>
+<span class="nc" id="L220">      return;</span>
+    }
+
+<span class="nc bnc" id="L223" title="All 2 branches missed.">    if (getCursor().equals(Cursor.HAND)) {</span>
+<span class="nc" id="L224">      if (model</span>
+<span class="nc" id="L225">          .getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer())</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">          .contains(current)) {</span>
+<span class="nc" id="L227">        setCursor(Cursor.DEFAULT);</span>
+<span class="nc" id="L228">        controller.placeDisk(current);</span>
+<span class="nc" id="L229">        setStyle(cssNormal);</span>
+      }
+    }
+<span class="nc" id="L232">  }</span>
+
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+<span class="nc" id="L236">    Platform.runLater(() -&gt; handlePropertyChangeEvent(evt));</span>
+<span class="nc" id="L237">  }</span>
+
+  private void handlePropertyChangeEvent(PropertyChangeEvent evt) {
+<span class="nc bnc" id="L240" title="All 2 branches missed.">    if (evt.getPropertyName().equals(SwitchButton.HINTS_STATE_CHANGED)) {</span>
+
+<span class="nc bnc" id="L242" title="All 2 branches missed.">      if (evt.getNewValue() instanceof Boolean) {</span>
+<span class="nc" id="L243">        indicateMoves = (boolean) evt.getNewValue();</span>
+<span class="nc" id="L244">        if (model</span>
+<span class="nc" id="L245">            .getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer())</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">            .contains(current)) {</span>
+<span class="nc" id="L247">          indicatePossibleMove();</span>
+        }
+      }
+
+<span class="nc bnc" id="L251" title="All 2 branches missed.">    } else if (evt.getPropertyName().equals(Model.STATE_CHANGED)) {</span>
+<span class="nc" id="L252">      handleStateChanged(evt);</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">    } else if (evt.getPropertyName().equals(Model.LISTENERS_CHANGED)) {</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">      if (evt.getNewValue() instanceof Model) {</span>
+<span class="nc" id="L255">        this.model = (Model) evt.getNewValue();</span>
+<span class="nc" id="L256">        diskOnCell = null;</span>
+<span class="nc" id="L257">        isMovePossibleOnCell =</span>
+<span class="nc" id="L258">            model</span>
+<span class="nc" id="L259">                .getPossibleMovesForPlayer(</span>
+<span class="nc" id="L260">                    model.getState().getPlayerManagement().getCurrentPlayer())</span>
+<span class="nc" id="L261">                .contains(current);</span>
+<span class="nc" id="L262">        indicatePossibleMove();</span>
+      }
+<span class="nc bnc" id="L264" title="All 2 branches missed.">    } else if (evt.getPropertyName().equals(ViewImpl.STAGE_RESIZED)) {</span>
+<span class="nc" id="L265">      resizeCell();</span>
+    }
+<span class="nc" id="L267">  }</span>
+
+  private void handleStateChanged(PropertyChangeEvent evt) {
+<span class="nc bnc" id="L270" title="All 2 branches missed.">    if (model.getState().getCurrentPhase() == Phase.FINISHED) {</span>
+<span class="nc" id="L271">      isMovePossibleOnCell = false;</span>
+<span class="nc" id="L272">      indicateMoves = false;</span>
+<span class="nc" id="L273">      indicatePossibleMove();</span>
+    }
+
+<span class="nc" id="L276">    if (model</span>
+<span class="nc" id="L277">        .getPossibleMovesForPlayer(model.getState().getPlayerManagement().getCurrentPlayer())</span>
+<span class="nc bnc" id="L278" title="All 2 branches missed.">        .contains(current)) {</span>
+<span class="nc" id="L279">      isMovePossibleOnCell = true;</span>
+<span class="nc" id="L280">    } else {</span>
+<span class="nc" id="L281">      isMovePossibleOnCell = false;</span>
+    }
+<span class="nc" id="L283">    indicatePossibleMove();</span>
+
+<span class="nc bnc" id="L285" title="All 4 branches missed.">    if (model.getState().getField().get(current).isPresent() &amp;&amp; diskOnCell == null) {</span>
+
+<span class="nc" id="L287">      diskOnCell =</span>
+<span class="nc" id="L288">          new GraphicDisk(</span>
+<span class="nc" id="L289">              getWidth() - 10, getHeight() - 10, (getHeight() - 10) / 2, getDiskColor());</span>
+
+<span class="nc" id="L291">      gameBoardGrid.playPlacementSound();</span>
+
+<span class="nc" id="L293">      setCenter(diskOnCell);</span>
+<span class="nc" id="L294">      setStyle(cssNormal);</span>
+<span class="nc bnc" id="L295" title="All 4 branches missed.">    } else if (model.getState().getField().get(current).isPresent() &amp;&amp; diskOnCell != null) {</span>
+<span class="nc" id="L296">      diskOnCell.changeColor(getDiskColor());</span>
+    }
+<span class="nc" id="L298">  }</span>
+
+  private Color getDiskColor() {
+<span class="nc" id="L301">    Color color = model.getState().getField().get(current).get().getPlayer().getColor();</span>
+
+<span class="nc bnc" id="L303" title="All 2 branches missed.">    if (controller instanceof MultiplayerController) {</span>
+<span class="nc" id="L304">      if (!model</span>
+<span class="nc" id="L305">          .getState()</span>
+<span class="nc" id="L306">          .getField()</span>
+<span class="nc" id="L307">          .get(current)</span>
+<span class="nc" id="L308">          .get()</span>
+<span class="nc" id="L309">          .getPlayer()</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">          .equals(((MultiplayerController) controller).getOwnPlayer())) {</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">        if (similarTo(color, ((MultiplayerController) controller).getOwnPlayer().getColor())) {</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">          if (similarTo(color, Color.WHITE)) {</span>
+<span class="nc" id="L313">            color = Color.SILVER;</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">          } else if (similarTo(color, Color.BLACK)) {</span>
+<span class="nc" id="L315">            color = Color.GRAY;</span>
+<span class="nc" id="L316">          } else {</span>
+<span class="nc" id="L317">            color = color.deriveColor(15, 15, 10, 1);</span>
+          }
+        }
+      }
+    }
+
+<span class="nc" id="L323">    return color;</span>
+  }
+
+  private void indicatePossibleMove() {
+<span class="nc bnc" id="L327" title="All 6 branches missed.">    if (indicateMoves &amp;&amp; isMovePossibleOnCell &amp;&amp; diskOnCell == null) {</span>
+
+<span class="nc bnc" id="L329" title="All 2 branches missed.">      if (controller.getCurrentGameMode() == GameMode.SINGLEPLAYER</span>
+<span class="nc bnc" id="L330" title="All 2 branches missed.">          &amp;&amp; model.getState().getPlayerManagement().getCurrentPlayer() instanceof AiPlayer) {</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">        if (diskOnCell == null) {</span>
+<span class="nc" id="L332">          setCenter(null);</span>
+<span class="nc" id="L333">          setStyle(cssNormal);</span>
+        }
+<span class="nc" id="L335">        return;</span>
+      }
+
+<span class="nc bnc" id="L338" title="All 2 branches missed.">      if (controller.getCurrentGameMode() == GameMode.MULTIPLAYER) {</span>
+<span class="nc bnc" id="L339" title="All 2 branches missed.">        if (controller instanceof MultiplayerController) {</span>
+<span class="nc" id="L340">          if (!((MultiplayerController) controller)</span>
+<span class="nc" id="L341">              .getOwnPlayer()</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">              .equals(model.getState().getPlayerManagement().getCurrentPlayer())) {</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">            if (diskOnCell == null) {</span>
+<span class="nc" id="L344">              setCenter(null);</span>
+<span class="nc" id="L345">              setStyle(cssNormal);</span>
+            }
+<span class="nc" id="L347">            return;</span>
+          }
+        }
+      }
+
+<span class="nc" id="L352">      double prefRadius = (getHeight() - 30) / 2;</span>
+
+<span class="nc" id="L354">      Circle circle = new Circle(prefRadius);</span>
+<span class="nc" id="L355">      circle.setFill(new Color(0, 1, 0, 0.5));</span>
+<span class="nc" id="L356">      circle.setCenterX(getWidth() / 2);</span>
+<span class="nc" id="L357">      circle.setCenterY(getHeight() / 2);</span>
+
+<span class="nc" id="L359">      setStyle(cssHighlighted);</span>
+<span class="nc" id="L360">      setCenter(circle);</span>
+<span class="nc" id="L361">    } else {</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">      if (diskOnCell == null) {</span>
+<span class="nc" id="L363">        setCenter(null);</span>
+<span class="nc" id="L364">        setStyle(cssNormal);</span>
+      }
+    }
+<span class="nc" id="L367">  }</span>
+
+  private boolean similarTo(Color c, Color v) {
+<span class="nc" id="L370">    double distance =</span>
+<span class="nc" id="L371">        Math.sqrt(</span>
+<span class="nc" id="L372">            (c.getRed() - v.getRed()) * (c.getRed() - v.getRed())</span>
+<span class="nc" id="L373">                + (c.getGreen() - v.getGreen()) * (c.getGreen() - v.getGreen())</span>
+<span class="nc" id="L374">                + (c.getBlue() - v.getBlue()) * (c.getBlue() - v.getBlue()));</span>
+
+<span class="nc bnc" id="L376" title="All 2 branches missed.">    if (distance &lt; 0.25) {</span>
+<span class="nc" id="L377">      return true;</span>
+    } else {
+<span class="nc" id="L379">      return false;</span>
+    }
+  }
+
+  /**
+   * Places the given disk on this visual cell.
+   *
+   * @param disk the disk to place on this cell
+   */
+  void placeDisk(GraphicDisk disk) {
+<span class="nc" id="L389">    setCenter(disk);</span>
+<span class="nc" id="L390">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

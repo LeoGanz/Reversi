@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>LobbyRepresentation.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network</a> &gt; <span class="el_source">LobbyRepresentation.java</span></div><h1>LobbyRepresentation.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network;
+
+import de.lmu.ifi.sosylab.fddlj.model.Phase;
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+
+/**
+ * Representation of a {@link GameLobby} containing only information intended for public use.
+ *
+ * @author Leonard Ganz
+ */
+public class LobbyRepresentation {
+  private final int lobbyID;
+  private final Player playerOne;
+  private final Player playerTwo;
+  private final Phase gamePhase;
+
+  /**
+   * Create a new {@link LobbyRepresentation} with the data provided.
+   *
+   * @param lobbyID identifier of the lobby
+   * @param playerOne first player playing the game
+   * @param playerTwo second player playing the game
+   * @param gamePhase current {@link Phase} of the game played in this lobby
+   */
+<span class="fc" id="L25">  public LobbyRepresentation(int lobbyID, Player playerOne, Player playerTwo, Phase gamePhase) {</span>
+<span class="fc" id="L26">    this.lobbyID = lobbyID;</span>
+<span class="fc" id="L27">    this.playerOne = playerOne;</span>
+<span class="fc" id="L28">    this.playerTwo = playerTwo;</span>
+<span class="fc" id="L29">    this.gamePhase = gamePhase;</span>
+<span class="fc" id="L30">  }</span>
+
+  /**
+   * Get the Id of the lobby.
+   *
+   * @return the lobbyID
+   */
+  public int getLobbyID() {
+<span class="nc" id="L38">    return lobbyID;</span>
+  }
+
+  /**
+   * Get {@link Player} one.
+   *
+   * @return the playerOne
+   */
+  public Player getPlayerOne() {
+<span class="nc" id="L47">    return playerOne;</span>
+  }
+
+  /**
+   * Get {@link Player} two.
+   *
+   * @return the playerTwo
+   */
+  public Player getPlayerTwo() {
+<span class="nc" id="L56">    return playerTwo;</span>
+  }
+
+  /**
+   * Get the current phase of the game.
+   *
+   * @return the gamePhase
+   */
+  public Phase getGamePhase() {
+<span class="nc" id="L65">    return gamePhase;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

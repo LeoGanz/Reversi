@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ClientImpl.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network</a> &gt; <span class="el_source">ClientImpl.java</span></div><h1>ClientImpl.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network;
+
+import com.google.gson.JsonSyntaxException;
+import de.lmu.ifi.sosylab.fddlj.model.Cell;
+import de.lmu.ifi.sosylab.fddlj.model.Disk;
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.GameState;
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ClientNotification;
+import de.lmu.ifi.sosylab.fddlj.network.communication.DiskPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.GameStateWithLastPlacementUuid;
+import de.lmu.ifi.sosylab.fddlj.network.communication.JoinRequest;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Message;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.UUID;
+
+/**
+ * The client enables a communication with a {@link Server}. It can connect to a given address on
+ * the port 43200. The client makes callbacks on a {@link ClientCompatibleGui} with the data
+ * received from the server.
+ */
+public class ClientImpl implements Client {
+
+  public static final int PORT = 43200;
+  private ClientCompatibleGui compatibleGui;
+  private InetAddress serverAddress;
+  private Model model;
+  private Player clientPlayer;
+  private Socket connection;
+  private BufferedReader in;
+  private PrintWriter out;
+  private UUID lastDiskPlacement;
+  private boolean connectionEstablished;
+  private boolean running;
+
+  /**
+   * Creates a new Client. The client will connect to a server, after it's started. To identify
+   * within matches a {@link Player} is required. For callbacks for notifications, which are sent by
+   * the server a {@link ClientCompatibleGui} must be provided.
+   *
+   * @param compatibleGui compatibleGui to make callbacks
+   * @param inetAddress Address of server to connect
+   * @param player Player to identify in matches
+   */
+<span class="fc" id="L57">  public ClientImpl(ClientCompatibleGui compatibleGui, InetAddress inetAddress, Player player) {</span>
+<span class="fc" id="L58">    this.compatibleGui = compatibleGui;</span>
+<span class="fc" id="L59">    serverAddress = inetAddress;</span>
+<span class="fc" id="L60">    clientPlayer = player;</span>
+<span class="fc" id="L61">  }</span>
+
+  @Override
+  public void startClient() {
+<span class="fc" id="L65">    running = true;</span>
+
+<span class="fc" id="L67">    initServerConnection();</span>
+
+<span class="fc" id="L69">    Thread connectorThread = new Thread(this::communicateWithServer);</span>
+<span class="fc" id="L70">    connectorThread.setDaemon(true);</span>
+<span class="fc" id="L71">    connectorThread.start();</span>
+<span class="fc" id="L72">  }</span>
+
+  private void initServerConnection() {
+    try {
+<span class="fc" id="L76">      connection = new Socket(serverAddress, PORT);</span>
+<span class="fc" id="L77">      out = new PrintWriter(connection.getOutputStream(), true, StandardCharsets.UTF_8);</span>
+<span class="fc" id="L78">      out.flush();</span>
+<span class="fc" id="L79">      in =</span>
+<span class="fc" id="L80">          new BufferedReader(</span>
+<span class="fc" id="L81">              new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));</span>
+
+<span class="fc" id="L83">      connectionEstablished = true;</span>
+<span class="pc" id="L84">    } catch (@SuppressWarnings(&quot;unused&quot;)IOException e) {</span>
+<span class="nc" id="L85">      compatibleGui.handleConnectionError();</span>
+<span class="nc" id="L86">      terminate();</span>
+    }
+<span class="fc" id="L88">  }</span>
+
+  @Override
+  public void joinAnyRandomPublicLobby(boolean asSpectator) {
+<span class="fc" id="L92">    JoinRequest joinRequest =</span>
+<span class="fc" id="L93">        JoinRequest.generateJoinAnyPublicLobbyRequest(clientPlayer, asSpectator);</span>
+
+<span class="fc" id="L95">    sendMessage(joinRequest);</span>
+<span class="fc" id="L96">  }</span>
+
+  @Override
+  public void joinSpecificLobby(boolean asSpectator, int lobbyId) {
+<span class="fc" id="L100">    JoinRequest joinRequest =</span>
+<span class="fc" id="L101">        JoinRequest.generateJoinSpecificLobbyRequest(clientPlayer, asSpectator, lobbyId);</span>
+
+<span class="fc" id="L103">    sendMessage(joinRequest);</span>
+<span class="fc" id="L104">  }</span>
+
+  @Override
+  public void createNewPrivateLobby() {
+<span class="fc" id="L108">    JoinRequest joinRequest = JoinRequest.generateJoinNewPrivateLobbyRequest(clientPlayer);</span>
+
+<span class="fc" id="L110">    sendMessage(joinRequest);</span>
+<span class="fc" id="L111">  }</span>
+
+  @Override
+  public DiskPlacement placeDisk(Disk disk, Cell cell) {
+<span class="fc" id="L115">    DiskPlacement diskPlacement = new DiskPlacement(lastDiskPlacement, disk, cell);</span>
+
+<span class="fc" id="L117">    sendMessage(diskPlacement);</span>
+<span class="fc" id="L118">    return diskPlacement;</span>
+  }
+
+  @Override
+  public void requestGameRestart() {
+<span class="nc" id="L123">    sendMessage(ClientNotification.REQUEST_RESTART);</span>
+<span class="nc" id="L124">  }</span>
+
+  @Override
+  public void acceptGameRestart() {
+<span class="fc" id="L128">    sendMessage(ClientNotification.ACCEPT_RESTART_REQUEST);</span>
+<span class="fc" id="L129">  }</span>
+
+  @Override
+  public void denyGameRestart() {
+<span class="nc" id="L133">    sendMessage(ClientNotification.DENY_RESTART_REQUEST);</span>
+<span class="nc" id="L134">  }</span>
+
+  /**
+   * Send a message to a server.
+   *
+   * @param messageObject message object do send to server
+   */
+  private void sendMessage(Object messageObject) {
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">    if (connectionEstablished) {</span>
+<span class="fc" id="L143">      out.println(new Message&lt;&gt;(messageObject).toJson());</span>
+    }
+<span class="fc" id="L145">  }</span>
+
+  private void requestGameStateWithLastPlacementUuid() {
+<span class="fc" id="L148">    sendMessage(ClientNotification.REQUEST_CURRENT_GAMESTATE_WITH_LAST_PLACEMENT_UUID);</span>
+<span class="fc" id="L149">  }</span>
+
+  private void communicateWithServer() {
+
+<span class="fc bfc" id="L153" title="All 2 branches covered.">    while (running) {</span>
+      String receivedLine;
+      try {
+<span class="fc" id="L156">        receivedLine = in.readLine();</span>
+<span class="fc" id="L157">        processReceivedLine(receivedLine);</span>
+<span class="fc" id="L158">      } catch (IOException e) {</span>
+<span class="fc" id="L159">        terminate();</span>
+      }
+    }
+<span class="fc" id="L162">  }</span>
+
+  private void processReceivedLine(String receivedLine) {
+    Message&lt;?&gt; message;
+
+    try {
+<span class="fc" id="L168">      message = Message.fromJson(receivedLine);</span>
+<span class="pc" id="L169">    } catch (JsonSyntaxException e) {</span>
+<span class="nc" id="L170">      System.out.println(&quot;Can not decode server answer: &quot; + receivedLine);</span>
+<span class="nc" id="L171">      return;</span>
+    }
+
+<span class="fc bfc" id="L174" title="All 2 branches covered.">    if (message.getData() instanceof JoinRequest.Response) {</span>
+<span class="fc" id="L175">      processJoinRequestResponse((JoinRequest.Response) message.getData());</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">    } else if (message.getData() instanceof RejectedPlacement) {</span>
+<span class="fc" id="L177">      processRejectedPlacement((RejectedPlacement) message.getData());</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">    } else if (message.getData() instanceof ServerNotification) {</span>
+<span class="fc" id="L179">      processServerNotification((ServerNotification) message.getData());</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">    } else if (message.getData() instanceof DiskPlacement) {</span>
+<span class="fc" id="L181">      processDiskPlacement((DiskPlacement) message.getData());</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">    } else if (message.getData() instanceof Spectators) {</span>
+<span class="fc" id="L183">      processSpectators((Spectators) message.getData());</span>
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">    } else if (message.getData() instanceof GameState) {</span>
+<span class="nc" id="L185">      processGamestate((GameState) message.getData());</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">    } else if (message.getData() instanceof GameStateWithLastPlacementUuid) {</span>
+<span class="fc" id="L187">      processGameStateWithLastPlacementUuid((GameStateWithLastPlacementUuid) message.getData());</span>
+    }
+<span class="fc" id="L189">  }</span>
+
+  private void processJoinRequestResponse(JoinRequest.Response response) {
+<span class="fc" id="L192">    compatibleGui.receivedJoinRequestResponse(response);</span>
+<span class="fc" id="L193">  }</span>
+
+  private void processRejectedPlacement(RejectedPlacement rejectedPlacement) {
+<span class="fc bfc" id="L196" title="All 2 branches covered.">    if ((rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PLACEMENT)</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">        || (rejectedPlacement.getReason() == RejectedPlacement.Reason.INVALID_PREVIOUS_UUID)) {</span>
+<span class="fc" id="L198">      requestGameStateWithLastPlacementUuid();</span>
+    }
+
+<span class="fc" id="L201">    compatibleGui.receivedRejectedPlacementReason(rejectedPlacement.getReason());</span>
+<span class="fc" id="L202">  }</span>
+
+  private void processServerNotification(ServerNotification serverNotification) {
+<span class="fc bfc" id="L205" title="All 2 branches covered.">    if (serverNotification == ServerNotification.SERVER_SHUTTING_DOWN) {</span>
+<span class="fc" id="L206">      terminate();</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">    } else if ((serverNotification == ServerNotification.PLAYER_ONE_LEFT)</span>
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">        || (serverNotification == ServerNotification.PLAYER_TWO_LEFT)) {</span>
+<span class="fc" id="L209">      model.setWaiting();</span>
+    }
+
+<span class="fc" id="L212">    compatibleGui.receivedServerNotification(serverNotification);</span>
+<span class="fc" id="L213">  }</span>
+
+  private void processDiskPlacement(DiskPlacement diskPlacement) {
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">    if (!Objects.equals(lastDiskPlacement, diskPlacement.getPrevious())) {</span>
+<span class="nc" id="L217">      requestGameStateWithLastPlacementUuid();</span>
+<span class="nc" id="L218">      return;</span>
+    }
+
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">    if (model.placeDisk(diskPlacement.getDisk(), diskPlacement.getLocation())) {</span>
+<span class="fc" id="L222">      lastDiskPlacement = diskPlacement.getUuid();</span>
+<span class="fc" id="L223">    } else { // DiskPlacement from Server is not valid with current game state</span>
+<span class="nc" id="L224">      requestGameStateWithLastPlacementUuid();</span>
+    }
+<span class="fc" id="L226">  }</span>
+
+  private void processSpectators(Spectators spectators) {
+<span class="fc" id="L229">    compatibleGui.receivedSpectator(spectators);</span>
+<span class="fc" id="L230">  }</span>
+
+  private void processGamestate(GameState gameState) {
+<span class="fc" id="L233">    model = new ModelImpl(gameState, GameMode.MULTIPLAYER);</span>
+
+<span class="fc" id="L235">    compatibleGui.modelExchanged(model);</span>
+<span class="fc" id="L236">  }</span>
+
+  private void processGameStateWithLastPlacementUuid(
+      GameStateWithLastPlacementUuid gameStateWithLastPlacementUuid) {
+<span class="fc" id="L240">    processGamestate(gameStateWithLastPlacementUuid.getGameState());</span>
+<span class="fc" id="L241">    lastDiskPlacement = gameStateWithLastPlacementUuid.getLastPlacementUuid();</span>
+<span class="fc" id="L242">  }</span>
+
+  @Override
+  public void terminate() {
+<span class="fc" id="L246">    running = false;</span>
+<span class="fc" id="L247">    connectionEstablished = false;</span>
+    try {
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">      if (connection != null) {</span>
+<span class="fc" id="L250">        connection.close();</span>
+      }
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">      if (in != null) {</span>
+<span class="fc" id="L253">        in.close();</span>
+      }
+<span class="pc bpc" id="L255" title="1 of 2 branches missed.">      if (out != null) {</span>
+<span class="fc" id="L256">        out.close();</span>
+      }
+<span class="pc" id="L258">    } catch (IOException e) {</span>
+<span class="nc" id="L259">      System.out.println(&quot;Error due terminating client&quot;);</span>
+    }
+<span class="fc" id="L261">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

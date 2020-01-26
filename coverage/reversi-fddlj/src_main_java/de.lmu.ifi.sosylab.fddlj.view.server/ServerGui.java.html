@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ServerGui.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view.server</a> &gt; <span class="el_source">ServerGui.java</span></div><h1>ServerGui.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view.server;
+
+import de.lmu.ifi.sosylab.fddlj.network.LobbyRepresentation;
+import de.lmu.ifi.sosylab.fddlj.network.Server;
+import de.lmu.ifi.sosylab.fddlj.network.ServerListener;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+
+/**
+ * This class offers a simple GUI for the server in which the user sees the different active lobbies
+ * and their respective status and he also can shut down the server.
+ *
+ * @author Josef Feger
+ */
+public class ServerGui implements ServerListener {
+
+  private Server server;
+  private Map&lt;Integer, LobbyView&gt; lobbies;
+
+  private Stage stage;
+  private BorderPane root;
+  private VBox lobbyList;
+
+  /**
+   * Public constructor of this class initialises the GUI and attaches it to the given server.
+   *
+   * @param server the server instance for which to create the GUI.
+   */
+<span class="nc" id="L46">  public ServerGui(Server server) {</span>
+<span class="nc" id="L47">    this.server = server;</span>
+<span class="nc" id="L48">    lobbies = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L50">    server.addListener(this);</span>
+
+<span class="nc" id="L52">    initGui();</span>
+<span class="nc" id="L53">  }</span>
+
+  private void initGui() {
+<span class="nc" id="L56">    stage = new Stage();</span>
+
+<span class="nc" id="L58">    root = new BorderPane();</span>
+<span class="nc" id="L59">    root.setStyle(&quot;-fx-background-color: #576385; -fx-padding: 20;&quot;);</span>
+
+<span class="nc" id="L61">    Button button = new Button(&quot;Stop server&quot;);</span>
+<span class="nc" id="L62">    button.setStyle(&quot;-fx-background-color: #46729c;-fx-text-fill: #ffffff;&quot;);</span>
+<span class="nc" id="L63">    button.setMinHeight(50);</span>
+<span class="nc" id="L64">    button.setMaxWidth(350);</span>
+<span class="nc" id="L65">    button.setMinWidth(150);</span>
+<span class="nc" id="L66">    button.setCursor(Cursor.HAND);</span>
+<span class="nc" id="L67">    button.setFont(Font.font(18));</span>
+<span class="nc" id="L68">    button.setEffect(new DropShadow(4, Color.DARKGRAY));</span>
+<span class="nc" id="L69">    button.setOnAction(</span>
+<span class="nc" id="L70">        e -&gt; {</span>
+<span class="nc" id="L71">          server.initiateShutdown();</span>
+<span class="nc" id="L72">          stage.close();</span>
+<span class="nc" id="L73">        });</span>
+
+<span class="nc" id="L75">    root.setLeft(button);</span>
+<span class="nc" id="L76">    BorderPane.setAlignment(button, Pos.CENTER);</span>
+
+<span class="nc" id="L78">    lobbyList = new VBox(15);</span>
+<span class="nc" id="L79">    lobbyList.setStyle(&quot;-fx-background-color: rgba(160,160,160,150)&quot;);</span>
+
+<span class="nc" id="L81">    ScrollPane scrollPane = new ScrollPane();</span>
+<span class="nc" id="L82">    scrollPane.setContent(lobbyList);</span>
+<span class="nc" id="L83">    scrollPane.setFitToWidth(true);</span>
+<span class="nc" id="L84">    scrollPane.setFitToHeight(true);</span>
+<span class="nc" id="L85">    scrollPane.setPrefWidth(600);</span>
+<span class="nc" id="L86">    scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);</span>
+<span class="nc" id="L87">    scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);</span>
+<span class="nc" id="L88">    root.setCenter(lobbyList);</span>
+<span class="nc" id="L89">    BorderPane.setMargin(scrollPane, new Insets(0, 0, 0, 20));</span>
+
+<span class="nc" id="L91">    Scene scene = new Scene(root);</span>
+
+<span class="nc" id="L93">    stage.setScene(scene);</span>
+<span class="nc" id="L94">    stage.setWidth(800);</span>
+<span class="nc" id="L95">    stage.setHeight(500);</span>
+<span class="nc" id="L96">    stage.show();</span>
+
+<span class="nc" id="L98">    stage.setOnCloseRequest(e -&gt; server.initiateShutdown());</span>
+<span class="nc" id="L99">  }</span>
+
+  private void buildLobbies(Map&lt;Integer, LobbyRepresentation&gt; lobbies) {
+
+<span class="nc" id="L103">    lobbyList.getChildren().clear();</span>
+<span class="nc" id="L104">    this.lobbies.clear();</span>
+
+<span class="nc bnc" id="L106" title="All 2 branches missed.">    for (Entry&lt;Integer, LobbyRepresentation&gt; id : lobbies.entrySet()) {</span>
+<span class="nc" id="L107">      LobbyRepresentation lobby = id.getValue();</span>
+<span class="nc" id="L108">      LobbyView lobbyView = new LobbyView(lobby);</span>
+<span class="nc" id="L109">      lobbyList.getChildren().add(lobbyView);</span>
+<span class="nc" id="L110">      this.lobbies.put(lobby.getLobbyID(), lobbyView);</span>
+    }
+<span class="nc" id="L112">  }</span>
+
+  @Override
+  public void serverShuttingDown() {
+<span class="nc" id="L116">    Platform.runLater(</span>
+<span class="nc" id="L117">        new Runnable() {</span>
+
+          @Override
+          public void run() {
+<span class="nc" id="L121">            Alert alert = new Alert(AlertType.INFORMATION);</span>
+<span class="nc" id="L122">            alert.setTitle(&quot;Server&quot;);</span>
+<span class="nc" id="L123">            alert.setHeaderText(&quot;Shutting down.&quot;);</span>
+<span class="nc" id="L124">            alert.setContentText(&quot;The server is shutting down&quot;);</span>
+
+<span class="nc" id="L126">            alert.show();</span>
+
+<span class="nc" id="L128">            stage.close();</span>
+<span class="nc" id="L129">          }</span>
+        });
+<span class="nc" id="L131">  }</span>
+
+  @Override
+  public void lobbyUpdated(int lobbyID, LobbyRepresentation lobbyRepresentation) {
+<span class="nc" id="L135">    Platform.runLater(</span>
+<span class="nc" id="L136">        () -&gt; {</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">          if (lobbyRepresentation == null) {</span>
+<span class="nc" id="L138">            lobbyList.getChildren().remove(lobbies.get(lobbyID));</span>
+<span class="nc" id="L139">            return;</span>
+          }
+
+<span class="nc bnc" id="L142" title="All 2 branches missed.">          if (lobbies.get(lobbyID) != null) {</span>
+<span class="nc" id="L143">            lobbies.get(lobbyID).updateLobby(lobbyRepresentation);</span>
+<span class="nc" id="L144">          } else {</span>
+<span class="nc" id="L145">            LobbyView lobbyView = new LobbyView(lobbyRepresentation);</span>
+<span class="nc" id="L146">            lobbies.put(lobbyRepresentation.getLobbyID(), lobbyView);</span>
+<span class="nc" id="L147">            lobbyList.getChildren().add(lobbyView);</span>
+          }
+<span class="nc" id="L149">        });</span>
+<span class="nc" id="L150">  }</span>
+
+  @Override
+  public void allLobbies(Map&lt;Integer, LobbyRepresentation&gt; lobbies) {
+
+<span class="nc" id="L155">    Platform.runLater(() -&gt; buildLobbies(lobbies));</span>
+<span class="nc" id="L156">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

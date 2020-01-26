@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>HotseatPlayerCreation.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">HotseatPlayerCreation.java</span></div><h1>HotseatPlayerCreation.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
+import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+/**
+ * This class offers a pane in which two players can enter their information which is needed to
+ * start a hotseat game.
+ *
+ * @author Josef Feger
+ */
+public class HotseatPlayerCreation extends BorderPane {
+
+  private static final int HBOX_SPACING = 50;
+  private static final int SPACING_VBOX_PLAYER = 40;
+
+  private static final int PADDING_TOP_PANE = 20;
+  private static final String CSS_TEXTFIELD_NORMAL =
+      &quot;-fx-border-color: transparent transparent rgb(255,0,0) transparent;&quot;;
+  private static final String CSS_TEXTFIELD_SELECTED =
+      &quot;-fx-border-color: transparent transparent rgb(255,0,0) transparent;&quot;;
+
+  private ResourceBundle messages;
+
+  /**
+   * Public constructor of this class, initialises the Resource Bundle used in this class for
+   * displaying predefined text.
+   *
+   * @param messages the resource bundle object for externalized strings
+   */
+<span class="nc" id="L46">  public HotseatPlayerCreation(ResourceBundle messages) {</span>
+<span class="nc" id="L47">    this.messages = messages;</span>
+<span class="nc" id="L48">  }</span>
+
+  /**
+   * Builds a pane in which two players can enter their information.
+   *
+   * @param gameModeSelector a reference to a game mode selector instance *
+   * @param controller the reference to a controller instance
+   * @param primaryStage the stage created by the FX application to display the actual game
+   */
+  void initPane(GameModeSelector gameModeSelector, Controller controller, Stage primaryStage) {
+
+<span class="nc" id="L59">    HBox alignment = new HBox(HBOX_SPACING);</span>
+<span class="nc" id="L60">    alignment.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L62">    VBox vboxPlayerOne = new VBox(SPACING_VBOX_PLAYER);</span>
+<span class="nc" id="L63">    vboxPlayerOne.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L64">    TextField textFieldOne = new TextField();</span>
+<span class="nc" id="L65">    vboxPlayerOne</span>
+<span class="nc" id="L66">        .getChildren()</span>
+<span class="nc" id="L67">        .add(</span>
+<span class="nc" id="L68">            PlayerCreationUtils.getInputField(</span>
+<span class="nc" id="L69">                textFieldOne, messages.getString(&quot;PlayerCreation_UsernamePlayerOnePrompt&quot;)));</span>
+<span class="nc" id="L70">    ColorPicker colorPickerOne = new ColorPicker(PlayerCreationUtils.getRandomColor());</span>
+<span class="nc" id="L71">    vboxPlayerOne</span>
+<span class="nc" id="L72">        .getChildren()</span>
+<span class="nc" id="L73">        .add(PlayerCreationUtils.getColorPickerPane(colorPickerOne, messages));</span>
+<span class="nc" id="L74">    alignment.getChildren().add(vboxPlayerOne);</span>
+
+<span class="nc" id="L76">    alignment.getChildren().add(PlayerCreationUtils.getSeparator());</span>
+
+<span class="nc" id="L78">    VBox vboxPlayerTwo = new VBox(SPACING_VBOX_PLAYER);</span>
+<span class="nc" id="L79">    vboxPlayerTwo.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L80">    TextField textFieldTwo = new TextField();</span>
+<span class="nc" id="L81">    vboxPlayerTwo</span>
+<span class="nc" id="L82">        .getChildren()</span>
+<span class="nc" id="L83">        .add(</span>
+<span class="nc" id="L84">            PlayerCreationUtils.getInputField(</span>
+<span class="nc" id="L85">                textFieldTwo, messages.getString(&quot;PlayerCreation_UsernamePlayerTwoPrompt&quot;)));</span>
+<span class="nc" id="L86">    ColorPicker colorPickerTwo = new ColorPicker(PlayerCreationUtils.getRandomColor());</span>
+<span class="nc" id="L87">    vboxPlayerTwo</span>
+<span class="nc" id="L88">        .getChildren()</span>
+<span class="nc" id="L89">        .add(PlayerCreationUtils.getColorPickerPane(colorPickerTwo, messages));</span>
+<span class="nc" id="L90">    alignment.getChildren().add(vboxPlayerTwo);</span>
+
+<span class="nc" id="L92">    setTop(alignment);</span>
+<span class="nc" id="L93">    BorderPane.setAlignment(alignment, Pos.CENTER);</span>
+<span class="nc" id="L94">    BorderPane.setMargin(alignment, new Insets(PADDING_TOP_PANE));</span>
+
+<span class="nc" id="L96">    ChoiceBox&lt;String&gt; choiceBox =</span>
+<span class="nc" id="L97">        new ChoiceBox&lt;String&gt;(</span>
+<span class="nc" id="L98">            FXCollections.observableArrayList(PlayerCreationUtils.gameFieldSizeOptions));</span>
+<span class="nc" id="L99">    VBox choice = PlayerCreationUtils.getGameFieldSizeSelection(choiceBox, messages);</span>
+<span class="nc" id="L100">    setCenter(choice);</span>
+<span class="nc" id="L101">    BorderPane.setAlignment(choice, Pos.TOP_CENTER);</span>
+
+<span class="nc" id="L103">    HBox bottom =</span>
+<span class="nc" id="L104">        buildBottomMulti(</span>
+<span class="nc" id="L105">            textFieldOne,</span>
+<span class="nc" id="L106">            textFieldTwo,</span>
+<span class="nc" id="L107">            colorPickerOne,</span>
+<span class="nc" id="L108">            colorPickerTwo,</span>
+<span class="nc" id="L109">            gameModeSelector,</span>
+<span class="nc" id="L110">            choiceBox,</span>
+<span class="nc" id="L111">            controller,</span>
+<span class="nc" id="L112">            primaryStage);</span>
+<span class="nc" id="L113">    setBottom(bottom);</span>
+<span class="nc" id="L114">    BorderPane.setAlignment(bottom, Pos.CENTER);</span>
+<span class="nc" id="L115">    BorderPane.setMargin(bottom, new Insets(0, 0, 20, 0));</span>
+<span class="nc" id="L116">  }</span>
+
+  private HBox buildBottomMulti(
+      TextField textFieldOne,
+      TextField textFieldTwo,
+      ColorPicker colorPickerOne,
+      ColorPicker colorPickerTwo,
+      GameModeSelector gameModeSelector,
+      ChoiceBox&lt;String&gt; choiceBox,
+      Controller controller,
+      Stage primaryStage) {
+
+<span class="nc" id="L128">    HBox hbox = new HBox(30);</span>
+<span class="nc" id="L129">    hbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L131">    Button start =</span>
+<span class="nc" id="L132">        PlayerCreationUtils.getButton(messages.getString(&quot;PlayerCreation_ButtonStart_Text&quot;));</span>
+<span class="nc" id="L133">    start.setOnAction(</span>
+<span class="nc" id="L134">        e -&gt; {</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">          if (!PlayerCreationUtils.isTextFieldInputValid(textFieldOne.getText())) {</span>
+<span class="nc" id="L136">            textFieldOne.setStyle(CSS_TEXTFIELD_NORMAL);</span>
+<span class="nc" id="L137">            return;</span>
+          }
+
+<span class="nc bnc" id="L140" title="All 2 branches missed.">          if (!PlayerCreationUtils.isTextFieldInputValid(textFieldTwo.getText())) {</span>
+<span class="nc" id="L141">            textFieldTwo.setStyle(CSS_TEXTFIELD_SELECTED);</span>
+<span class="nc" id="L142">            return;</span>
+          }
+
+<span class="nc" id="L145">          startHotseat(</span>
+<span class="nc" id="L146">              textFieldOne.getText(),</span>
+<span class="nc" id="L147">              colorPickerOne.getValue(),</span>
+<span class="nc" id="L148">              textFieldTwo.getText(),</span>
+<span class="nc" id="L149">              colorPickerTwo.getValue(),</span>
+<span class="nc" id="L150">              PlayerCreationUtils.gameFieldSizes[choiceBox.getSelectionModel().getSelectedIndex()],</span>
+<span class="nc" id="L151">              controller,</span>
+<span class="nc" id="L152">              primaryStage);</span>
+<span class="nc" id="L153">          gameModeSelector.close();</span>
+<span class="nc" id="L154">        });</span>
+
+<span class="nc" id="L156">    Button back =</span>
+<span class="nc" id="L157">        PlayerCreationUtils.getButton(messages.getString(&quot;PlayerCreation_ButtonBack_Text&quot;));</span>
+<span class="nc" id="L158">    back.setOnAction(e -&gt; gameModeSelector.returnToMainScreen());</span>
+
+<span class="nc" id="L160">    textFieldOne.setOnKeyReleased(</span>
+<span class="nc" id="L161">        e -&gt; {</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">          if (e.getCode() == KeyCode.ENTER) {</span>
+<span class="nc" id="L163">            start.fire();</span>
+          }
+<span class="nc" id="L165">        });</span>
+<span class="nc" id="L166">    textFieldTwo.setOnKeyReleased(</span>
+<span class="nc" id="L167">        e -&gt; {</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">          if (e.getCode() == KeyCode.ENTER) {</span>
+<span class="nc" id="L169">            start.fire();</span>
+          }
+<span class="nc" id="L171">        });</span>
+
+<span class="nc" id="L173">    hbox.getChildren().addAll(start, back);</span>
+
+<span class="nc" id="L175">    return hbox;</span>
+  }
+
+  private void startHotseat(
+      String playerOneName,
+      Color playerOneColor,
+      String playerTwoName,
+      Color playerTwoColor,
+      int gameFieldSize,
+      Controller controller,
+      Stage primaryStage) {
+
+<span class="nc bnc" id="L187" title="All 2 branches missed.">    if (PlayerCreationUtils.similarTo(playerOneColor, playerTwoColor)) {</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">      if (PlayerCreationUtils.similarTo(playerTwoColor, Color.WHITE)) {</span>
+<span class="nc" id="L189">        playerTwoColor = Color.SILVER;</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">      } else if (PlayerCreationUtils.similarTo(playerTwoColor, Color.BLACK)) {</span>
+<span class="nc" id="L191">        playerTwoColor = Color.GRAY;</span>
+<span class="nc" id="L192">      } else {</span>
+<span class="nc" id="L193">        playerTwoColor = playerTwoColor.deriveColor(15, 15, 10, 1);</span>
+      }
+    }
+<span class="nc" id="L196">    Player playerOne = new PlayerImpl(playerOneName, playerOneColor);</span>
+<span class="nc" id="L197">    Player playerTwo = new PlayerImpl(playerTwoName, playerTwoColor);</span>
+
+<span class="nc" id="L199">    controller.startMainView(GameMode.HOTSEAT, primaryStage, playerOne, playerTwo, gameFieldSize);</span>
+<span class="nc" id="L200">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

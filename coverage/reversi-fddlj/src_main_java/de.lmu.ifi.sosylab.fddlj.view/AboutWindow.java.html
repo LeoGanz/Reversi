@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>AboutWindow.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">AboutWindow.java</span></div><h1>AboutWindow.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ResourceBundle;
+import java.util.stream.Stream;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+
+/**
+ * This class displays a window in which the user can see additional, detailed information about
+ * this game, such as the licenses and the game's rules.
+ *
+ * @author Josef Feger
+ */
+public class AboutWindow extends Stage {
+
+  private ResourceBundle messages;
+
+  private static final int PREFWIDTH_SCROLLPANE = 600;
+  private static final int SPACING_VBOX_RULES = 15;
+  private static final int LINESPACING_TEXTFLOW = 4;
+<span class="nc" id="L39">  private static final Font FONT_TEXT_RULES = Font.font(&quot;Calibri&quot;, FontWeight.NORMAL, 18);</span>
+
+  /**
+   * Public constructor of this class initialises stage and content.
+   *
+   * @param messages the ResourceBundle for the externalised strings
+   */
+  public AboutWindow(ResourceBundle messages) {
+<span class="nc" id="L47">    super();</span>
+
+<span class="nc" id="L49">    this.messages = messages;</span>
+
+<span class="nc" id="L51">    initWindow();</span>
+<span class="nc" id="L52">  }</span>
+
+  private void initWindow() {
+<span class="nc" id="L55">    TabPane tabPane = new TabPane();</span>
+
+<span class="nc" id="L57">    Tab tabRules = getRulesTab();</span>
+<span class="nc" id="L58">    Tab tabLicenses = getLicenseTab();</span>
+
+<span class="nc" id="L60">    tabPane.getTabs().add(tabRules);</span>
+<span class="nc" id="L61">    tabPane.getTabs().add(tabLicenses);</span>
+
+<span class="nc" id="L63">    BorderPane root = new BorderPane();</span>
+<span class="nc" id="L64">    root.setCenter(tabPane);</span>
+<span class="nc" id="L65">    root.getStylesheets().add(&quot;cssFiles/about.css&quot;);</span>
+<span class="nc" id="L66">    Scene scene = new Scene(root);</span>
+
+<span class="nc" id="L68">    setHeight(5 * Screen.getPrimary().getVisualBounds().getHeight() / 6);</span>
+
+<span class="nc" id="L70">    setScene(scene);</span>
+<span class="nc" id="L71">    setTitle(messages.getString(&quot;aboutWindow_Title&quot;));</span>
+<span class="nc" id="L72">    centerOnScreen();</span>
+<span class="nc" id="L73">    show();</span>
+<span class="nc" id="L74">  }</span>
+
+  private Tab getLicenseTab() {
+
+<span class="nc" id="L78">    Text text = new Text(readFile(&quot;files/NOTICE.md&quot;));</span>
+<span class="nc" id="L79">    text.setFont(FONT_TEXT_RULES);</span>
+<span class="nc" id="L80">    text.setFill(Color.WHITE);</span>
+
+<span class="nc" id="L82">    TextFlow textFlow = new TextFlow();</span>
+<span class="nc" id="L83">    textFlow.getChildren().add(text);</span>
+<span class="nc" id="L84">    textFlow.setLineSpacing(LINESPACING_TEXTFLOW);</span>
+<span class="nc" id="L85">    textFlow.setTextAlignment(TextAlignment.CENTER);</span>
+
+<span class="nc" id="L87">    ScrollPane scrollPane = new ScrollPane();</span>
+<span class="nc" id="L88">    scrollPane.setContent(textFlow);</span>
+<span class="nc" id="L89">    scrollPane.setFitToWidth(true);</span>
+<span class="nc" id="L90">    scrollPane.setFitToHeight(true);</span>
+<span class="nc" id="L91">    scrollPane.setPrefWidth(PREFWIDTH_SCROLLPANE);</span>
+<span class="nc" id="L92">    scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);</span>
+<span class="nc" id="L93">    scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);</span>
+
+<span class="nc" id="L95">    Tab tab = new Tab(messages.getString(&quot;aboutWindow_Tab_Licenses_Title&quot;), scrollPane);</span>
+<span class="nc" id="L96">    tab.setClosable(false);</span>
+
+<span class="nc" id="L98">    return tab;</span>
+  }
+
+  private Tab getRulesTab() {
+
+<span class="nc" id="L103">    VBox vbox = new VBox(SPACING_VBOX_RULES);</span>
+<span class="nc" id="L104">    vbox.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L105">    vbox.getChildren().add(new SpecificRulesPane(messages));</span>
+
+<span class="nc" id="L107">    ScrollPane scrollPane = new ScrollPane();</span>
+<span class="nc" id="L108">    scrollPane.setContent(vbox);</span>
+<span class="nc" id="L109">    scrollPane.setFitToWidth(true);</span>
+<span class="nc" id="L110">    scrollPane.setFitToHeight(true);</span>
+<span class="nc" id="L111">    scrollPane.setPrefWidth(PREFWIDTH_SCROLLPANE);</span>
+<span class="nc" id="L112">    scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);</span>
+<span class="nc" id="L113">    scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);</span>
+
+<span class="nc" id="L115">    Tab tab = new Tab(messages.getString(&quot;aboutWindow_Tab_Rules_Title&quot;), scrollPane);</span>
+<span class="nc" id="L116">    tab.setClosable(false);</span>
+
+<span class="nc" id="L118">    return tab;</span>
+  }
+
+  private String readFile(String filePath) {
+    BufferedReader reader;
+    try {
+<span class="nc" id="L124">      reader =</span>
+<span class="nc" id="L125">          new BufferedReader(</span>
+<span class="nc" id="L126">              new InputStreamReader(</span>
+<span class="nc" id="L127">                  getClass().getClassLoader().getResourceAsStream(filePath), &quot;UTF-8&quot;));</span>
+<span class="nc" id="L128">      StringBuilder contentBuilder = new StringBuilder();</span>
+
+<span class="nc" id="L130">      Stream&lt;String&gt; stream = reader.lines();</span>
+<span class="nc" id="L131">      stream.forEach(s -&gt; contentBuilder.append(s).append(&quot;\n&quot;));</span>
+
+<span class="nc" id="L133">      reader.close();</span>
+
+<span class="nc" id="L135">      return contentBuilder.toString();</span>
+<span class="nc" id="L136">    } catch (UnsupportedEncodingException e1) {</span>
+<span class="nc" id="L137">      return messages.getString(&quot;aboutWindow_Rules_LicenseFile_ReadError&quot;);</span>
+<span class="nc" id="L138">    } catch (IOException e) {</span>
+<span class="nc" id="L139">      return messages.getString(&quot;aboutWindow_Rules_LicenseFile_ReadError&quot;);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

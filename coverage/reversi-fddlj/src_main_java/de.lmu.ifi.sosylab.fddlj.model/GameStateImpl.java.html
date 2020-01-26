@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>GameStateImpl.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.model</a> &gt; <span class="el_source">GameStateImpl.java</span></div><h1>GameStateImpl.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.model;
+
+import java.util.Objects;
+
+/**
+ * A concrete Implementation of ModifiableGameState and thus by extension an implementation of
+ * {@link GameState}. Provides the equals and hashCode methods.
+ *
+ * @author Daniel Leidreiter
+ */
+public class GameStateImpl implements ModifiableGameState {
+
+  private Phase phase;
+  private ModifiableGameField field;
+  private ModifiablePlayerManagement manager;
+
+  /** Creates an empty GameState with all values nulled. */
+<span class="fc" id="L18">  public GameStateImpl() {</span>
+<span class="fc" id="L19">    phase = null;</span>
+<span class="fc" id="L20">    field = null;</span>
+<span class="fc" id="L21">    manager = null;</span>
+<span class="fc" id="L22">  }</span>
+
+  @Override
+  public void setCurrentPhase(Phase phase) {
+<span class="fc" id="L26">    this.phase = phase;</span>
+<span class="fc" id="L27">  }</span>
+
+  @Override
+  public void setGameField(ModifiableGameField gameField) {
+<span class="fc" id="L31">    field = gameField;</span>
+<span class="fc" id="L32">  }</span>
+
+  @Override
+  public void setPlayerManagement(ModifiablePlayerManagement playerManagement) {
+<span class="fc" id="L36">    manager = playerManagement;</span>
+<span class="fc" id="L37">  }</span>
+
+  @Override
+  public Phase getCurrentPhase() {
+<span class="fc" id="L41">    return phase;</span>
+  }
+
+  @Override
+  public ModifiableGameField getField() {
+<span class="fc" id="L46">    return field;</span>
+  }
+
+  @Override
+  public ModifiablePlayerManagement getPlayerManagement() {
+<span class="fc" id="L51">    return manager;</span>
+  }
+
+  @Override
+  public ModifiableGameState makeCopy() {
+<span class="fc" id="L56">    GameStateImpl copy = new GameStateImpl();</span>
+<span class="fc" id="L57">    copy.setCurrentPhase(getCurrentPhase());</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (getField() != null) {</span>
+<span class="fc" id="L59">      copy.setGameField(getField().makeCopy());</span>
+    }
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    if (getPlayerManagement() != null) {</span>
+<span class="fc" id="L62">      copy.setPlayerManagement(getPlayerManagement().makeCopy());</span>
+    }
+<span class="fc" id="L64">    return copy;</span>
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    if (this == obj) {</span>
+<span class="fc" id="L70">      return true;</span>
+    }
+<span class="fc bfc" id="L72" title="All 2 branches covered.">    if (!(obj instanceof GameStateImpl)) {</span>
+<span class="fc" id="L73">      return false;</span>
+    }
+
+<span class="fc" id="L76">    GameStateImpl other = (GameStateImpl) obj;</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    return Objects.equals(phase, other.phase)</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        &amp;&amp; Objects.equals(field, other.field)</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        &amp;&amp; Objects.equals(manager, other.manager);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="fc" id="L84">    return Objects.hash(phase, field, manager);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

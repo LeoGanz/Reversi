@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>SpecificRulesPane.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">SpecificRulesPane.java</span></div><h1>SpecificRulesPane.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import java.util.ResourceBundle;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
+
+/**
+ * This class offers a pane in which the rules of the reversi game are explained in specific way,
+ * supported by graphical examples.
+ *
+ * @author Josef Feger
+ */
+public class SpecificRulesPane extends VBox {
+
+  private static final int IMAGE_HEIGHT = 260;
+<span class="nc" id="L26">  private final Font textFont = Font.font(&quot;Calibri&quot;, FontWeight.NORMAL, 18);</span>
+  private static final int VBOX_SPACING = 10;
+  private static final int HBOX_SPACING = 20;
+  private static final int LINESPACING_TEXTFLOW = 4;
+
+  private ResourceBundle messages;
+
+  /**
+   * Constructor of this class initialises the pane.
+   *
+   * @param messages the ResourceBundle for the externalised strings
+   */
+  public SpecificRulesPane(ResourceBundle messages) {
+<span class="nc" id="L39">    super(50);</span>
+<span class="nc" id="L40">    this.messages = messages;</span>
+
+<span class="nc" id="L42">    setAlignment(Pos.TOP_CENTER);</span>
+<span class="nc" id="L43">    getChildren().add(getGeneralRules());</span>
+<span class="nc" id="L44">    getChildren().add(getGameFieldInformation());</span>
+<span class="nc" id="L45">    getChildren().add(getFirstMovesInformation());</span>
+<span class="nc" id="L46">    getChildren().add(getGameStartInformation());</span>
+<span class="nc" id="L47">    getChildren().add(getPlacementRulesInformation());</span>
+<span class="nc" id="L48">    getChildren().add(getGameEndingInformation());</span>
+<span class="nc" id="L49">  }</span>
+
+  private VBox getGeneralRules() {
+<span class="nc" id="L52">    VBox vbox = new VBox(VBOX_SPACING);</span>
+<span class="nc" id="L53">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L55">    Label heading = new Label(messages.getString(&quot;aboutWindow_Rules_General_Heading&quot;));</span>
+<span class="nc" id="L56">    heading.setId(&quot;heading&quot;);</span>
+<span class="nc" id="L57">    vbox.getChildren().add(heading);</span>
+
+<span class="nc" id="L59">    vbox.getChildren().add(getTextFlow(getText(messages.getString(&quot;aboutWindow_Rules_General&quot;))));</span>
+
+<span class="nc" id="L61">    return vbox;</span>
+  }
+
+  private VBox getGameFieldInformation() {
+<span class="nc" id="L65">    VBox vbox = new VBox(VBOX_SPACING);</span>
+<span class="nc" id="L66">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L68">    Label heading = new Label(messages.getString(&quot;aboutWindow_Rules_GameField&quot;));</span>
+<span class="nc" id="L69">    heading.setId(&quot;heading&quot;);</span>
+<span class="nc" id="L70">    vbox.getChildren().add(heading);</span>
+
+<span class="nc" id="L72">    vbox.getChildren()</span>
+<span class="nc" id="L73">        .add(getTextFlow(getText(messages.getString(&quot;aboutWindow_Rules_GameField_Text&quot;))));</span>
+
+<span class="nc" id="L75">    Image gameField =</span>
+<span class="nc" id="L76">        new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/gameField.png&quot;));</span>
+<span class="nc" id="L77">    ImageView imageView = new ImageView(gameField);</span>
+<span class="nc" id="L78">    imageView.setPreserveRatio(true);</span>
+<span class="nc" id="L79">    imageView.setFitHeight(IMAGE_HEIGHT);</span>
+<span class="nc" id="L80">    vbox.getChildren().add(imageView);</span>
+
+<span class="nc" id="L82">    return vbox;</span>
+  }
+
+  private VBox getFirstMovesInformation() {
+
+<span class="nc" id="L87">    VBox vbox = new VBox(VBOX_SPACING);</span>
+<span class="nc" id="L88">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L90">    Label heading = new Label(messages.getString(&quot;aboutWindow_Rules_DiskNumber&quot;));</span>
+<span class="nc" id="L91">    heading.setId(&quot;heading&quot;);</span>
+<span class="nc" id="L92">    vbox.getChildren().add(heading);</span>
+
+<span class="nc" id="L94">    vbox.getChildren()</span>
+<span class="nc" id="L95">        .add(getTextFlow(getText(messages.getString(&quot;aboutWindow_Rules_DiskNumber_Text&quot;))));</span>
+
+<span class="nc" id="L97">    Image diskIndicator =</span>
+<span class="nc" id="L98">        new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/DiskIndicator.png&quot;));</span>
+<span class="nc" id="L99">    ImageView imageView = new ImageView(diskIndicator);</span>
+<span class="nc" id="L100">    imageView.setPreserveRatio(true);</span>
+<span class="nc" id="L101">    imageView.setFitHeight(IMAGE_HEIGHT);</span>
+<span class="nc" id="L102">    vbox.getChildren().add(imageView);</span>
+
+<span class="nc" id="L104">    return vbox;</span>
+  }
+
+  private VBox getGameStartInformation() {
+<span class="nc" id="L108">    VBox vbox = new VBox(VBOX_SPACING);</span>
+<span class="nc" id="L109">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L111">    Label heading = new Label(messages.getString(&quot;aboutWindow_Rules_GameStart&quot;));</span>
+<span class="nc" id="L112">    heading.setId(&quot;heading&quot;);</span>
+<span class="nc" id="L113">    vbox.getChildren().add(heading);</span>
+
+<span class="nc" id="L115">    vbox.getChildren().add(getTextFlow(getText(messages.getString(&quot;aboutWindow_Rules_GameStart&quot;))));</span>
+
+<span class="nc" id="L117">    HBox hbox = new HBox(HBOX_SPACING);</span>
+<span class="nc" id="L118">    hbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L120">    Image versOne =</span>
+<span class="nc" id="L121">        new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/start_vers1.png&quot;));</span>
+<span class="nc" id="L122">    ImageView imageViewOne = new ImageView(versOne);</span>
+<span class="nc" id="L123">    imageViewOne.setPreserveRatio(true);</span>
+<span class="nc" id="L124">    imageViewOne.setFitHeight(IMAGE_HEIGHT);</span>
+
+<span class="nc" id="L126">    Image versTwo =</span>
+<span class="nc" id="L127">        new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/start_vers2.png&quot;));</span>
+<span class="nc" id="L128">    ImageView imageViewTwo = new ImageView(versTwo);</span>
+<span class="nc" id="L129">    imageViewTwo.setPreserveRatio(true);</span>
+<span class="nc" id="L130">    imageViewTwo.setFitHeight(IMAGE_HEIGHT);</span>
+
+<span class="nc" id="L132">    hbox.getChildren().addAll(imageViewOne, imageViewTwo);</span>
+<span class="nc" id="L133">    vbox.getChildren().add(hbox);</span>
+
+<span class="nc" id="L135">    return vbox;</span>
+  }
+
+  private VBox getPlacementRulesInformation() {
+<span class="nc" id="L139">    VBox vbox = new VBox(VBOX_SPACING);</span>
+<span class="nc" id="L140">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L142">    Label heading = new Label(messages.getString(&quot;aboutWindow_Rules_PossibleMoves&quot;));</span>
+<span class="nc" id="L143">    heading.setId(&quot;heading&quot;);</span>
+<span class="nc" id="L144">    vbox.getChildren().add(heading);</span>
+
+<span class="nc" id="L146">    vbox.getChildren()</span>
+<span class="nc" id="L147">        .add(getTextFlow(getText(messages.getString(&quot;aboutWindow_Rules_PossibleMoves_Text&quot;))));</span>
+
+<span class="nc" id="L149">    Image possibleMoves =</span>
+<span class="nc" id="L150">        new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/possibleMoves.png&quot;));</span>
+<span class="nc" id="L151">    ImageView imageView = new ImageView(possibleMoves);</span>
+<span class="nc" id="L152">    imageView.setPreserveRatio(true);</span>
+<span class="nc" id="L153">    imageView.setFitHeight(IMAGE_HEIGHT);</span>
+<span class="nc" id="L154">    vbox.getChildren().add(imageView);</span>
+
+<span class="nc" id="L156">    vbox.getChildren()</span>
+<span class="nc" id="L157">        .add(getTextFlow(getText(messages.getString(&quot;aboutWindow_Rules_PossibleMoves_Example&quot;))));</span>
+
+<span class="nc" id="L159">    Image moveDone =</span>
+<span class="nc" id="L160">        new Image(getClass().getClassLoader().getResourceAsStream(&quot;images/moveDone.png&quot;));</span>
+<span class="nc" id="L161">    ImageView imageViewTwo = new ImageView(moveDone);</span>
+<span class="nc" id="L162">    imageViewTwo.setPreserveRatio(true);</span>
+<span class="nc" id="L163">    imageViewTwo.setFitHeight(IMAGE_HEIGHT);</span>
+<span class="nc" id="L164">    vbox.getChildren().add(imageViewTwo);</span>
+
+<span class="nc" id="L166">    return vbox;</span>
+  }
+
+  private VBox getGameEndingInformation() {
+<span class="nc" id="L170">    VBox vbox = new VBox(VBOX_SPACING);</span>
+<span class="nc" id="L171">    vbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L173">    Label heading = new Label(messages.getString(&quot;aboutWindow_Rules_GameEnding&quot;));</span>
+<span class="nc" id="L174">    heading.setId(&quot;heading&quot;);</span>
+<span class="nc" id="L175">    vbox.getChildren().add(heading);</span>
+
+<span class="nc" id="L177">    vbox.getChildren()</span>
+<span class="nc" id="L178">        .add(getTextFlow(getText(messages.getString(&quot;aboutWindow_Rules_GameEnding_Text&quot;))));</span>
+
+<span class="nc" id="L180">    return vbox;</span>
+  }
+
+  private TextFlow getTextFlow(Text text) {
+<span class="nc" id="L184">    TextFlow textFlow = new TextFlow();</span>
+<span class="nc" id="L185">    textFlow.getChildren().add(text);</span>
+<span class="nc" id="L186">    textFlow.setLineSpacing(LINESPACING_TEXTFLOW);</span>
+<span class="nc" id="L187">    textFlow.setTextAlignment(TextAlignment.CENTER);</span>
+
+<span class="nc" id="L189">    return textFlow;</span>
+  }
+
+  private Text getText(String input) {
+<span class="nc" id="L193">    Text text = new Text(input);</span>
+<span class="nc" id="L194">    text.setFont(textFont);</span>
+<span class="nc" id="L195">    text.setFill(Color.WHITE);</span>
+
+<span class="nc" id="L197">    return text;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

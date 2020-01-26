@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>GameFieldImpl.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.model</a> &gt; <span class="el_source">GameFieldImpl.java</span></div><h1>GameFieldImpl.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.model;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+/**
+ * The class GameFieldImpl implements GameField and ModifiableGameField. GameFieldImpl represents
+ * the game field and stores the information about which disks are on the Cells of the game field.
+ * Provides the equals and hashCode methods.
+ *
+ * @author Dora Pruteanu
+ */
+public class GameFieldImpl implements ModifiableGameField {
+
+  private final int size;
+
+  private Disk[][] field;
+
+  /**
+   * The constructor GameFieldImpl sets the game field to its initial state with the size {@value
+   * #STANDARD_SIZE}.
+   */
+  public GameFieldImpl() {
+<span class="fc" id="L28">    this(GameField.STANDARD_SIZE);</span>
+<span class="fc" id="L29">  }</span>
+
+  /**
+   * The constructor GameFieldImpl sets the game field to its initial state with a given size.
+   *
+   * @param size of the GameFieldImpl which will be created. size must be divisible by 2 and at
+   *     least be 4.
+   */
+<span class="fc" id="L37">  public GameFieldImpl(int size) {</span>
+<span class="fc bfc" id="L38" title="All 4 branches covered.">    if (((size % 2) != 0) || size &lt; 4) {</span>
+<span class="fc" id="L39">      throw new IllegalArgumentException(&quot;Size must be divisible by 2 and be at least 4&quot;);</span>
+    }
+<span class="fc" id="L41">    this.size = size;</span>
+<span class="fc" id="L42">    field = new Disk[size][size];</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">    for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">      for (int j = 0; j &lt; size; j++) {</span>
+<span class="fc" id="L45">        set(new CellImpl(i, j), null);</span>
+      }
+    }
+<span class="fc" id="L48">  }</span>
+
+  @Override
+  public int getSize() {
+<span class="fc" id="L52">    return size;</span>
+  }
+
+  @Override
+  public void set(Cell cell, Disk newValue) {
+<span class="fc" id="L57">    throwErrorWhenOutOfBounds(cell);</span>
+<span class="fc" id="L58">    field[cell.getColumn()][cell.getRow()] = newValue;</span>
+<span class="fc" id="L59">  }</span>
+
+  @Override
+  public Disk remove(Cell cell) {
+<span class="fc" id="L63">    throwErrorWhenOutOfBounds(cell);</span>
+<span class="fc" id="L64">    Disk disk = field[cell.getColumn()][cell.getRow()];</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (disk != null) {</span>
+<span class="fc" id="L66">      field[cell.getColumn()][cell.getRow()] = null;</span>
+<span class="fc" id="L67">      return disk;</span>
+    }
+<span class="fc" id="L69">    return null;</span>
+  }
+
+  @Override
+  public Optional&lt;Disk&gt; get(Cell cell) {
+<span class="fc" id="L74">    throwErrorWhenOutOfBounds(cell);</span>
+<span class="fc" id="L75">    Disk disk = field[cell.getColumn()][cell.getRow()];</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">    if (disk != null) {</span>
+<span class="fc" id="L77">      return Optional.of(disk);</span>
+    }
+<span class="fc" id="L79">    return Optional.empty();</span>
+  }
+
+  @Override
+  public Map&lt;Cell, Player&gt; getCellsOccupiedWithDisks() {
+<span class="fc" id="L84">    Map&lt;Cell, Player&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    for (int column = 0; column &lt; size; column++) {</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">      for (int row = 0; row &lt; size; row++) {</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (field[column][row] != null) {</span>
+<span class="fc" id="L88">          map.put(new CellImpl(column, row), field[column][row].getPlayer());</span>
+        }
+      }
+    }
+<span class="fc" id="L92">    return map;</span>
+  }
+
+  @Override
+  public Set&lt;Cell&gt; getAllCellsForPlayer(Player player) {
+<span class="fc" id="L97">    Set&lt;Cell&gt; set = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">    for (int column = 0; column &lt; size; column++) {</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">      for (int row = 0; row &lt; size; row++) {</span>
+<span class="fc bfc" id="L100" title="All 4 branches covered.">        if ((field[column][row] != null) &amp;&amp; field[column][row].getPlayer().equals(player)) {</span>
+<span class="fc" id="L101">          set.add(new CellImpl(column, row));</span>
+        }
+      }
+    }
+<span class="fc" id="L105">    return set;</span>
+  }
+
+  @Override
+  public boolean isCellOfPlayer(Player player, Cell cell) {
+<span class="fc bfc" id="L110" title="All 2 branches covered.">    if (field[cell.getColumn()][cell.getRow()] != null) {</span>
+<span class="fc" id="L111">      return field[cell.getColumn()][cell.getRow()].getPlayer().equals(player);</span>
+    } else {
+<span class="fc" id="L113">      return false;</span>
+    }
+  }
+
+  @Override
+  public boolean isWithinBounds(Cell cell) {
+<span class="fc bfc" id="L119" title="All 4 branches covered.">    return (cell.getColumn() &gt;= 0)</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        &amp;&amp; (cell.getColumn() &lt; size)</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        &amp;&amp; (cell.getRow() &gt;= 0)</span>
+<span class="fc" id="L122">        &amp;&amp; (cell.getRow() &lt; size);</span>
+  }
+
+  @Override
+  public ModifiableGameField makeCopy() {
+<span class="fc" id="L127">    GameFieldImpl newField = new GameFieldImpl(size);</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">    for (int column = 0; column &lt; size; column++) {</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">      for (int row = 0; row &lt; size; row++) {</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (field[column][row] != null) {</span>
+<span class="fc" id="L131">          newField.set(</span>
+<span class="fc" id="L132">              new CellImpl(column, row), new DiskImpl(field[column][row].getPlayer().makeCopy()));</span>
+        }
+      }
+    }
+<span class="fc" id="L136">    return newField;</span>
+  }
+
+  /**
+   * The method throwErrorWhenOutOfBounds checks if the given cell is within the game field. If the
+   * cell isn't within the game field an IllegalArgumentException is thrown.
+   */
+  private void throwErrorWhenOutOfBounds(Cell cell) {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    if (!isWithinBounds(cell)) {</span>
+<span class="fc" id="L145">      throw new IllegalArgumentException(</span>
+<span class="fc" id="L146">          &quot;The coordinates of the cell: &quot; + cell + &quot; are out of bounds&quot;);</span>
+    }
+<span class="fc" id="L148">  }</span>
+
+  @Override
+  public boolean equals(Object obj) {
+<span class="fc bfc" id="L152" title="All 2 branches covered.">    if (this == obj) {</span>
+<span class="fc" id="L153">      return true;</span>
+    }
+<span class="fc bfc" id="L155" title="All 2 branches covered.">    if (!(obj instanceof GameFieldImpl)) {</span>
+<span class="fc" id="L156">      return false;</span>
+    }
+
+<span class="fc" id="L159">    GameFieldImpl other = (GameFieldImpl) obj;</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">    if (other.size != size) {</span>
+<span class="fc" id="L161">      return false;</span>
+    }
+<span class="fc bfc" id="L163" title="All 2 branches covered.">    for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">      for (int j = 0; j &lt; size; j++) {</span>
+<span class="fc" id="L165">        Cell toCheck = new CellImpl(i, j);</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">        if (!(get(toCheck).equals(other.get(toCheck)))) {</span>
+<span class="fc" id="L167">          return false;</span>
+        }
+      }
+    }
+<span class="fc" id="L171">    return true;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="fc" id="L176">    return Arrays.deepHashCode(field);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>MultiPlayerInformationPane.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.view</a> &gt; <span class="el_source">MultiPlayerInformationPane.java</span></div><h1>MultiPlayerInformationPane.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.view;
+
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.model.PlayerImpl;
+import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+
+/**
+ * Offers a pane in which a user can enter all the necessary information to start an online game.
+ *
+ * @author Josef Feger
+ */
+public class MultiPlayerInformationPane extends BorderPane {
+
+  private static final int SPACING_HBOX = 50;
+  private static final int SPACING_VBOXES = 40;
+
+  private ResourceBundle messages;
+
+  /**
+   * Public constructor of this class, initialises the Resource Bundle used in this class for
+   * displaying predefined text.
+   *
+   * @param messages the resource bundle object for externalized strings
+   */
+<span class="nc" id="L42">  public MultiPlayerInformationPane(ResourceBundle messages) {</span>
+<span class="nc" id="L43">    this.messages = messages;</span>
+<span class="nc" id="L44">  }</span>
+
+  /**
+   * Show a pane that allow a single player to enter his/her information, such as name and preferred
+   * color for the disks.
+   *
+   * @param gameModeSelector the reference to a gameModeSelector instance
+   * @param primaryStage the stage created by the FX application to display the actual game
+   */
+  void initPane(GameModeSelector gameModeSelector, Stage primaryStage) {
+<span class="nc" id="L54">    HBox alignment = new HBox(SPACING_HBOX);</span>
+<span class="nc" id="L55">    alignment.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L57">    VBox vboxPlayer = new VBox(SPACING_VBOXES);</span>
+<span class="nc" id="L58">    vboxPlayer.setAlignment(Pos.TOP_CENTER);</span>
+<span class="nc" id="L59">    TextField textField = new TextField();</span>
+<span class="nc" id="L60">    vboxPlayer</span>
+<span class="nc" id="L61">        .getChildren()</span>
+<span class="nc" id="L62">        .add(</span>
+<span class="nc" id="L63">            PlayerCreationUtils.getInputField(</span>
+<span class="nc" id="L64">                textField, messages.getString(&quot;PlayerCreation_UsernamePrompt&quot;)));</span>
+<span class="nc" id="L65">    ColorPicker colorPicker = new ColorPicker(PlayerCreationUtils.getRandomColor());</span>
+<span class="nc" id="L66">    vboxPlayer.getChildren().add(PlayerCreationUtils.getColorPickerPane(colorPicker, messages));</span>
+<span class="nc" id="L67">    alignment.getChildren().add(vboxPlayer);</span>
+
+<span class="nc" id="L69">    alignment.getChildren().add(PlayerCreationUtils.getSeparator());</span>
+
+<span class="nc" id="L71">    VBox vboxConnection = new VBox(SPACING_VBOXES);</span>
+<span class="nc" id="L72">    vboxConnection.setAlignment(Pos.TOP_CENTER);</span>
+<span class="nc" id="L73">    TextField textFieldServer = new TextField();</span>
+<span class="nc" id="L74">    vboxConnection</span>
+<span class="nc" id="L75">        .getChildren()</span>
+<span class="nc" id="L76">        .add(</span>
+<span class="nc" id="L77">            PlayerCreationUtils.getInputField(</span>
+<span class="nc" id="L78">                textFieldServer, messages.getString(&quot;PlayerCreation_serverIPAddress&quot;)));</span>
+<span class="nc" id="L79">    TextField textFieldLobby = new TextField();</span>
+<span class="nc" id="L80">    textFieldLobby.setPromptText(messages.getString(&quot;PlayerCreation_TextFieldPrompt&quot;));</span>
+<span class="nc" id="L81">    Tooltip tooltip = new Tooltip();</span>
+<span class="nc" id="L82">    tooltip.setText(messages.getString(&quot;PlayerCreation_TooltipLobbyId&quot;));</span>
+<span class="nc" id="L83">    tooltip.setFont(Font.font(14));</span>
+<span class="nc" id="L84">    textFieldLobby.setTooltip(tooltip);</span>
+<span class="nc" id="L85">    VBox container =</span>
+<span class="nc" id="L86">        PlayerCreationUtils.getInputField(</span>
+<span class="nc" id="L87">            textFieldLobby, messages.getString(&quot;PlayerCreation_LobbyIDPrompt&quot;));</span>
+<span class="nc" id="L88">    vboxConnection.getChildren().add(container);</span>
+
+<span class="nc" id="L90">    Label alternateText = new Label();</span>
+<span class="nc" id="L91">    alternateText.setText(messages.getString(&quot;PlayerCreation_AlternateLobbyIDText&quot;));</span>
+<span class="nc" id="L92">    alternateText.setMaxWidth(300);</span>
+<span class="nc" id="L93">    alternateText.setWrapText(true);</span>
+<span class="nc" id="L94">    alternateText.setId(&quot;alternateText&quot;);</span>
+
+<span class="nc" id="L96">    alignment.getChildren().add(vboxConnection);</span>
+
+<span class="nc" id="L98">    setTop(alignment);</span>
+<span class="nc" id="L99">    BorderPane.setAlignment(alignment, Pos.CENTER);</span>
+<span class="nc" id="L100">    BorderPane.setMargin(alignment, new Insets(50));</span>
+
+<span class="nc" id="L102">    CheckBox checkbox =</span>
+<span class="nc" id="L103">        new CheckBox(messages.getString(&quot;PlayerCreation_PrivateLobbyCheckbox_Text&quot;));</span>
+<span class="nc" id="L104">    checkbox.setSelected(false);</span>
+<span class="nc" id="L105">    checkbox.setMinHeight(25);</span>
+<span class="nc" id="L106">    checkbox</span>
+<span class="nc" id="L107">        .selectedProperty()</span>
+<span class="nc" id="L108">        .addListener(</span>
+<span class="nc" id="L109">            new ChangeListener&lt;Boolean&gt;() {</span>
+              @Override
+              public void changed(
+                  ObservableValue&lt;? extends Boolean&gt; observable,
+                  Boolean oldValue,
+                  Boolean newValue) {
+<span class="nc bnc" id="L115" title="All 2 branches missed.">                if (!newValue) {</span>
+<span class="nc" id="L116">                  container.getChildren().remove(alternateText);</span>
+<span class="nc" id="L117">                  container.getChildren().add(textFieldLobby);</span>
+<span class="nc" id="L118">                } else {</span>
+<span class="nc" id="L119">                  container.getChildren().remove(textFieldLobby);</span>
+<span class="nc" id="L120">                  container.getChildren().add(alternateText);</span>
+                }
+<span class="nc" id="L122">              }</span>
+            });
+<span class="nc" id="L124">    Tooltip tooltipCheckbox = new Tooltip();</span>
+<span class="nc" id="L125">    tooltipCheckbox.setText(messages.getString(&quot;PlayerCreation_PrivateLobbyCheckbox_Tooltip&quot;));</span>
+<span class="nc" id="L126">    tooltipCheckbox.setFont(Font.font(14));</span>
+<span class="nc" id="L127">    checkbox.setTooltip(tooltipCheckbox);</span>
+<span class="nc" id="L128">    setCenter(checkbox);</span>
+<span class="nc" id="L129">    BorderPane.setAlignment(checkbox, Pos.TOP_CENTER);</span>
+<span class="nc" id="L130">    BorderPane.setMargin(checkbox, new Insets(20));</span>
+
+<span class="nc" id="L132">    HBox bottom =</span>
+<span class="nc" id="L133">        buildBottomOnline(</span>
+<span class="nc" id="L134">            textField,</span>
+<span class="nc" id="L135">            colorPicker,</span>
+<span class="nc" id="L136">            textFieldServer,</span>
+<span class="nc" id="L137">            textFieldLobby,</span>
+<span class="nc" id="L138">            checkbox,</span>
+<span class="nc" id="L139">            gameModeSelector,</span>
+<span class="nc" id="L140">            primaryStage);</span>
+<span class="nc" id="L141">    setBottom(bottom);</span>
+<span class="nc" id="L142">    BorderPane.setAlignment(bottom, Pos.CENTER);</span>
+<span class="nc" id="L143">    BorderPane.setMargin(bottom, new Insets(0, 0, 20, 0));</span>
+<span class="nc" id="L144">  }</span>
+
+  private HBox buildBottomOnline(
+      TextField playerName,
+      ColorPicker playerColor,
+      TextField serverAddress,
+      TextField lobbyNumber,
+      CheckBox checkbox,
+      GameModeSelector selector,
+      Stage primaryStage) {
+
+<span class="nc" id="L155">    HBox hbox = new HBox(30);</span>
+<span class="nc" id="L156">    hbox.setAlignment(Pos.CENTER);</span>
+
+<span class="nc" id="L158">    Button start =</span>
+<span class="nc" id="L159">        PlayerCreationUtils.getButton(messages.getString(&quot;PlayerCreation_ButtonStart_Text&quot;));</span>
+<span class="nc" id="L160">    start.setOnAction(</span>
+<span class="nc" id="L161">        e -&gt; {</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">          if (!PlayerCreationUtils.isTextFieldInputValid(playerName.getText())) {</span>
+<span class="nc" id="L163">            playerName.setStyle(</span>
+<span class="nc" id="L164">                &quot;-fx-border-color: transparent transparent rgb(255,0,0) transparent;&quot;);</span>
+<span class="nc" id="L165">            return;</span>
+          }
+
+<span class="nc bnc" id="L168" title="All 2 branches missed.">          if (!PlayerCreationUtils.isTextFieldInputValid(serverAddress.getText())) {</span>
+<span class="nc" id="L169">            serverAddress.setStyle(</span>
+<span class="nc" id="L170">                &quot;-fx-border-color: transparent transparent rgb(255,0,0) transparent;&quot;);</span>
+<span class="nc" id="L171">            return;</span>
+          }
+<span class="nc bnc" id="L173" title="All 2 branches missed.">          if (!lobbyNumber.getText().isEmpty()</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">              &amp;&amp; !lobbyNumber.getText().trim().matches(&quot;(?&lt;=\\s|^)\\d+(?=\\s|$)&quot;)) {</span>
+<span class="nc" id="L175">            lobbyNumber.setStyle(</span>
+<span class="nc" id="L176">                &quot;-fx-border-color: transparent transparent rgb(255,0,0) transparent;&quot;);</span>
+<span class="nc" id="L177">            return;</span>
+          }
+
+<span class="nc" id="L180">          int id = -1;</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">          if (!lobbyNumber.getText().isEmpty()) {</span>
+<span class="nc" id="L182">            id = Integer.parseInt(lobbyNumber.getText().trim());</span>
+          }
+
+<span class="nc" id="L185">          startMultiplayer(</span>
+<span class="nc" id="L186">              playerName.getText(),</span>
+<span class="nc" id="L187">              playerColor.getValue(),</span>
+<span class="nc" id="L188">              serverAddress.getText(),</span>
+<span class="nc" id="L189">              id,</span>
+<span class="nc" id="L190">              checkbox.isSelected(),</span>
+<span class="nc" id="L191">              primaryStage);</span>
+<span class="nc" id="L192">          selector.close();</span>
+<span class="nc" id="L193">        });</span>
+
+<span class="nc" id="L195">    serverAddress.setOnKeyPressed(</span>
+<span class="nc" id="L196">        e -&gt; {</span>
+<span class="nc bnc" id="L197" title="All 2 branches missed.">          if (e.getCode() == KeyCode.ENTER) {</span>
+<span class="nc" id="L198">            start.fire();</span>
+          }
+<span class="nc" id="L200">        });</span>
+<span class="nc" id="L201">    playerName.setOnKeyPressed(</span>
+<span class="nc" id="L202">        e -&gt; {</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">          if (e.getCode() == KeyCode.ENTER) {</span>
+<span class="nc" id="L204">            start.fire();</span>
+          }
+<span class="nc" id="L206">        });</span>
+<span class="nc" id="L207">    lobbyNumber.setOnKeyPressed(</span>
+<span class="nc" id="L208">        e -&gt; {</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">          if (e.getCode() == KeyCode.ENTER) {</span>
+<span class="nc" id="L210">            start.fire();</span>
+          }
+<span class="nc" id="L212">        });</span>
+
+<span class="nc" id="L214">    Button back =</span>
+<span class="nc" id="L215">        PlayerCreationUtils.getButton(messages.getString(&quot;PlayerCreation_ButtonBack_Text&quot;));</span>
+<span class="nc" id="L216">    back.setOnAction(e -&gt; selector.returnToMainScreen());</span>
+
+<span class="nc" id="L218">    hbox.getChildren().addAll(start, back);</span>
+
+<span class="nc" id="L220">    return hbox;</span>
+  }
+
+  private void startMultiplayer(
+      String playerName,
+      Color playerColor,
+      String serverAddress,
+      int lobbyID,
+      boolean checkbox,
+      Stage primaryStage) {
+<span class="nc" id="L230">    Player player = new PlayerImpl(playerName, playerColor);</span>
+
+<span class="nc" id="L232">    MultiplayerControllerImpl controller = new MultiplayerControllerImpl(primaryStage);</span>
+<span class="nc" id="L233">    controller.startOnlineGame(player, serverAddress, lobbyID, checkbox);</span>
+<span class="nc" id="L234">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>

@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>GameLobby.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=8;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Reversi_Tests (26.01.2020 23:25:39)</a> &gt; <a href="../../index.html" class="el_group">reversi-fddlj</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">de.lmu.ifi.sosylab.fddlj.network</a> &gt; <span class="el_source">GameLobby.java</span></div><h1>GameLobby.java</h1><pre class="source lang-java linenums">package de.lmu.ifi.sosylab.fddlj.network;
+
+import de.lmu.ifi.sosylab.fddlj.model.GameMode;
+import de.lmu.ifi.sosylab.fddlj.model.Model;
+import de.lmu.ifi.sosylab.fddlj.model.ModelImpl;
+import de.lmu.ifi.sosylab.fddlj.model.Phase;
+import de.lmu.ifi.sosylab.fddlj.model.Player;
+import de.lmu.ifi.sosylab.fddlj.network.communication.DiskPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.GameStateWithLastPlacementUuid;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement;
+import de.lmu.ifi.sosylab.fddlj.network.communication.RejectedPlacement.Reason;
+import de.lmu.ifi.sosylab.fddlj.network.communication.ServerNotification;
+import de.lmu.ifi.sosylab.fddlj.network.communication.Spectators;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+/**
+ * A GameLobby manages a game between two players on the server side. It is responsible for
+ * validating moves received from the clients.
+ *
+ * @author Leonard Ganz
+ */
+public class GameLobby {
+
+  private int lobbyID;
+  private ServerImpl server;
+  private Model masterGame;
+  private ClientConnection connOne;
+  private ClientConnection connTwo;
+  private Player playerOne;
+  private Player playerTwo;
+  private Set&lt;ClientConnection&gt; spectatorsConnections;
+  private Map&lt;Integer, Player&gt; spectatorsPlayers;
+  private boolean freshStart;
+  private UUID lastPlacementID;
+  private boolean restartRequestOne;
+  private boolean restartRequestTwo;
+
+  /**
+   * Create a new lobby for two connected players.
+   *
+   * @param lobbyID integer used to identify the game lobby
+   */
+<span class="fc" id="L49">  public GameLobby(int lobbyID, ServerImpl server) {</span>
+<span class="fc" id="L50">    this.lobbyID = lobbyID;</span>
+<span class="fc" id="L51">    this.server = server;</span>
+<span class="fc" id="L52">    spectatorsConnections = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L53">    spectatorsPlayers = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L54">    freshStart = true;</span>
+<span class="fc" id="L55">  }</span>
+
+  /**
+   * Try to perform a disk placement.
+   *
+   * @param requestedDiskPlacement disk placement that shall be performed
+   */
+  public synchronized RejectedPlacement tryDiskPlacement(DiskPlacement requestedDiskPlacement) {
+<span class="fc" id="L63">    UUID uuid = requestedDiskPlacement.getUuid();</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">    if (!Objects.equals(requestedDiskPlacement.getPrevious(), lastPlacementID)) {</span>
+<span class="nc" id="L65">      return new RejectedPlacement(uuid, Reason.INVALID_PREVIOUS_UUID);</span>
+    }
+<span class="fc" id="L67">    if (!Objects.equals(</span>
+<span class="fc" id="L68">        requestedDiskPlacement.getDisk().getPlayer(),</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        masterGame.getState().getPlayerManagement().getCurrentPlayer())) {</span>
+<span class="fc" id="L70">      return new RejectedPlacement(uuid, Reason.NOT_YOUR_TURN);</span>
+    }
+
+<span class="fc" id="L73">    boolean valid =</span>
+<span class="fc" id="L74">        masterGame.placeDisk(</span>
+<span class="fc" id="L75">            requestedDiskPlacement.getDisk(), requestedDiskPlacement.getLocation());</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">    if (valid) {</span>
+<span class="fc" id="L77">      lastPlacementID = uuid;</span>
+<span class="fc" id="L78">      broadcast(requestedDiskPlacement);</span>
+<span class="fc" id="L79">      resetRestartRequests();</span>
+<span class="fc" id="L80">      return null;</span>
+    } else {
+<span class="fc" id="L82">      return new RejectedPlacement(uuid, Reason.INVALID_PLACEMENT);</span>
+    }
+  }
+
+  /**
+   * Try to join into the lobby as a participating player.
+   *
+   * @param conn the connection trying to join
+   * @return whether joining was successful
+   */
+  public synchronized boolean joinAsPlayer(ClientConnection conn, Player player) {
+<span class="fc bfc" id="L93" title="All 2 branches covered.">    if (!needsPlayers()) {</span>
+<span class="fc" id="L94">      return false;</span>
+    }
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (connOne == null) {</span>
+<span class="fc" id="L97">      connOne = conn;</span>
+<span class="fc" id="L98">      playerOne = player;</span>
+<span class="fc" id="L99">    } else {</span>
+<span class="fc" id="L100">      connTwo = conn;</span>
+<span class="fc" id="L101">      playerTwo = player;</span>
+    }
+<span class="fc" id="L103">    conn.setLobby(this);</span>
+
+<span class="pc bpc" id="L105" title="1 of 4 branches missed.">    if ((connOne != null) &amp;&amp; (connTwo != null)) {</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">      if (freshStart) {</span>
+<span class="fc" id="L107">        handleStart();</span>
+<span class="fc" id="L108">      } else {</span>
+<span class="fc" id="L109">        handleResume();</span>
+      }
+    }
+<span class="fc" id="L112">    publishLobbyUpdate();</span>
+<span class="fc" id="L113">    return true;</span>
+  }
+
+  private void handleStart() {
+<span class="fc" id="L117">    lastPlacementID = null;</span>
+<span class="fc" id="L118">    masterGame = new ModelImpl(GameMode.HOTSEAT, playerOne, playerTwo);</span>
+<span class="fc" id="L119">    freshStart = false;</span>
+<span class="fc" id="L120">    broadcast(getGameStateWithLastPlacementUuid());</span>
+<span class="fc" id="L121">  }</span>
+
+  private void handleResume() {
+<span class="fc" id="L124">    lastPlacementID = null;</span>
+<span class="fc" id="L125">    masterGame.substitutePlayersWith(playerOne, playerTwo);</span>
+<span class="fc" id="L126">    masterGame.unsetWaiting();</span>
+<span class="fc" id="L127">    resetRestartRequests();</span>
+<span class="fc" id="L128">    broadcast(getGameStateWithLastPlacementUuid());</span>
+<span class="fc" id="L129">  }</span>
+
+  /**
+   * Try to join into the lobby as a spectating player.
+   *
+   * @param conn the connection trying to join
+   */
+  public synchronized void joinAsSpectator(ClientConnection conn, Player player) {
+<span class="fc" id="L137">    spectatorsConnections.add(conn);</span>
+<span class="fc" id="L138">    spectatorsPlayers.put(conn.getConnectionID(), player);</span>
+<span class="fc" id="L139">    broadcast(getSpectators());</span>
+<span class="fc" id="L140">    conn.setLobby(this);</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">    if (masterGame != null) {</span>
+<span class="fc" id="L142">      conn.sendMessageWith(getGameStateWithLastPlacementUuid());</span>
+    }
+<span class="fc" id="L144">  }</span>
+
+  /**
+   * Called to signal that a client has left the lobby. If both participating players have left, the
+   * lobby will be closed. Else another player can join. If leaving player was spectating the game
+   * will also continue.
+   *
+   * @param connectionID integer id used to reference the leaving client connection
+   */
+  public synchronized void leave(int connectionID) {
+<span class="fc" id="L154">    ClientConnection leavingConn = server.getConnection(connectionID);</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">    if (leavingConn == null) {</span>
+<span class="nc" id="L156">      return;</span>
+    } else {
+<span class="fc" id="L158">      leavingConn.setLobby(null);</span>
+    }
+
+<span class="fc bfc" id="L161" title="All 4 branches covered.">    if ((connOne != null) &amp;&amp; (connOne.getConnectionID() == connectionID)) {</span>
+<span class="fc" id="L162">      connOne = null;</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">      if (server.isRunning()) { // reduce spam on server shutdown</span>
+<span class="fc" id="L164">        broadcast(ServerNotification.PLAYER_ONE_LEFT);</span>
+      }
+<span class="pc bpc" id="L166" title="1 of 4 branches missed.">    } else if ((connTwo != null) &amp;&amp; (connTwo.getConnectionID() == connectionID)) {</span>
+<span class="fc" id="L167">      connTwo = null;</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">      if (server.isRunning()) { // reduce spam on server shutdown</span>
+<span class="nc" id="L169">        broadcast(ServerNotification.PLAYER_TWO_LEFT);</span>
+      }
+<span class="nc" id="L171">    } else {</span>
+<span class="fc" id="L172">      spectatorsConnections.remove(server.getConnection(connectionID));</span>
+<span class="fc" id="L173">      spectatorsPlayers.remove(connectionID);</span>
+<span class="fc" id="L174">      broadcast(getSpectators());</span>
+<span class="fc" id="L175">      return;</span>
+    }
+
+    // only reached if leaving connection was conn 1 or conn 2
+<span class="fc bfc" id="L179" title="All 2 branches covered.">    if (masterGame != null) {</span>
+<span class="fc" id="L180">      masterGame.setWaiting();</span>
+    }
+<span class="fc" id="L182">    publishLobbyUpdate();</span>
+<span class="fc" id="L183">    resetRestartRequests();</span>
+
+<span class="fc bfc" id="L185" title="All 4 branches covered.">    if ((connOne == null) &amp;&amp; (connTwo == null)) {</span>
+<span class="fc" id="L186">      closeLobby();</span>
+    }
+<span class="fc" id="L188">  }</span>
+
+  /**
+   * Whether the lobby needs more players for the game to run.
+   *
+   * @return whether players are needed
+   */
+  public synchronized boolean needsPlayers() {
+<span class="fc bfc" id="L196" title="All 4 branches covered.">    return (connOne == null) || (connTwo == null);</span>
+  }
+
+  /**
+   * Request a restart of the game. The partner has to accept the request before the restart will
+   * take place. If a placement is made before the partner accepts, the request is canceled as the
+   * game situation has changed.
+   *
+   * @param connectionID integer to reference the connection making the request
+   */
+  public synchronized void requestRestart(int connectionID) {
+<span class="nc bnc" id="L207" title="All 4 branches missed.">    if ((connOne != null) &amp;&amp; (connOne.getConnectionID() == connectionID)) {</span>
+<span class="nc" id="L208">      restartRequestOne = true;</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">      if (connTwo != null) {</span>
+<span class="nc" id="L210">        connTwo.sendMessageWith(ServerNotification.PARTNER_REQUESTED_RESTART);</span>
+      }
+<span class="nc bnc" id="L212" title="All 4 branches missed.">    } else if ((connTwo != null) &amp;&amp; (connTwo.getConnectionID() == connectionID)) {</span>
+<span class="nc" id="L213">      restartRequestTwo = true;</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">      if (connOne != null) {</span>
+<span class="nc" id="L215">        connOne.sendMessageWith(ServerNotification.PARTNER_REQUESTED_RESTART);</span>
+      }
+    }
+<span class="nc" id="L218">  }</span>
+
+  /**
+   * Accept the partner's request of restarting the game. Has no effect if no request has been made
+   * by the partner.
+   *
+   * @param connectionID integer to reference the connection accepting the request
+   */
+  public synchronized void acceptRestart(int connectionID) {
+<span class="nc bnc" id="L227" title="All 6 branches missed.">    if ((connOne != null) &amp;&amp; (connOne.getConnectionID() == connectionID) &amp;&amp; restartRequestTwo) {</span>
+<span class="nc" id="L228">      connTwo.sendMessageWith(ServerNotification.PARTNER_ACCEPTED_RESTART);</span>
+<span class="nc" id="L229">      restartRequestOne = true; // needed for not firing &quot;partner denied&quot; when resetting</span>
+<span class="nc" id="L230">      restartGame();</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">    } else if ((connTwo != null)</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        &amp;&amp; (connTwo.getConnectionID() == connectionID)</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        &amp;&amp; restartRequestOne) {</span>
+<span class="nc" id="L234">      connOne.sendMessageWith(ServerNotification.PARTNER_ACCEPTED_RESTART);</span>
+<span class="nc" id="L235">      restartRequestTwo = true; // needed for not firing &quot;partner denied&quot; when resetting</span>
+<span class="nc" id="L236">      restartGame();</span>
+    }
+<span class="nc" id="L238">  }</span>
+
+  /**
+   * Deny the partner's request of restarting the game. Has no effect if no request has been made by
+   * the partner.
+   *
+   * @param connectionID integer to reference the connection denying the request
+   */
+  public synchronized void denyRestart(int connectionID) {
+<span class="nc bnc" id="L247" title="All 6 branches missed.">    if ((((connOne != null) &amp;&amp; (connOne.getConnectionID() == connectionID)) &amp;&amp; restartRequestTwo)</span>
+<span class="nc bnc" id="L248" title="All 4 branches missed.">        || (((connTwo != null) &amp;&amp; (connTwo.getConnectionID() == connectionID))</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">            &amp;&amp; restartRequestOne)) {</span>
+<span class="nc" id="L250">      resetRestartRequests();</span>
+    }
+<span class="nc" id="L252">  }</span>
+
+  /**
+   * Get a {@link GameStateWithLastPlacementUuid}.
+   *
+   * @return the GameStateWithLastPlacementUuid with current game data
+   */
+  public synchronized GameStateWithLastPlacementUuid getGameStateWithLastPlacementUuid() {
+<span class="fc" id="L260">    return new GameStateWithLastPlacementUuid(masterGame.getState(), lastPlacementID);</span>
+  }
+
+  private void restartGame() {
+<span class="nc" id="L264">    freshStart = true;</span>
+<span class="nc" id="L265">    resetRestartRequests();</span>
+<span class="nc" id="L266">    broadcast(ServerNotification.RESTARTING);</span>
+<span class="nc" id="L267">    handleStart();</span>
+<span class="nc" id="L268">  }</span>
+
+  private void resetRestartRequests() {
+    // if both were true, reset has been accepted
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">    if (restartRequestOne ^ restartRequestTwo) {</span>
+<span class="nc bnc" id="L273" title="All 4 branches missed.">      if (restartRequestOne &amp;&amp; (connTwo != null)) {</span>
+<span class="nc" id="L274">        connTwo.sendMessageWith(ServerNotification.PARTNER_DENIED_RESTART);</span>
+<span class="nc bnc" id="L275" title="All 4 branches missed.">      } else if (restartRequestTwo &amp;&amp; (connOne != null)) {</span>
+<span class="nc" id="L276">        connOne.sendMessageWith(ServerNotification.PARTNER_DENIED_RESTART);</span>
+      }
+    }
+
+<span class="fc" id="L280">    restartRequestOne = false;</span>
+<span class="fc" id="L281">    restartRequestTwo = false;</span>
+<span class="fc" id="L282">  }</span>
+
+  /**
+   * Get the id of the game lobby.
+   *
+   * @return an integer id
+   */
+  public int getLobbyID() {
+<span class="fc" id="L290">    return lobbyID;</span>
+  }
+
+  /**
+   * Is the game of this lobby running.
+   *
+   * @return whether the game is in phase running
+   */
+  public boolean isGameRunning() {
+<span class="pc bpc" id="L299" title="1 of 2 branches missed.">    return masterGame.getState().getCurrentPhase() == Phase.RUNNING;</span>
+  }
+
+  /**
+   * Get a {@link LobbyRepresentation} for the current state of this lobby.
+   *
+   * @return a representation of this lobby containing public information
+   */
+  public synchronized LobbyRepresentation getRepresentation() {
+<span class="fc" id="L308">    Phase phase = Phase.WAITING;</span>
+<span class="fc bfc" id="L309" title="All 2 branches covered.">    if (masterGame != null) {</span>
+<span class="fc" id="L310">      phase = masterGame.getState().getCurrentPhase();</span>
+    }
+<span class="fc" id="L312">    return new LobbyRepresentation(lobbyID, playerOne, playerTwo, phase);</span>
+  }
+
+  private void broadcast(Object objectToBrodcast) {
+<span class="fc" id="L316">    Stream.concat(Stream.of(connOne, connTwo), spectatorsConnections.stream())</span>
+<span class="fc" id="L317">        .filter(Objects::nonNull)</span>
+<span class="fc" id="L318">        .forEach(conn -&gt; conn.sendMessageWith(objectToBrodcast));</span>
+<span class="fc" id="L319">  }</span>
+
+  private Spectators getSpectators() {
+<span class="fc" id="L322">    return new Spectators(lobbyID, spectatorsPlayers.values());</span>
+  }
+
+  private void closeLobby() {
+<span class="pc bpc" id="L326" title="1 of 2 branches missed.">    if (server.isRunning()) { // reduce spam on server shutdown</span>
+<span class="nc" id="L327">      broadcast(ServerNotification.LOBBY_CLOSED);</span>
+    }
+<span class="fc" id="L329">    server.lobbyClosed(lobbyID);</span>
+<span class="fc" id="L330">  }</span>
+
+  private void publishLobbyUpdate() {
+<span class="fc" id="L333">    server.lobbyUpdated(lobbyID);</span>
+<span class="fc" id="L334">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span>Reversi_Tests (26.01.2020 23:25:39)</div></body></html>
